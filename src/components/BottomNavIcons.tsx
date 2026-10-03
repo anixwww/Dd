@@ -181,3 +181,88 @@ export const NavMoreIcon: React.FC<NavIconProps> = ({ active, className = 'w-5 h
     </span>
   );
 };
+
+/**
+ * 4. Часові досягнення — Астролябія / Хронометр свободи (в стилі Головна, СОС, Ще)
+ */
+export const NavTimeAchievementIcon: React.FC<NavIconProps> = ({ active, className = 'w-5 h-5' }) => {
+  return (
+    <span className={`inline-flex items-center justify-center relative ${className}`}>
+      <svg
+        viewBox="0 0 24 24"
+        className={`w-full h-full overflow-visible transition-all duration-300 ${active ? 'scale-110' : 'opacity-85'}`}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={active ? 2 : 1.7}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        {/* Top Winder & Loop (Astrolabe / Pocket Chronometer Crown) */}
+        <path
+          d="M 9.5,2.2 C 9.5,1 14.5,1 14.5,2.2 M 12,2.2 L 12,4"
+          className={active ? 'stroke-amber-300' : 'stroke-current'}
+          strokeWidth="1.4"
+        />
+        <rect
+          x="10"
+          y="2.5"
+          width="4"
+          height="2"
+          rx="0.5"
+          className={active ? 'stroke-amber-300 fill-zinc-950' : 'stroke-current fill-current/10'}
+          strokeWidth="1.2"
+        />
+
+        {/* Main Outer Chronometer Dial */}
+        <circle
+          cx="12"
+          cy="13"
+          r="8.5"
+          className={active ? 'stroke-amber-400 fill-amber-500/10' : 'stroke-current fill-current/5'}
+          strokeWidth="1.8"
+        />
+
+        {/* 4 Cardinal Ticks / Astrolabe Points */}
+        <line x1="12" y1="5.5" x2="12" y2="7.5" className={active ? 'stroke-amber-300' : 'stroke-current'} strokeWidth="1.2" />
+        <line x1="12" y1="18.5" x2="12" y2="20.5" className={active ? 'stroke-amber-300' : 'stroke-current'} strokeWidth="1.2" />
+        <line x1="4.5" y1="13" x2="6.5" y2="13" className={active ? 'stroke-amber-300' : 'stroke-current'} strokeWidth="1.2" />
+        <line x1="17.5" y1="13" x2="19.5" y2="13" className={active ? 'stroke-amber-300' : 'stroke-current'} strokeWidth="1.2" />
+
+        {/* Victory Clock Hands (pointing to 10:10) */}
+        <line
+          x1="12"
+          y1="13"
+          x2="8.8"
+          y2="9.8"
+          className={active ? 'stroke-amber-200' : 'stroke-current'}
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        />
+        <line
+          x1="12"
+          y1="13"
+          x2="15.8"
+          y2="10.8"
+          className={active ? 'stroke-amber-300' : 'stroke-current'}
+          strokeWidth="1.4"
+          strokeLinecap="round"
+        />
+
+        {/* Center Jewel Pivot */}
+        <circle
+          cx="12"
+          cy="13"
+          r="1.8"
+          className={active ? 'stroke-amber-200 fill-zinc-950' : 'stroke-current fill-zinc-950'}
+          strokeWidth="1.2"
+        />
+
+        {/* Inner Diamond / Star of Freedom at 12 o'clock */}
+        <polygon
+          points="12,8 12.6,9.2 13.8,9.5 12.8,10.3 13.2,11.5 12,10.8 10.8,11.5 11.2,10.3 10.2,9.5 11.4,9.2"
+          className={active ? 'fill-amber-300 stroke-none' : 'fill-current/30 stroke-none'}
+        />
+      </svg>
+    </span>
+  );
+};

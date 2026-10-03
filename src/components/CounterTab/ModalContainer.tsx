@@ -197,13 +197,16 @@ export const ModalContainer = React.memo(({
   React.useEffect(() => {
     const handleOpenSystems = () => setIsSystemsModalOpen(true);
     const handleOpenWho = () => setIsWhoMilestonesModalOpen(true);
+    const handleOpenGoal = () => setIsGoalModalOpen(true);
 
     window.addEventListener('open-systems-recovery-modal', handleOpenSystems);
     window.addEventListener('open-who-milestones-modal', handleOpenWho);
+    window.addEventListener('open-goal-modal', handleOpenGoal);
 
     return () => {
       window.removeEventListener('open-systems-recovery-modal', handleOpenSystems);
       window.removeEventListener('open-who-milestones-modal', handleOpenWho);
+      window.removeEventListener('open-goal-modal', handleOpenGoal);
     };
   }, []);
 

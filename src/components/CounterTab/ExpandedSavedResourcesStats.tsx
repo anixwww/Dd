@@ -179,22 +179,25 @@ export const ExpandedSavedResourcesStats: React.FC<ExpandedSavedResourcesStatsPr
     };
   }, [selectedHorizon, costPerDay, perDay, packSize, minutesPerCig]);
 
+  const safeCigsAvoided = isNaN(Number(cigsAvoided)) ? 0 : Math.max(0, Number(cigsAvoided));
+  const safeTotalSaved = isNaN(Number(totalSaved)) ? 0 : Math.max(0, Number(totalSaved));
+
   // Toxicology & Biological Protection Metrics
-  const tarGrams = (cigsAvoided * 0.01).toFixed(1);
-  const coLiters = (cigsAvoided * 0.018).toFixed(1);
-  const heartBeatsSaved = Math.round(cigsAvoided * 15 * 12);
-  const nicotineMilligrams = (cigsAvoided * 1.2).toFixed(1);
-  const treesSaved = (cigsAvoided / 300).toFixed(1);
+  const tarGrams = (safeCigsAvoided * 0.01).toFixed(1);
+  const coLiters = (safeCigsAvoided * 0.018).toFixed(1);
+  const heartBeatsSaved = Math.round(safeCigsAvoided * 15 * 12);
+  const nicotineMilligrams = (safeCigsAvoided * 1.2).toFixed(1);
+  const treesSaved = (safeCigsAvoided / 300).toFixed(1);
 
   // Tangible Reward Equivalents calculated dynamically with custom prices
-  const coffeeCups = Math.floor(totalSaved / (prices.coffee || 65));
-  const booksCount = Math.floor(totalSaved / (prices.book || 350));
-  const cinemaTickets = Math.floor(totalSaved / (prices.cinema || 250));
-  const pizzaNights = Math.floor(totalSaved / (prices.pizza || 420));
+  const coffeeCups = Math.floor(safeTotalSaved / (prices.coffee || 65));
+  const booksCount = Math.floor(safeTotalSaved / (prices.book || 350));
+  const cinemaTickets = Math.floor(safeTotalSaved / (prices.cinema || 250));
+  const pizzaNights = Math.floor(safeTotalSaved / (prices.pizza || 420));
 
   // Goals spending and available funds
   const spentOnGoals = (goals?.base || 0) + (goals?.done?.reduce((acc, g) => acc + (g.amount || g.total || 0), 0) || 0);
-  const availableForGoals = Math.max(0, totalSaved - spentOnGoals);
+  const availableForGoals = Math.max(0, safeTotalSaved - spentOnGoals);
 
   return (
     <div className="mt-3 pt-3 border-t border-zinc-800 space-y-3 font-sans select-none animate-fadeIn text-left">

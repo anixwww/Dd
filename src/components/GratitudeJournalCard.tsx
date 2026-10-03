@@ -203,19 +203,21 @@ export const GratitudeJournalCard: React.FC<GratitudeJournalCardProps> = ({
             </h3>
           </div>
 
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDockChange?.(true);
-              }}
-              className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center p-1.5 -mr-1 -my-1 text-slate-400 hover:text-amber-600 dark:hover:text-amber-300 cursor-pointer rounded-xl hover:bg-amber-500/15 active:bg-amber-500/25 active:scale-90 transition-all"
-              title="Закріпити у плаваючий острівець"
-            >
-              <Pin className="w-4 h-4" />
-            </button>
-          </div>
+          {onDockChange && (
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDockChange(true);
+                }}
+                className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center p-1.5 -mr-1 -my-1 text-slate-400 hover:text-amber-600 dark:hover:text-amber-300 cursor-pointer rounded-xl hover:bg-amber-500/15 active:bg-amber-500/25 active:scale-90 transition-all"
+                title="Закріпити у плаваючий острівець"
+              >
+                <Pin className="w-4 h-4" />
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Content & Progress Bar */}

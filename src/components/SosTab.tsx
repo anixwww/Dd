@@ -851,7 +851,7 @@ export const SosTab: React.FC<SosTabProps> = React.memo(({
                 onClick={() => setMode('menu')}
                 className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 rounded-2xl font-bold text-xs cursor-pointer transition-colors"
               >
-                Зрозуміло, виконати
+                Зрозуміло
               </button>
             </div>
           )}
@@ -1008,18 +1008,6 @@ export const SosTab: React.FC<SosTabProps> = React.memo(({
           })}
         </div>
       )}
-
-      {/* 6. КНОПКА «НАЗАД» ДЛЯ ПОВЕРНЕННЯ У ВКЛАДКУ SOS */}
-      <div className="pt-2 flex flex-col">
-        <button
-          type="button"
-          onClick={() => setMode('menu')}
-          className="w-full py-3.5 px-4 bg-zinc-800 hover:bg-zinc-700 dark:bg-zinc-800/90 dark:hover:bg-zinc-700 border border-zinc-700/60 dark:border-zinc-700/80 text-white rounded-2xl font-bold text-xs shadow-sm transition-all flex items-center justify-center gap-2 active:scale-[0.98] cursor-pointer"
-        >
-          <ChevronLeft className="w-4 h-4" />
-          <span>Назад</span>
-        </button>
-      </div>
     </div>
   );
 });

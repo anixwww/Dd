@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Zap, Timer, Gift, CheckCircle2, Plus, X, Trophy, Sparkles, Clock, RotateCcw, Coffee, Smile, Minimize2, Maximize2, Pin } from 'lucide-react';
+import { RefractedPrismLightningIcon } from './CounterTab/RefractedStatusIcons';
 
 interface QuickGoal {
   id: string;
@@ -157,11 +159,12 @@ export const QuickGoalCard: React.FC<QuickGoalCardProps> = ({ accent = 'amber', 
   let progressPct = 0;
 
   if (quickGoal) {
-    timeLeftMs = Math.max(0, quickGoal.targetTime - now);
-    isReached = now >= quickGoal.targetTime;
-    const totalDuration = quickGoal.targetTime - quickGoal.createdAt;
-    const elapsed = now - quickGoal.createdAt;
-    progressPct = totalDuration > 0 ? Math.min(100, Math.max(0, (elapsed / totalDuration) * 100)) : 100;
+    timeLeftMs = Math.max(0, (quickGoal.targetTime || 0) - now);
+    isReached = now >= (quickGoal.targetTime || 0);
+    const totalDuration = (quickGoal.targetTime || 0) - (quickGoal.createdAt || 0);
+    const elapsed = now - (quickGoal.createdAt || 0);
+    const rawPct = totalDuration > 0 ? Math.min(100, Math.max(0, (elapsed / totalDuration) * 100)) : 100;
+    progressPct = isNaN(rawPct) ? 0 : rawPct;
   }
 
   const formatTimeLeft = (ms: number) => {
@@ -191,10 +194,10 @@ export const QuickGoalCard: React.FC<QuickGoalCardProps> = ({ accent = 'amber', 
         !quickGoal ? (
           <div
             onClick={() => setIsModalOpen(true)}
-            className="w-full py-1.5 px-2.5 bg-gradient-to-r from-fuchsia-500/15 via-purple-500/10 to-pink-500/15 dark:from-fuchsia-950/40 dark:via-purple-950/30 dark:to-pink-950/40 border border-fuchsia-400/40 dark:border-fuchsia-500/30 rounded-xl hover:border-fuchsia-500/60 transition-all active:scale-[0.99] text-left relative overflow-hidden flex items-center justify-between gap-2 cursor-pointer shadow-2xs"
+            className="w-full py-1.5 px-2.5 bg-gradient-to-r from-amber-500/15 via-yellow-500/10 to-orange-500/15 dark:from-amber-950/40 dark:via-yellow-950/30 dark:to-orange-950/40 border border-amber-400/40 dark:border-amber-500/30 rounded-xl hover:border-amber-500/60 transition-all active:scale-[0.99] text-left relative overflow-hidden flex items-center justify-between gap-2 cursor-pointer shadow-2xs"
           >
-            <div className="flex items-center gap-1.5 relative z-10 text-[11px] font-semibold text-fuchsia-700 dark:text-fuchsia-300">
-              <Gift className="w-3.5 h-3.5 text-fuchsia-500 shrink-0" />
+            <div className="flex items-center gap-2 relative z-10 text-[11px] font-semibold text-amber-700 dark:text-amber-300">
+              <RefractedPrismLightningIcon className="w-4 h-4 shrink-0" />
               <span>Швидка ціль: Натисніть, щоб задати ✨</span>
             </div>
             <div className="flex items-center gap-1 shrink-0 relative z-10">
@@ -318,23 +321,23 @@ export const QuickGoalCard: React.FC<QuickGoalCardProps> = ({ accent = 'amber', 
         ) : (
           <div
             onClick={() => setIsModalOpen(true)}
-            className="w-full py-1.5 px-2.5 bg-gradient-to-r from-fuchsia-500/15 via-purple-500/10 to-pink-500/15 dark:from-fuchsia-950/40 dark:via-purple-950/30 dark:to-pink-950/40 border border-fuchsia-400/40 dark:border-fuchsia-500/30 rounded-xl hover:border-fuchsia-500/60 transition-all active:scale-[0.99] text-left relative overflow-hidden flex items-center justify-between gap-2 cursor-pointer shadow-2xs"
+            className="w-full py-1.5 px-2.5 bg-gradient-to-r from-amber-500/15 via-yellow-500/10 to-orange-500/15 dark:from-amber-950/40 dark:via-yellow-950/30 dark:to-orange-950/40 border border-amber-400/40 dark:border-amber-500/30 rounded-xl hover:border-amber-500/60 transition-all active:scale-[0.99] text-left relative overflow-hidden flex items-center justify-between gap-2 cursor-pointer shadow-2xs"
           >
-            <div className="flex items-center gap-1.5 min-w-0 flex-1 relative z-10">
-              <Gift className="w-3.5 h-3.5 text-fuchsia-500 shrink-0" />
+            <div className="flex items-center gap-2 min-w-0 flex-1 relative z-10">
+              <RefractedPrismLightningIcon className="w-4 h-4 shrink-0" />
               <span className="text-[11px] font-bold text-slate-800 dark:text-[#f4f4f5] truncate">
                 {quickGoal.title}
               </span>
               <div className="w-12 h-1 bg-slate-200/80 dark:bg-zinc-800 rounded-full overflow-hidden shrink-0">
                 <div
-                  className="h-full bg-gradient-to-r from-fuchsia-500 to-pink-500 transition-all duration-1000"
+                  className="h-full bg-gradient-to-r from-amber-500 to-yellow-400 transition-all duration-1000"
                   style={{ width: `${progressPct}%` }}
                 />
               </div>
             </div>
 
             <div className="flex items-center gap-1 shrink-0 relative z-10 font-mono text-[10px] font-bold">
-              <span className="text-fuchsia-600 dark:text-fuchsia-300">{formatTimeLeft(timeLeftMs)}</span>
+              <span className="text-amber-600 dark:text-amber-300">{formatTimeLeft(timeLeftMs)}</span>
               <button
                 type="button"
                 onClick={(e) => {
@@ -367,19 +370,19 @@ export const QuickGoalCard: React.FC<QuickGoalCardProps> = ({ accent = 'amber', 
       ) : (
         /* FULL CARD VIEW */
         <div
-          className="p-3.5 bg-gradient-to-r from-fuchsia-500/15 via-purple-500/10 to-pink-500/15 dark:from-fuchsia-950/40 dark:via-purple-950/30 dark:to-pink-950/40 border border-fuchsia-400/40 dark:border-fuchsia-500/30 rounded-2xl shadow-2xs relative overflow-hidden transition-all cursor-pointer hover:border-fuchsia-500/60 hover:scale-[1.01] active:scale-[0.99]"
+          className="p-3.5 bg-gradient-to-r from-amber-500/15 via-yellow-500/10 to-orange-500/15 dark:from-amber-950/40 dark:via-yellow-950/30 dark:to-orange-950/40 border border-amber-400/40 dark:border-amber-500/30 rounded-2xl shadow-2xs relative overflow-hidden transition-all cursor-pointer hover:border-amber-500/60 hover:scale-[1.01] active:scale-[0.99]"
           onClick={() => setIsModalOpen(true)}
         >
           {/* Card Header */}
           <div className="flex items-center justify-between mb-1.5 relative z-10">
-            <div className="flex items-center gap-1.5">
-              <div className="p-1.5 rounded-lg bg-gradient-to-br from-fuchsia-500 to-pink-500 text-white shadow-xs">
-                <Gift className="w-3.5 h-3.5 fill-white/20" />
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 rounded-lg bg-amber-500/20 border border-amber-500/30 text-amber-300 shadow-xs flex items-center justify-center">
+                <RefractedPrismLightningIcon className="w-4 h-4 shrink-0" />
               </div>
               <div>
                 <h3 className="text-[11px] font-bold uppercase tracking-wider text-slate-800 dark:text-[#f4f4f5] flex items-center gap-1.5">
                   <span>Швидка ціль</span>
-                  <span className="text-[9px] font-semibold lowercase bg-fuchsia-500/20 dark:bg-fuchsia-500/30 text-fuchsia-700 dark:text-fuchsia-300 px-1.5 py-0.2 rounded-full border border-fuchsia-400/30">
+                  <span className="text-[9px] font-semibold lowercase bg-amber-500/20 dark:bg-amber-500/30 text-amber-700 dark:text-amber-300 px-1.5 py-0.2 rounded-full border border-amber-400/30">
                     до 24 год
                   </span>
                 </h3>
@@ -498,10 +501,10 @@ export const QuickGoalCard: React.FC<QuickGoalCardProps> = ({ accent = 'amber', 
         </div>
       )}
 
-      {/* CREATE / VIEW QUICK GOAL MODAL */}
-      {isModalOpen && (
+      {/* CREATE / VIEW QUICK GOAL MODAL (Rendered at root level via createPortal) */}
+      {isModalOpen && typeof document !== 'undefined' && createPortal(
         <div 
-          className="fixed inset-0 z-[120] flex items-center justify-center bg-black/75 backdrop-blur-md transition-opacity duration-300 animate-fadeIn p-4"
+          className="fixed inset-0 z-[600] flex items-center justify-center bg-black/80 backdrop-blur-md transition-opacity duration-300 animate-fadeIn p-4"
           onClick={() => setIsModalOpen(false)}
         >
           <div 
@@ -510,8 +513,8 @@ export const QuickGoalCard: React.FC<QuickGoalCardProps> = ({ accent = 'amber', 
           >
             <div className="flex items-center justify-between pb-3 mb-3 border-b border-white/10 shrink-0">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-white/10 border border-white/10 text-white flex items-center justify-center shrink-0">
-                  <Gift className="w-4 h-4 text-fuchsia-400" />
+                <div className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 flex items-center justify-center shrink-0 shadow-inner">
+                  <RefractedPrismLightningIcon className="w-5 h-5 shrink-0" />
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-white tracking-wide">
@@ -522,13 +525,38 @@ export const QuickGoalCard: React.FC<QuickGoalCardProps> = ({ accent = 'amber', 
                   </p>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() => setIsModalOpen(false)}
-                className="p-1.5 rounded-xl text-zinc-400 hover:text-white hover:bg-white/10 cursor-pointer transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
+
+              <div className="flex items-center gap-2">
+                {/* Pin / Dock button on the modal window */}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const nextDocked = !isDocked;
+                    try {
+                      localStorage.setItem('quit-smoking:quick-goal-docked', String(nextDocked));
+                      window.dispatchEvent(new Event('quick-goal-docked-change'));
+                      window.dispatchEvent(new Event('storage'));
+                    } catch {}
+                  }}
+                  className={`px-2.5 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                    isDocked 
+                      ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-xs' 
+                      : 'bg-zinc-800/80 text-zinc-400 hover:text-white border-zinc-700/60'
+                  }`}
+                  title={isDocked ? "Закріплено в індикаторах (клік, щоб відкріпити)" : "Закріпити в індикатори вгорі"}
+                >
+                  <Pin className={`w-3.5 h-3.5 ${isDocked ? 'fill-amber-300 text-amber-300' : ''}`} />
+                  <span>{isDocked ? 'Закріплено' : 'Закріпити'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="p-1.5 rounded-xl text-zinc-400 hover:text-white hover:bg-white/10 cursor-pointer transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
             </div>
 
             <div className="overflow-y-auto flex-1 pr-1">
@@ -685,7 +713,7 @@ export const QuickGoalCard: React.FC<QuickGoalCardProps> = ({ accent = 'amber', 
                         handleStartGoal(customTitle, selectedDurationHours * 3600 * 1000);
                       }
                     }}
-                    className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs cursor-pointer transition-all shadow-md active:scale-95"
+                    className="w-full py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-zinc-950 font-extrabold rounded-xl text-xs cursor-pointer transition-all shadow-md active:scale-95"
                   >
                     Запустити швидку ціль ⚡
                   </button>
@@ -693,7 +721,8 @@ export const QuickGoalCard: React.FC<QuickGoalCardProps> = ({ accent = 'amber', 
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

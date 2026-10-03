@@ -12,6 +12,7 @@ import {
   CompletedGoal,
 } from './types';
 import { CounterTab } from './components/CounterTab';
+
 const StarMeditationModal = React.lazy(() => import('./components/StarMeditationModal').then(m => ({ default: m.StarMeditationModal })));
 const SetupModal = React.lazy(() => import('./components/Modals').then(m => ({ default: m.SetupModal })));
 const RelapseModal = React.lazy(() => import('./components/Modals').then(m => ({ default: m.RelapseModal })));
@@ -25,7 +26,6 @@ const SosOverlayModal = React.lazy(() => import('./components/SosOverlayModal').
 import { MiniResourceBar } from './components/MiniResourceBar';
 import { LivingCosmicRingVisual } from './components/LivingCosmicRingVisual';
 import { HourlyAchievementModal } from './components/HourlyAchievementModal';
-import { CurrentAchievementBadge } from './components/CurrentAchievementBadge';
 
 // Heavy Background Animations Lazy Imports
 const StardustBackground = React.lazy(() => 
@@ -46,7 +46,7 @@ const SummerBreezeBackground = React.lazy(() =>
 
 // Heavy Secondary Tab Views Lazy Imports
 const HealthTab = React.lazy(() => 
-  import('./components/HealthTab').then(m => ({ default: m.HealthTab }))
+  import('./components/HealthTab/index').then(m => ({ default: m.HealthTab }))
 );
 const StateSurveyTab = React.lazy(() => 
   import('./components/StateSurveyTab').then(m => ({ default: m.StateSurveyTab }))
@@ -125,9 +125,9 @@ function AppContent() {
   });
   const [appTheme, setAppTheme] = React.useState<string>(() => {
     try {
-      return localStorage.getItem(STORAGE_KEYS.APP_THEME) || 'standard';
+      return localStorage.getItem(STORAGE_KEYS.APP_THEME) || 'standard-static';
     } catch {
-      return 'standard';
+      return 'standard-static';
     }
   });
 
@@ -135,7 +135,9 @@ function AppContent() {
   const [startDate, setStartDate] = React.useState<number>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.START);
-      return saved ? Number(saved) : Date.now();
+      if (!saved) return Date.now();
+      const num = Number(saved);
+      return !isNaN(num) && num > 0 ? num : Date.now();
     } catch {
       return Date.now();
     }
@@ -584,9 +586,25 @@ function AppContent() {
 
     window.addEventListener('change-tab', handleTabChange);
     window.addEventListener('open-sos-timer-modal', handleOpenSosTimer);
+
+    const handleOpenSectionOverlay = (e: any) => {
+      const secKey = e?.detail;
+      if (secKey) {
+        if (['counter', 'health', 'state', 'tree', 'sand', 'orbit', 'bowls', 'sprout', 'sos', 'more'].includes(secKey)) {
+          setActiveTab(secKey as TabType);
+        } else {
+          setActiveOverlaySection(secKey);
+        }
+      }
+    };
+    window.addEventListener('open-section-overlay', handleOpenSectionOverlay);
+    window.addEventListener('open-overlay-section', handleOpenSectionOverlay);
+
     return () => {
       window.removeEventListener('change-tab', handleTabChange);
       window.removeEventListener('open-sos-timer-modal', handleOpenSosTimer);
+      window.removeEventListener('open-section-overlay', handleOpenSectionOverlay);
+      window.removeEventListener('open-overlay-section', handleOpenSectionOverlay);
     };
   }, []);
 
@@ -626,7 +644,8 @@ function AppContent() {
   // Persist styling modes (frameless, radius, glass)
   React.useEffect(() => {
     try {
-      const frameless = localStorage.getItem('quit-smoking:frameless-mode') === 'true';
+      const framelessVal = localStorage.getItem('quit-smoking:frameless-mode');
+      const frameless = framelessVal !== 'false';
       const radius = localStorage.getItem('quit-smoking:card-radius') || '24px';
       const glass = localStorage.getItem('quit-smoking:liquid-glass') === 'true';
       document.documentElement.setAttribute('data-frameless', String(frameless));
@@ -935,13 +954,15 @@ function AppContent() {
 
   // Time difference in milliseconds, updated strictly 1 time per second for MAX ENERGY EFFICIENCY!
   const [diffMs, setDiffMs] = React.useState<number>(() => {
-    return Math.max(0, Date.now() - startDate);
+    const safeStart = typeof startDate === 'number' && !isNaN(startDate) && startDate > 0 ? startDate : Date.now();
+    return Math.max(0, Date.now() - safeStart);
   });
 
   // 1-second interval loop with page visibility pausing (Item 5)
   React.useEffect(() => {
     const updateTime = () => {
-      setDiffMs(Math.max(0, Date.now() - startDate));
+      const safeStart = typeof startDate === 'number' && !isNaN(startDate) && startDate > 0 ? startDate : Date.now();
+      setDiffMs(Math.max(0, Date.now() - safeStart));
     };
 
     updateTime();
@@ -1151,9 +1172,19 @@ function AppContent() {
   }, [activeTab]);
 
   // Total free time including previous streaks
-  const pastFreeMs = React.useMemo(() => streaks.reduce((acc, s) => acc + (s.to - s.from), 0), [streaks]);
-  const totalFreeMs = diffMs + pastFreeMs;
-  const longestStreakMs = React.useMemo(() => Math.max(diffMs, ...streaks.map((s) => s.to - s.from)), [diffMs, streaks]);
+  const pastFreeMs = React.useMemo(() => (streaks || []).reduce((acc, s) => {
+    const f = Number(s?.from);
+    const t = Number(s?.to);
+    return isNaN(f) || isNaN(t) || t <= f ? acc : acc + (t - f);
+  }, 0), [streaks]);
+  const safeDiffMs = isNaN(diffMs) ? 0 : Math.max(0, diffMs);
+  const totalFreeMs = safeDiffMs + pastFreeMs;
+  const longestStreakMs = React.useMemo(() => {
+    const validStreaks = (streaks || [])
+      .map(s => Number(s?.to) - Number(s?.from))
+      .filter(d => !isNaN(d) && d > 0);
+    return Math.max(safeDiffMs, ...validStreaks, 0);
+  }, [safeDiffMs, streaks]);
 
   const totalDays = Math.floor(totalFreeMs / (24 * 3600 * 1000));
   const totalHours = Math.floor(totalFreeMs / (3600 * 1000));
@@ -1161,14 +1192,24 @@ function AppContent() {
 
   // Total free time intervals (past streaks + active streak)
   const intervals = React.useMemo(() => {
-    const list = streaks.map((s) => ({ from: s.from, to: s.to }));
-    list.push({ from: startDate, to: Date.now() });
+    const safeStart = typeof startDate === 'number' && !isNaN(startDate) && startDate > 0 ? startDate : Date.now();
+    const list = (streaks || [])
+      .filter(s => s && !isNaN(Number(s.from)) && !isNaN(Number(s.to)) && Number(s.to) > Number(s.from))
+      .map((s) => ({ from: Number(s.from), to: Number(s.to) }));
+    list.push({ from: safeStart, to: Date.now() });
     return list;
   }, [streaks, startDate, diffMs]);
 
   // Calculations for money and cigarettes avoided (supports price changes over time)
-  const cigsAvoided = React.useMemo(() => calculateCigsAvoided(intervals, money), [intervals, money]);
-  const totalSaved = React.useMemo(() => calculateTotalSaved(intervals, money), [intervals, money]);
+  const cigsAvoided = React.useMemo(() => {
+    const res = calculateCigsAvoided(intervals, money);
+    return isNaN(res) ? 0 : Math.max(0, res);
+  }, [intervals, money]);
+
+  const totalSaved = React.useMemo(() => {
+    const res = calculateTotalSaved(intervals, money);
+    return isNaN(res) ? 0 : Math.max(0, res);
+  }, [intervals, money]);
 
   // Dot badges
   const todayKey = React.useMemo(() => {
@@ -2078,9 +2119,6 @@ function AppContent() {
         </div>,
         document.body
       )}
-
-      {/* Floating Current Achievement Badge in Top Right Corner */}
-      <CurrentAchievementBadge startDate={startDate} />
 
       {/* Floating Notification Toast */}
       {appToast && (

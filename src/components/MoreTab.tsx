@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Streak, GoalsState, MoneySettings, PriceTier, DayRating } from '../types';
+import { Streak, GoalsState, MoneySettings, PriceTier, DayRating, SavingsGoal } from '../types';
 import {
   Calendar,
   RefreshCw,
@@ -16,6 +16,7 @@ import {
   ChevronUp,
   Info,
   Heart,
+  HeartPulse,
   ChevronRight,
   Award,
   ShoppingBag,
@@ -62,8 +63,11 @@ import { TIMER_STYLES, getTimerStyleCssClass } from './CounterTab/TimerStyles';
 import { TimerSkinModal } from './CounterTab/TimerSkinModal';
 import { GratitudeJournalCard } from './GratitudeJournalCard';
 import { DailyStepsSection } from './DailyStepsSection';
+import { QuickGoalCard } from './QuickGoalCard';
 const getSectionRefractedPictogram = (key: string, cls: string = 'w-5 h-5') => {
   switch (key) {
+    case 'who_progress': return <HeartPulse className={cls} />;
+    case 'goals': return <Target className={cls} />;
     case 'calc': return <Calculator className={cls} />;
     case 'presets': return <Target className={cls} />;
     case 'themes': return <Palette className={cls} />;
@@ -271,27 +275,31 @@ export const MoreTab: React.FC<MoreTabProps> = ({
     } catch {}
   };
 
-  const renderPinButton = (key: string) => (
-    <button
-      type="button"
-      onClick={(e) => togglePinSection(key, e)}
-      className={`p-1.5 rounded-xl transition-all cursor-pointer ${
-        pinnedSections.includes(key)
-          ? 'bg-amber-500/20 text-zinc-300 border border-amber-500/40'
-          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-200/20 dark:hover:bg-zinc-800'
-      }`}
-      title={pinnedSections.includes(key) ? "Прибрати з Головної" : "Винести на Головну"}
-    >
-      <Pin className="w-3.5 h-3.5" />
-    </button>
-  );
+  const renderPinButton = (key: string) => {
+    if (isOverlayMode) return null;
+    return (
+      <button
+        type="button"
+        onClick={(e) => togglePinSection(key, e)}
+        className={`p-1.5 rounded-xl transition-all cursor-pointer ${
+          pinnedSections.includes(key)
+            ? 'bg-amber-500/20 text-zinc-300 border border-amber-500/40'
+            : 'text-slate-400 hover:text-slate-200 hover:bg-slate-200/20 dark:hover:bg-zinc-800'
+        }`}
+        title={pinnedSections.includes(key) ? "Прибрати з Головної" : "Винести на Головну"}
+      >
+        <Pin className="w-3.5 h-3.5" />
+      </button>
+    );
+  };
 
   // Frameless & Glassmorphism customization
   const [framelessMode, setFramelessMode] = useState<boolean>(() => {
     try {
-      return localStorage.getItem('quit-smoking:frameless-mode') === 'true';
+      const saved = localStorage.getItem('quit-smoking:frameless-mode');
+      return saved !== 'false';
     } catch {
-      return false;
+      return true;
     }
   });
 
@@ -1352,6 +1360,13 @@ export const MoreTab: React.FC<MoreTabProps> = ({
             border-top: none !important;
             padding: 0 !important;
             margin-top: 0 !important;
+          }
+          .more-overlay-modal-mode button[title*="Закріпити"],
+          .more-overlay-modal-mode button[title*="Прибрати"],
+          .more-overlay-modal-mode button[title*="Винести"],
+          .more-overlay-modal-mode .lucide-pin,
+          .more-overlay-modal-mode svg.lucide-pin {
+            display: none !important;
           }
         `}} />
       )}
@@ -3058,6 +3073,9 @@ export const MoreTab: React.FC<MoreTabProps> = ({
                 className={`w-full p-4 flex items-center justify-between gap-3 text-left cursor-pointer transition-colors group select-none ${accentClasses.btn}`}
               >
                 <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-9 h-9 rounded-xl bg-zinc-800/80 text-zinc-200 border border-zinc-700/50 flex items-center justify-center flex-none shadow-xs group-hover:border-zinc-600 transition-colors">
+                    {getSectionRefractedPictogram("who_progress", "w-5 h-5")}
+                  </div>
                   <div className="min-w-0">
                     <h3 className="text-sm font-bold text-zinc-100 truncate flex items-center gap-2">
                       <span>Прогрес одужання за ВООЗ</span>

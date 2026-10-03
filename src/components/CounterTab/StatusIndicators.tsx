@@ -75,6 +75,7 @@ export const StatusIndicators: React.FC<StatusIndicatorsProps> = React.memo(({
   quickGoalNow,
   diffMs,
   getBodySystemsRecovery,
+  setIsGoalModalOpen,
   dailyStepsState,
   mentalHealthState,
   gratitudeState,
@@ -223,20 +224,23 @@ export const StatusIndicators: React.FC<StatusIndicatorsProps> = React.memo(({
   if (activeCount === 0 || isAnalyzerModalOpen) return null;
 
   // 1. Регенерація систем (%) - прогрес ПОТОЧНОГО етапу (активної системи)
-  const allSystems = getBodySystemsRecovery(diffMs);
+  const allSystems = getBodySystemsRecovery(diffMs || 0);
   const activeSystem = allSystems.find((s) => s.progress < 100);
-  const systemsPct = activeSystem ? activeSystem.progress : 100;
+  const rawSystemsPct = activeSystem ? activeSystem.progress : 100;
+  const systemsPct = isNaN(rawSystemsPct) ? 100 : rawSystemsPct;
 
   // 2. Рубежі ВООЗ (%) - прогрес ПОТОЧНОГО етапу (до наступного рубежу)
-  const achieved = HEALTH_MILESTONES.filter((m) => diffMs >= m.t);
+  const safeDiffMs = isNaN(Number(diffMs)) ? 0 : Math.max(0, Number(diffMs));
+  const achieved = HEALTH_MILESTONES.filter((m) => safeDiffMs >= m.t);
   const prevT = achieved.length > 0 ? achieved[achieved.length - 1].t : 0;
-  const nextMilestone = HEALTH_MILESTONES.find((m) => diffMs < m.t);
+  const nextMilestone = HEALTH_MILESTONES.find((m) => safeDiffMs < m.t);
   let whoPct = 100;
   if (nextMilestone) {
     const nextT = nextMilestone.t;
     const totalInStage = nextT - prevT;
-    const elapsedInStage = diffMs - prevT;
-    whoPct = totalInStage > 0 ? Math.min(100, Math.max(0, Math.round((elapsedInStage / totalInStage) * 100))) : 0;
+    const elapsedInStage = safeDiffMs - prevT;
+    const rawWhoPct = totalInStage > 0 ? Math.min(100, Math.max(0, Math.round((elapsedInStage / totalInStage) * 100))) : 0;
+    whoPct = isNaN(rawWhoPct) ? 0 : rawWhoPct;
   }
 
   // Inactive / Dimmed starlight styling matching inactive Yin-Yang and Eye icons (fixed width ensures all icons align perfectly in a vertical column)
@@ -247,10 +251,51 @@ export const StatusIndicators: React.FC<StatusIndicatorsProps> = React.memo(({
   return (
     <div className="flex flex-col items-start gap-1 z-[45] pointer-events-none select-none">
       
-      {/* 1. ПОДАРУНОК: ШВИДКА ЦІЛЬ (Подарунок) - ЗАВЖДИ НА РІВНІ ТАЙМЕРА */}
+      {/* 1. ПОДАРУНОК: ЦІЛЬ (Подарунок - ПЕРШИЙ) */}
+      {currentGoalsDocked && (() => {
+        const activeGoals = goals?.queue || [];
+        const activeGoal = activeGoals.length > 0 ? activeGoals[0] : null;
+        const hasGoal = Boolean(activeGoal && activeGoal.amount && Number(activeGoal.amount) > 0);
+        const netSaved = Math.max(0, totalSaved - (goals?.base || 0));
+        const amount = activeGoal?.amount || 0;
+        const pct = hasGoal && amount > 0 ? Math.min(100, Math.floor((netSaved / amount) * 100)) : 0;
+
+        return (
+          <div 
+            onClick={(e) => {
+              e.stopPropagation();
+              if (setIsGoalModalOpen) {
+                setIsGoalModalOpen(true);
+              }
+              window.dispatchEvent(new CustomEvent('open-goal-modal'));
+            }}
+            className={itemClassName}
+            title={hasGoal 
+              ? `Ціль: «${activeGoal?.name || ''}» (${pct}%). Натисніть, щоб відкрити.`
+              : "Ціль. Натисніть, щоб додати."
+            }
+          >
+            <div className={`${iconWrapperClassName} animate-pictogram-step-1`}>
+              {iconStyle === 'sparkles' ? (
+                <Sparkle className="w-5 h-5 text-[#FFFDD0] shrink-0" />
+              ) : (
+                <RefractedPrismGiftIcon className="w-5 h-5 shrink-0" />
+              )}
+            </div>
+            {hasGoal && (
+              <span className={textClassName}>
+                {pct}%
+              </span>
+            )}
+          </div>
+        );
+      })()}
+
+      {/* 2. БЛИСКАВКА: ШВИДКА ЦІЛЬ (Блискавка - ПІД НИМ) */}
       {currentQuickGoalDocked && (() => {
+        const hasQuickGoal = Boolean(quickGoalData && quickGoalData.targetTime && quickGoalData.targetTime > (quickGoalData.createdAt || 0));
         let qgPct = 0;
-        if (quickGoalData) {
+        if (hasQuickGoal) {
           const isFailed = Boolean(startDate && startDate > quickGoalData.createdAt && !quickGoalData.isCompleted);
           const isReached = quickGoalNow >= quickGoalData.targetTime;
           if (!isFailed && !isReached) {
@@ -265,53 +310,13 @@ export const StatusIndicators: React.FC<StatusIndicatorsProps> = React.memo(({
           <div 
             onClick={(e) => {
               e.stopPropagation();
-              setCurrentQuickGoalDocked(false);
-              setIsQuickGoalDocked?.(false);
-              try {
-                localStorage.setItem('quit-smoking:quick-goal-docked', 'false');
-                window.dispatchEvent(new Event('quick-goal-docked-change'));
-                window.dispatchEvent(new Event('storage'));
-              } catch {}
+              window.dispatchEvent(new CustomEvent('open-quick-goal-modal'));
             }}
             className={itemClassName}
-            title={`Швидка ціль (${qgPct}%). Натисніть, щоб зняти закріплення.`}
-          >
-            <div className={`${iconWrapperClassName} animate-pictogram-step-1`}>
-              {iconStyle === 'sparkles' ? (
-                <Sparkle className="w-5 h-5 text-[#FFFDD0] shrink-0" />
-              ) : (
-                <RefractedPrismGiftIcon className="w-5 h-5 shrink-0" />
-              )}
-            </div>
-            <span className={textClassName}>
-              {qgPct}%
-            </span>
-          </div>
-        );
-      })()}
-
-      {/* 2. БЛИСКАВКА: ЦІЛЬ (Блискавка) */}
-      {currentGoalsDocked && (() => {
-        const activeGoals = goals?.queue || [];
-        const activeGoal = activeGoals.length > 0 ? activeGoals[0] : null;
-        const netSaved = Math.max(0, totalSaved - (goals?.base || 0));
-        const amount = activeGoal?.amount || 0;
-        const pct = amount > 0 ? Math.min(100, Math.floor((netSaved / amount) * 100)) : 0;
-
-        return (
-          <div 
-            onClick={(e) => {
-              e.stopPropagation();
-              setCurrentGoalsDocked(false);
-              setIsGoalsDocked?.(false);
-              try {
-                localStorage.setItem('quit-smoking:goals-docked', 'false');
-                window.dispatchEvent(new Event('goals-docked-change'));
-                window.dispatchEvent(new Event('storage'));
-              } catch {}
-            }}
-            className={itemClassName}
-            title={`Ціль: ${activeGoal ? activeGoal.name : 'Немає'} (${pct}%). Натисніть, щоб зняти закріплення.`}
+            title={hasQuickGoal 
+              ? (quickGoalData?.title ? `Швидка ціль: «${quickGoalData.title}» (${qgPct}%). Натисніть, щоб відкрити.` : `Швидка ціль (${qgPct}%). Натисніть, щоб відкрити.`) 
+              : "Швидка ціль. Натисніть, щоб встановити."
+            }
           >
             <div className={`${iconWrapperClassName} animate-pictogram-step-2`}>
               {iconStyle === 'sparkles' ? (
@@ -320,9 +325,11 @@ export const StatusIndicators: React.FC<StatusIndicatorsProps> = React.memo(({
                 <RefractedPrismLightningIcon className="w-5 h-5 shrink-0" />
               )}
             </div>
-            <span className={textClassName}>
-              {pct}%
-            </span>
+            {hasQuickGoal && (
+              <span className={textClassName}>
+                {qgPct}%
+              </span>
+            )}
           </div>
         );
       })()}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Zap, Pin, Clock } from 'lucide-react';
+import { Gift, Pin, Clock } from 'lucide-react';
 
 interface GoalsSectionProps {
   goals: any;
@@ -47,8 +47,8 @@ export const GoalsSection = React.memo(({
     >
       <div className="flex items-center justify-between mb-2 relative z-10">
         <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-lg bg-zinc-800/90 border border-zinc-700/60 text-zinc-300 flex items-center justify-center">
-            <Zap className="w-3.5 h-3.5 text-zinc-300" />
+          <div className="p-1.5 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-300 flex items-center justify-center">
+            <Gift className="w-3.5 h-3.5 text-amber-300" />
           </div>
           <h3 className="text-[11px] font-bold uppercase tracking-wider text-zinc-200">
             Ціль

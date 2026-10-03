@@ -202,19 +202,21 @@ export const DailyStepsSection: React.FC<DailyStepsSectionProps> = ({
             </h3>
           </div>
 
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDockChange?.(true);
-              }}
-              className="w-7 h-7 flex items-center justify-center text-zinc-400 hover:text-zinc-200 cursor-pointer rounded-lg hover:bg-zinc-800/60 transition-all"
-              title="Закріпити"
-            >
-              <Pin className="w-3.5 h-3.5" />
-            </button>
-          </div>
+          {onDockChange && (
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDockChange(true);
+                }}
+                className="w-7 h-7 flex items-center justify-center text-zinc-400 hover:text-zinc-200 cursor-pointer rounded-lg hover:bg-zinc-800/60 transition-all"
+                title="Закріпити"
+              >
+                <Pin className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Content & Progress Bar */}

@@ -69,20 +69,15 @@ import { restoreAllWindowsToFeed } from '../../utils/cardStorageSafety';
 import { AnalyzerTip } from '../AnalyzerTip';
 import { MotivationalPhrasesModal, MotivationStyle } from '../MotivationalPhrasesModal';
 import { GoalSettingsModal } from '../GoalSettingsModal';
+import { CurrentAchievementBadge } from '../CurrentAchievementBadge';
+import { RefractedPrismStarIcon, RefractedPrismYinYangIcon } from './RefractedStatusIcons';
 
 const RefractedYinYangIcon: React.FC<{ className?: string; isDecomposing?: boolean }> = ({ className = 'w-5 h-5' }) => (
-  <div className={`relative flex items-center justify-center ${className}`}>
-    <svg viewBox="0 0 24 24" className="w-full h-full fill-current">
-      <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="1.5" />
-      <path d="M12 2a10 10 0 0 0 0 20 5 5 0 0 0 0-10 5 5 0 0 1 0-10z" fill="currentColor" />
-      <circle cx="12" cy="7" r="1.5" fill="none" stroke="currentColor" strokeWidth="1.5" />
-      <circle cx="12" cy="17" r="1.5" fill="currentColor" />
-    </svg>
-  </div>
+  <RefractedPrismYinYangIcon className={className} />
 );
 
 const RefractedMeditationStarIcon: React.FC<{ className?: string; style?: React.CSSProperties; isDecomposing?: boolean }> = ({ className = 'w-5 h-5', style }) => (
-  <Star className={className} style={style} />
+  <RefractedPrismStarIcon className={className} style={style} />
 );
 
 const RefractedTimerShell: React.FC<{ children?: React.ReactNode; className?: string; style?: React.CSSProperties }> = ({ children, className = '', style }) => (
@@ -91,6 +86,8 @@ const RefractedTimerShell: React.FC<{ children?: React.ReactNode; className?: st
 
 const getSectionRefractedPictogram = (key: string, cls: string = 'w-5 h-5') => {
   switch (key) {
+    case 'goals': return <Gift className={cls} />;
+    case 'quick_goal': return <Zap className={cls} />;
     case 'calc': return <Calculator className={cls} />;
     case 'presets': return <Sliders className={cls} />;
     case 'themes': return <Palette className={cls} />;
@@ -130,7 +127,6 @@ const YinYangIcon: React.FC<{
 );
 
 import { QuickGoalCard } from '../QuickGoalCard';
-import { RecoveryPictogramsBlock } from './RecoveryPictograms';
 import { CoffeeBreakfastModal } from '../CoffeeBreakfastModal';
 import { StateChartModal } from '../StateChartModal';
 import { ExpandedSavedResourcesStats } from './ExpandedSavedResourcesStats';
@@ -551,8 +547,8 @@ const getSectionMetadata = (key: string) => {
 };
 
 interface QuickAccessViewSwitcherProps {
-  mode: 'large' | 'medium' | 'small' | 'list';
-  onChange: (mode: 'large' | 'medium' | 'small' | 'list') => void;
+  mode: 'large' | 'medium' | 'small' | 'pictograms' | 'list';
+  onChange: (mode: 'large' | 'medium' | 'small' | 'pictograms' | 'list') => void;
 }
 
 const QuickAccessViewSwitcher: React.FC<QuickAccessViewSwitcherProps> = ({ mode, onChange }) => {
@@ -560,6 +556,7 @@ const QuickAccessViewSwitcher: React.FC<QuickAccessViewSwitcherProps> = ({ mode,
     { id: 'large' as const, icon: LayoutGrid, title: 'Великі плитки' },
     { id: 'medium' as const, icon: Grid, title: 'Середні плитки' },
     { id: 'small' as const, icon: Grid3X3, title: 'Малі плитки' },
+    { id: 'pictograms' as const, icon: Sparkles, title: 'Піктограми' },
     { id: 'list' as const, icon: List, title: 'Список' },
   ];
 
@@ -1292,24 +1289,23 @@ const CounterTabComponent: React.FC<CounterTabProps> = ({
   // One-time check to make sure cards (Gratitude, Steps, Mental Health) are visible in feed
   React.useEffect(() => {
     try {
-      const restored = localStorage.getItem('quit-smoking:cards-restored-v3');
+      const restored = localStorage.getItem('quit-smoking:cards-docked-v1');
       if (!restored) {
-        localStorage.setItem('quit-smoking:steps-docked', 'false');
-        localStorage.setItem('quit-smoking:mental-health-docked', 'false');
-        localStorage.setItem('quit-smoking:gratitude-docked', 'false');
-        localStorage.setItem('quit-smoking:cards-restored-v3', 'true');
-        setIsStepsDocked(false);
-        setIsMentalHealthDocked(false);
-        setIsGratitudeDocked(false);
+        localStorage.setItem('quit-smoking:goals-docked', 'true');
+        localStorage.setItem('quit-smoking:quick-goal-docked', 'true');
+        localStorage.setItem('quit-smoking:cards-docked-v1', 'true');
+        setIsGoalsDocked(true);
+        setIsQuickGoalDocked(true);
       }
     } catch {}
   }, []);
 
   const [isGoalsDocked, setIsGoalsDocked] = React.useState<boolean>(() => {
     try {
-      return localStorage.getItem('quit-smoking:goals-docked') === 'true';
+      const val = localStorage.getItem('quit-smoking:goals-docked');
+      return val === null ? true : val === 'true';
     } catch {
-      return false;
+      return true;
     }
   });
 
@@ -1416,9 +1412,10 @@ const CounterTabComponent: React.FC<CounterTabProps> = ({
 
   const [isQuickGoalDocked, setIsQuickGoalDocked] = React.useState<boolean>(() => {
     try {
-      return localStorage.getItem('quit-smoking:quick-goal-docked') === 'true';
+      const val = localStorage.getItem('quit-smoking:quick-goal-docked');
+      return val === null ? true : val === 'true';
     } catch {
-      return false;
+      return true;
     }
   });
 
@@ -2425,18 +2422,18 @@ const CounterTabComponent: React.FC<CounterTabProps> = ({
     } catch {}
   };
 
-  // Quick Access View Mode: 'list' | 'large' | 'medium' | 'small'
-  const [quickAccessViewMode, setQuickAccessViewMode] = React.useState<'list' | 'large' | 'medium' | 'small'>(() => {
+  // Quick Access View Mode: 'list' | 'large' | 'medium' | 'small' | 'pictograms'
+  const [quickAccessViewMode, setQuickAccessViewMode] = React.useState<'list' | 'large' | 'medium' | 'small' | 'pictograms'>(() => {
     try {
       const saved = localStorage.getItem('quit-smoking:quick-access-view-mode');
-      if (saved === 'list' || saved === 'large' || saved === 'medium' || saved === 'small') {
+      if (saved === 'list' || saved === 'large' || saved === 'medium' || saved === 'small' || saved === 'pictograms') {
         return saved;
       }
     } catch {}
     return 'medium';
   });
 
-  const handleSetQuickAccessViewMode = (mode: 'list' | 'large' | 'medium' | 'small') => {
+  const handleSetQuickAccessViewMode = (mode: 'list' | 'large' | 'medium' | 'small' | 'pictograms') => {
     setQuickAccessViewMode(mode);
     try {
       localStorage.setItem('quit-smoking:quick-access-view-mode', mode);
@@ -2498,6 +2495,13 @@ const CounterTabComponent: React.FC<CounterTabProps> = ({
   };
 
   const handleTileClick = (key: string) => {
+    if (['counter', 'health', 'state', 'tree', 'sand', 'orbit', 'bowls', 'sprout', 'sos', 'more'].includes(key)) {
+      if (onSwitchTab) onSwitchTab(key as any);
+      return;
+    }
+    if (onOpenOverlaySection) {
+      onOpenOverlaySection(key);
+    }
     window.dispatchEvent(new CustomEvent('open-section-overlay', { detail: key }));
   };
 
@@ -2589,102 +2593,7 @@ const CounterTabComponent: React.FC<CounterTabProps> = ({
   });
 
   // Timer Hidden State (temporary, reset on next entry/session)
-  const [isTimerHidden, setIsTimerHidden] = React.useState<boolean>(() => {
-    try {
-      return sessionStorage.getItem('quit-smoking:timer-hidden') === 'true';
-    } catch {
-      return false;
-    }
-  });
-
-  const [isTimerInfoOpen, setIsTimerInfoOpen] = React.useState(false);
   const [isTreeTipOpen, setIsTreeTipOpen] = React.useState(false);
-
-  const hideTimer = () => {
-    setIsTimerHidden(true);
-    try {
-      sessionStorage.setItem('quit-smoking:timer-hidden', 'true');
-    } catch {}
-  };
-
-  const showTimer = () => {
-    setIsTimerHidden(false);
-    try {
-      sessionStorage.removeItem('quit-smoking:timer-hidden');
-    } catch {}
-  };
-
-  const handleTimerMouseDown = (e: React.MouseEvent) => {
-    setSwipeStartX(e.clientX);
-    hasSwiped.current = false;
-  };
-
-  const handleTimerMouseMove = (e: React.MouseEvent) => {
-  };
-
-  const handleTimerMouseLeave = () => {
-  };
-
-  const handleTimerMouseUp = (e: React.MouseEvent) => {
-    setSwipeStartX(null);
-  };
-
-  const handleTimerClick = (e: React.MouseEvent) => {
-    if (isTimerHidden) return;
-    if (e.detail >= 2) {
-      setIsTimerMinimized(prev => {
-        const next = !prev;
-        try {
-          localStorage.setItem('quit-smoking:timer-minimized', String(next));
-        } catch {}
-        return next;
-      });
-      return;
-    }
-  };
-
-  const handleTimerTouchStart = (e: React.TouchEvent) => {
-    if (e.touches && e.touches[0]) {
-      const touch = e.touches[0];
-      setSwipeStartX(touch.clientX);
-      hasSwiped.current = false;
-    }
-  };
-
-  const handleTimerTouchMove = (e: React.TouchEvent) => {
-  };
-
-  const handleTimerTouchCancel = () => {
-  };
-
-  const handleTimerTouchEnd = (e: React.TouchEvent) => {
-    setSwipeStartX(null);
-  };
-
-  React.useEffect(() => {
-    const handleTimerEffectChange = () => {
-      try {
-        const mode = localStorage.getItem('quit-smoking:timer-horizon-effect');
-        setTimerEffectMode(mode || 'none');
-      } catch {}
-    };
-    const handleTimerTextureChange = () => {
-      try {
-        const tex = localStorage.getItem('quit-smoking:timer-texture');
-        setTimerTexture(tex || 'none');
-      } catch {}
-    };
-    window.addEventListener('timer-effect-change', handleTimerEffectChange);
-    window.addEventListener('timer-texture-change', handleTimerTextureChange);
-    window.addEventListener('storage', handleTimerEffectChange);
-    window.addEventListener('storage', handleTimerTextureChange);
-    return () => {
-      window.removeEventListener('timer-effect-change', handleTimerEffectChange);
-      window.removeEventListener('timer-texture-change', handleTimerTextureChange);
-      window.removeEventListener('storage', handleTimerEffectChange);
-      window.removeEventListener('storage', handleTimerTextureChange);
-    };
-  }, []);
 
   const nextReason = () => {
     if (reasons.length > 1) {
@@ -2815,10 +2724,11 @@ const CounterTabComponent: React.FC<CounterTabProps> = ({
 
   // Calculation of returned time: 1 cigarette takes user-defined minutes (default 7 min)
   const returnedTimeData = React.useMemo(() => {
-    const minutesPerCig = money?.minutesPerCig ?? 7;
-    const totalMinutes = Math.round(cigsAvoided * minutesPerCig);
-    const wholeHours = Math.floor(totalMinutes / 60);
-    const remainingMinutes = totalMinutes % 60;
+    const safeCigs = isNaN(Number(cigsAvoided)) ? 0 : Math.max(0, Number(cigsAvoided));
+    const minutesPerCig = isNaN(Number(money?.minutesPerCig)) ? 7 : (money?.minutesPerCig ?? 7);
+    const totalMinutes = Math.round(safeCigs * minutesPerCig);
+    const wholeHours = isNaN(totalMinutes) ? 0 : Math.floor(totalMinutes / 60);
+    const remainingMinutes = isNaN(totalMinutes) ? 0 : totalMinutes % 60;
 
     const getBooksDeclension = (b: number) => {
       const m10 = b % 10;
@@ -2846,7 +2756,7 @@ const CounterTabComponent: React.FC<CounterTabProps> = ({
     } else if (wholeHours > 0) {
       timeText = `${wholeHours} год${remainingMinutes > 0 ? ` ${remainingMinutes} хв` : ''}`;
     } else {
-      timeText = `${Math.max(1, totalMinutes)} хв`;
+      timeText = `${Math.max(0, totalMinutes)} хв`;
     }
 
     // Realistic equivalents
@@ -3743,16 +3653,16 @@ const CounterTabComponent: React.FC<CounterTabProps> = ({
           onContextMenu={(e) => {
             e.preventDefault();
           }}
-          className={`relative group flex flex-col w-full pt-3 pb-3 overflow-visible select-none items-center scale-100 transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          className={`relative group flex flex-col w-full pt-1 pb-1 overflow-visible select-none items-center scale-100 transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] ${
             isEverythingHidden || isIntroDialogueActive ? 'opacity-0 pointer-events-none -translate-y-2 blur-xs' : 'opacity-100 pointer-events-auto translate-y-0 blur-0'
           }`}
         >
-            <div className="relative flex items-center justify-center overflow-visible w-full">
+            <div className="relative flex items-center justify-center overflow-visible w-full min-h-[44px]">
               <div className="relative flex flex-col items-center justify-center w-full">
 
                   {/* 1. Meditation Star & Resource Chart Icon (Far Left Column, Symmetrical with Status Indicators) */}
                   <div 
-                    className={`absolute top-1.5 left-3.5 sm:left-4 z-[45] flex flex-col items-center gap-1.5 pointer-events-auto transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu will-change-[transform,opacity,filter] ${
+                    className={`absolute top-1 left-3.5 sm:left-4 z-[45] flex flex-col items-center gap-1.5 pointer-events-auto transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu will-change-[transform,opacity,filter] ${
                       showStar && introStarVisible
                         ? 'opacity-100 scale-100 blur-0 pointer-events-auto' 
                         : 'opacity-0 scale-75 blur-xl pointer-events-none'
@@ -3787,15 +3697,15 @@ const CounterTabComponent: React.FC<CounterTabProps> = ({
                     >
                       <FourPointStar className={`w-5 h-5 sm:w-5 sm:h-5 transition-all duration-300 origin-center ${
                         isZenStarBright 
-                          ? 'text-zinc-100 scale-125' 
-                          : 'text-zinc-400 dark:text-zinc-300 opacity-85 hover:opacity-100 group-hover/star:scale-115 animate-meditation-star'
+                          ? 'scale-125' 
+                          : 'opacity-85 hover:opacity-100 group-hover/star:scale-115'
                       }`} />
                     </button>
                   </div>
 
                   {/* 2. Pinned Goal & Recovery Indicators (Far Right Column, Horizontally aligned with Timer, Gift on top row) */}
                   <div 
-                    className={`absolute top-2 right-3.5 sm:right-4 z-[45] flex flex-col items-end pointer-events-auto transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu will-change-[transform,opacity,filter] ${
+                    className={`absolute top-1 right-3.5 sm:right-4 z-[45] flex flex-col items-end pointer-events-auto transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu will-change-[transform,opacity,filter] ${
                       showRows ? 'opacity-100 blur-0 scale-100' : 'opacity-0 blur-md scale-90 pointer-events-none'
                     }`}
                   >
@@ -3832,145 +3742,23 @@ const CounterTabComponent: React.FC<CounterTabProps> = ({
                     />
                   </div>
 
-                  {/* Center Timer Display in Top Bar */}
+                  {/* Time Achievements Display in Top Bar (ТАЙМЕР / ХРОНІКА) */}
                   <div
-                    onTouchStart={handleTimerTouchStart}
-                    onTouchMove={handleTimerTouchMove}
-                    onTouchEnd={handleTimerTouchEnd}
-                    onTouchCancel={handleTimerTouchCancel}
-                    onMouseDown={handleTimerMouseDown}
-                    onMouseMove={handleTimerMouseMove}
-                    onMouseUp={handleTimerMouseUp}
-                    onMouseLeave={handleTimerMouseLeave}
-                    onClick={handleTimerClick}
-                    className={`absolute top-2 left-1/2 -translate-x-1/2 z-30 flex items-center justify-center h-7 select-none transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu will-change-[transform,opacity,filter] cursor-pointer ${
+                    className={`relative z-[45] flex items-center justify-center select-none transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu will-change-[transform,opacity,filter] ${
                       introTimerVisible
                         ? 'opacity-100 scale-100 blur-0 translate-y-0 pointer-events-auto'
                         : 'opacity-0 scale-90 blur-xl -translate-y-2 pointer-events-none'
                     }`}
-                    title="Клік: перемикання режимів таймера"
                   >
-                    {!isTimerHidden && (() => {
-                      const isClassic = timerEffectMode === 'classic' || timerEffectMode === 'none' || !timerEffectMode;
-                      const isPrismShell = timerEffectMode === 'prism-shell';
-                      const styleClass = (isClassic || isPrismShell) ? '' : getTimerStyleCssClass(timerEffectMode);
-
-                      const renderChars = (val: string | number, isUnit: boolean = false) => {
-                        const str = String(val);
-                        return str.split('').map((char, i) => (
-                          <span
-                            key={i}
-                            className={`cosmic-dim-char inline-block transition-all duration-300 transform-gpu will-change-[opacity,transform,filter] ${
-                              isUnit 
-                                ? 'text-[11px] sm:text-[12px] font-bold text-zinc-400 dark:text-zinc-400' 
-                                : 'tabular-nums font-black text-zinc-100 dark:text-zinc-100 tracking-tight'
-                            }`}
-                          >
-                            {char}
-                          </span>
-                        ));
-                      };
-
-                      const timerContent = (
-                        <div 
-                          className={`relative z-10 inline-flex items-center justify-center text-[13px] sm:text-[15px] font-mono select-none pointer-events-none transition-all duration-300 animate-section-header-text section-delay-0 bg-transparent ${
-                            (isClassic || isPrismShell) 
-                              ? '' 
-                              : `${styleClass} scale-90 origin-center py-0.5 px-2`
-                          }`}
-                        >
-                          {/* Days */}
-                          <span className={`inline-flex items-center transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu ${
-                            showTimerDays ? 'opacity-100 blur-0 scale-100' : 'opacity-0 blur-md scale-75'
-                          }`}>
-                            {isClassic ? (
-                              <>
-                                {renderChars(days, false)}
-                                <span className="ml-0.5 mr-1.5 inline-flex items-center">
-                                  {renderChars('д', true)}
-                                </span>
-                              </>
-                            ) : isPrismShell ? (
-                              <>
-                                <span className="tabular-nums font-black refracted-prism-text tracking-tight cosmic-dim-char inline-block">{days}</span>
-                                <span className="text-[11px] sm:text-[12px] font-bold ml-0.5 mr-1.5 refracted-prism-unit cosmic-dim-char inline-block">д</span>
-                              </>
-                            ) : (
-                              <>
-                                <span className="tabular-nums font-black tracking-tight cosmic-dim-char inline-block">{days}</span>
-                                <span className="text-[11px] sm:text-[12px] font-bold ml-0.5 mr-1.5 cosmic-dim-char inline-block">д</span>
-                              </>
-                            )}
-                          </span>
-
-                          {/* Hours */}
-                          <span className={`inline-flex items-center transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu ${
-                            showTimerHours ? 'opacity-100 blur-0 scale-100' : 'opacity-0 blur-md scale-75'
-                          }`}>
-                            {isClassic ? (
-                              <>
-                                {renderChars(pad(hours), false)}
-                                <span className="ml-0.5 mr-1.5 inline-flex items-center">
-                                  {renderChars('г', true)}
-                                </span>
-                              </>
-                            ) : isPrismShell ? (
-                              <>
-                                <span className="tabular-nums font-black refracted-prism-text tracking-tight cosmic-dim-char inline-block">{pad(hours)}</span>
-                                <span className="text-[11px] sm:text-[12px] font-bold ml-0.5 mr-1.5 refracted-prism-unit cosmic-dim-char inline-block">г</span>
-                              </>
-                            ) : (
-                              <>
-                                <span className="tabular-nums font-black tracking-tight cosmic-dim-char inline-block">{pad(hours)}</span>
-                                <span className="text-[11px] sm:text-[12px] font-bold ml-0.5 mr-1.5 cosmic-dim-char inline-block">г</span>
-                              </>
-                            )}
-                          </span>
-
-                          {/* Minutes */}
-                          <span className={`inline-flex items-center transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu ${
-                            showTimerMins ? 'opacity-100 blur-0 scale-100' : 'opacity-0 blur-md scale-75'
-                          }`}>
-                            {isClassic ? (
-                              <>
-                                {renderChars(pad(minutes), false)}
-                                <span className="ml-0.5 inline-flex items-center">
-                                  {renderChars('х', true)}
-                                </span>
-                              </>
-                            ) : isPrismShell ? (
-                              <>
-                                <span className="tabular-nums font-black refracted-prism-text tracking-tight cosmic-dim-char inline-block">{pad(minutes)}</span>
-                                <span className="text-[11px] sm:text-[12px] font-bold ml-0.5 refracted-prism-unit cosmic-dim-char inline-block">х</span>
-                              </>
-                            ) : (
-                              <>
-                                <span className="tabular-nums font-black tracking-tight cosmic-dim-char inline-block">{pad(minutes)}</span>
-                                <span className="text-[11px] sm:text-[12px] font-bold ml-0.5 cosmic-dim-char inline-block">х</span>
-                              </>
-                            )}
-                          </span>
-                        </div>
-                      );
-
-                      if (isPrismShell) {
-                        return (
-                          <RefractedTimerShell>
-                            {timerContent}
-                          </RefractedTimerShell>
-                        );
-                      }
-
-                      return timerContent;
-                    })()}
+                    <CurrentAchievementBadge startDate={startDate} />
                   </div>
               </div>
             </div>
           </div>
 
-        {/* Інтерактивний Аналізатор Здоров'я (ЗГУСТОК ЕНЕРГІЇ / ОБОЛОНКА) */}
+        {/* Інтерактивний Аналізатор Здоров'я (ЗГУСТОК ЕНЕРГІЇ / ОБОЛОНКА / КІЛЬЦЕ) */}
         {!isAnalyzerDocked && !isEverythingHidden && (
-          <div className="relative flex flex-col items-center justify-center my-0.5 select-none">
+          <div className="relative flex flex-col items-center justify-center my-1 select-none z-20">
             <div className={`transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu will-change-[transform,opacity,filter] ${
               isRingRevealed
                 ? 'opacity-100 scale-100 blur-0 translate-y-0 pointer-events-auto'
@@ -4037,8 +3825,8 @@ const CounterTabComponent: React.FC<CounterTabProps> = ({
             >
               <YinYangIcon className={`w-5 h-5 transition-all duration-300 group-hover/yinyang:scale-110 origin-center ${
                 isEverythingHidden
-                  ? 'animate-yinyang-slow text-white opacity-100'
-                  : 'text-zinc-400 dark:text-zinc-300 opacity-80 hover:opacity-100'
+                  ? 'scale-110 opacity-100'
+                  : 'opacity-85 hover:opacity-100'
               }`} />
             </button>
           </div>
@@ -4103,60 +3891,68 @@ const CounterTabComponent: React.FC<CounterTabProps> = ({
               </div>
 
               {/* Головний індикатор-рядок */}
-              <div 
-                onClick={toggleSavedStatsExpanded}
-                className="w-full py-2 px-2.5 xs:px-3 sm:px-4 rounded-2xl flex items-center justify-between gap-1 sm:gap-2 text-[10px] xs:text-[11px] sm:text-xs font-mono cursor-pointer transition-all duration-200 select-none shadow-xs bg-[#18181f]/90 border border-zinc-800/80 hover:bg-[#1f1f27] hover:border-zinc-700 overflow-hidden"
-                title={isSavedStatsExpanded ? "Згорнути детальну статистику" : "Розгорнути детальну статистику"}
-              >
-                <div className="flex-1 min-w-0 flex items-center justify-between sm:justify-center gap-1 xs:gap-1.5 sm:gap-3 text-zinc-300 font-semibold overflow-hidden">
-                  {/* 1. Wallet / Total Saved */}
-                  <span className="flex items-center gap-0.5 xs:gap-1 shrink-0 text-zinc-200">
-                    <Wallet className="w-3 h-3 xs:w-3.5 xs:h-3.5 text-zinc-400 shrink-0" />
-                    <span className="font-mono font-bold tracking-tighter xs:tracking-tight text-[10px] xs:text-[11px] sm:text-xs whitespace-nowrap">
-                      {Math.floor(totalSaved).toLocaleString('uk-UA')} {money?.cur ?? '₴'}
-                    </span>
-                  </span>
-                  
-                  {/* 2. Free Time */}
-                  <span className="flex items-center gap-0.5 xs:gap-1 shrink-0 text-zinc-200">
-                    <Bird className="w-3 h-3 xs:w-3.5 xs:h-3.5 text-zinc-400 shrink-0" />
-                    <span className="font-mono font-bold tracking-tighter xs:tracking-tight text-[10px] xs:text-[11px] sm:text-xs whitespace-nowrap">
-                      {returnedTimeData.timeText}
-                    </span>
-                  </span>
-                  
-                  {/* 3. Cigarettes Avoided */}
-                  <span className="flex items-center gap-0.5 xs:gap-1 shrink-0 text-zinc-200">
-                    <Cigarette className="w-3 h-3 xs:w-3.5 xs:h-3.5 text-zinc-400 shrink-0" />
-                    <span className="font-mono font-bold tracking-tighter xs:tracking-tight text-[10px] xs:text-[11px] sm:text-xs whitespace-nowrap">
-                      {Math.floor(cigsAvoided).toLocaleString('uk-UA')} шт
-                    </span>
-                  </span>
-                  
-                  {/* 4. Trees */}
-                  <span 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setIsTreeTipOpen(true);
-                    }}
-                    className="flex items-center gap-0.5 xs:gap-1 shrink-0 cursor-pointer hover:bg-zinc-800/60 px-0.5 xs:px-1 py-0.5 rounded-md transition-colors text-zinc-200"
-                    title="Врятовані дерева"
-                  >
-                    <TreePine className="w-3 h-3 xs:w-3.5 xs:h-3.5 text-zinc-400 shrink-0" />
-                    <span className="font-mono font-bold tracking-tighter xs:tracking-tight text-[10px] xs:text-[11px] sm:text-xs whitespace-nowrap">
-                      ~{(cigsAvoided / 300).toFixed(1)}
-                    </span>
-                  </span>
-                </div>
+              {(() => {
+                const safeSaved = isNaN(Number(totalSaved)) ? 0 : Math.max(0, Number(totalSaved));
+                const safeCigs = isNaN(Number(cigsAvoided)) ? 0 : Math.max(0, Number(cigsAvoided));
+                const safeTrees = (safeCigs / 300).toFixed(1);
 
-                <div className="text-zinc-500 hover:text-zinc-300 shrink-0 flex items-center pl-0.5 xs:pl-1">
-                  <ChevronDown 
-                    className={`w-3.5 h-3.5 transition-transform duration-300 ${
-                      isSavedStatsExpanded ? 'rotate-180 text-zinc-300' : 'rotate-0 text-zinc-500'
-                    }`} 
-                  />
-                </div>
-              </div>
+                return (
+                  <div 
+                    onClick={toggleSavedStatsExpanded}
+                    className="w-full py-2 px-2.5 xs:px-3 sm:px-4 rounded-2xl flex items-center justify-between gap-1 sm:gap-2 text-[10px] xs:text-[11px] sm:text-xs font-mono cursor-pointer transition-all duration-200 select-none shadow-xs bg-[#18181f]/90 border border-zinc-800/80 hover:bg-[#1f1f27] hover:border-zinc-700 overflow-hidden"
+                    title={isSavedStatsExpanded ? "Згорнути детальну статистику" : "Розгорнути детальну статистику"}
+                  >
+                    <div className="flex-1 min-w-0 flex items-center justify-between sm:justify-center gap-1 xs:gap-1.5 sm:gap-3 text-zinc-300 font-semibold overflow-hidden">
+                      {/* 1. Wallet / Total Saved */}
+                      <span className="flex items-center gap-0.5 xs:gap-1 shrink-0 text-zinc-200">
+                        <Wallet className="w-3 h-3 xs:w-3.5 xs:h-3.5 text-zinc-400 shrink-0" />
+                        <span className="font-mono font-bold tracking-tighter xs:tracking-tight text-[10px] xs:text-[11px] sm:text-xs whitespace-nowrap">
+                          {Math.floor(safeSaved).toLocaleString('uk-UA')} {money?.cur ?? '₴'}
+                        </span>
+                      </span>
+                      
+                      {/* 2. Free Time */}
+                      <span className="flex items-center gap-0.5 xs:gap-1 shrink-0 text-zinc-200">
+                        <Bird className="w-3 h-3 xs:w-3.5 xs:h-3.5 text-zinc-400 shrink-0" />
+                        <span className="font-mono font-bold tracking-tighter xs:tracking-tight text-[10px] xs:text-[11px] sm:text-xs whitespace-nowrap">
+                          {returnedTimeData.timeText}
+                        </span>
+                      </span>
+                      
+                      {/* 3. Cigarettes Avoided */}
+                      <span className="flex items-center gap-0.5 xs:gap-1 shrink-0 text-zinc-200">
+                        <Cigarette className="w-3 h-3 xs:w-3.5 xs:h-3.5 text-zinc-400 shrink-0" />
+                        <span className="font-mono font-bold tracking-tighter xs:tracking-tight text-[10px] xs:text-[11px] sm:text-xs whitespace-nowrap">
+                          {Math.floor(safeCigs).toLocaleString('uk-UA')} шт
+                        </span>
+                      </span>
+                      
+                      {/* 4. Trees */}
+                      <span 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsTreeTipOpen(true);
+                        }}
+                        className="flex items-center gap-0.5 xs:gap-1 shrink-0 cursor-pointer hover:bg-zinc-800/60 px-0.5 xs:px-1 py-0.5 rounded-md transition-colors text-zinc-200"
+                        title="Врятовані дерева"
+                      >
+                        <TreePine className="w-3 h-3 xs:w-3.5 xs:h-3.5 text-zinc-400 shrink-0" />
+                        <span className="font-mono font-bold tracking-tighter xs:tracking-tight text-[10px] xs:text-[11px] sm:text-xs whitespace-nowrap">
+                          ~{safeTrees}
+                        </span>
+                      </span>
+                    </div>
+
+                    <div className="text-zinc-500 hover:text-zinc-300 shrink-0 flex items-center pl-0.5 xs:pl-1">
+                      <ChevronDown 
+                        className={`w-3.5 h-3.5 transition-transform duration-300 ${
+                          isSavedStatsExpanded ? 'rotate-180 text-zinc-300' : 'rotate-0 text-zinc-500'
+                        }`} 
+                      />
+                    </div>
+                  </div>
+                );
+              })()}
 
             {/* Детальна інформація при розгортанні */}
             {!isStatsMinimized && (
@@ -4345,8 +4141,50 @@ const CounterTabComponent: React.FC<CounterTabProps> = ({
                 />
               </div>
 
-              {/* Плитковий вигляд (тільки клікабельні піктограми без кіл навколо) */}
-              {quickAccessViewMode !== 'list' ? (
+              {/* Вигляд: Чисті піктограми / Плитки / Список */}
+              {quickAccessViewMode === 'pictograms' ? (
+                /* Режим: Чисті піктограми (без квадратних рамок і фонів) */
+                <div className="pt-1.5 flex flex-wrap items-center justify-start gap-2 sm:gap-3 px-0.5">
+                  {pinnedSections.map((secKey) => {
+                    const visual = getSectionVisual(secKey);
+                    const tileTitle = customTileNames[secKey] || visual.title;
+
+                    return (
+                      <div
+                        key={secKey}
+                        onTouchStart={() => handleStartTilePress(secKey)}
+                        onTouchEnd={handleEndTilePress}
+                        onTouchMove={handleEndTilePress}
+                        onMouseDown={() => handleStartTilePress(secKey)}
+                        onMouseUp={handleEndTilePress}
+                        onMouseLeave={handleEndTilePress}
+                        onContextMenu={(e) => {
+                          e.preventDefault();
+                          handleOpenRenameTile(secKey);
+                        }}
+                        onClick={(e) => {
+                          if (isLongPressActiveRef.current) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            isLongPressActiveRef.current = false;
+                            return;
+                          }
+                          handleTileClick(secKey);
+                        }}
+                        className="flex flex-col items-center justify-center cursor-pointer group transition-all duration-200 active:scale-90 select-none py-1.5 px-2 rounded-2xl hover:bg-zinc-800/40"
+                        title={`${tileTitle} (затисніть для перейменування)`}
+                      >
+                        <div className="w-10 h-10 flex items-center justify-center transition-transform group-hover:scale-115 text-zinc-300 group-hover:text-[#FFFDD0] drop-shadow-[0_0_8px_rgba(255,255,255,0.15)] group-hover:drop-shadow-[0_0_12px_rgba(255,253,208,0.5)]">
+                          {visual.icon('w-6 h-6 sm:w-6.5 sm:h-6.5')}
+                        </div>
+                        <span className="text-[9.5px] font-bold text-center text-zinc-400 group-hover:text-zinc-100 truncate max-w-[62px] mt-0.5 leading-tight transition-colors">
+                          {tileTitle}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : quickAccessViewMode !== 'list' ? (
                 <div
                   className={`pt-1 ${
                     quickAccessViewMode === 'large'
@@ -4556,11 +4394,9 @@ const CounterTabComponent: React.FC<CounterTabProps> = ({
               </div>
 
               <div className="space-y-3">
-                {!isQuickGoalDocked && (
-                  <CardErrorBoundary cardName="Швидка ціль">
-                    <QuickGoalCard accent={accent} startDate={startDate} isDocked={isQuickGoalDocked} />
-                  </CardErrorBoundary>
-                )}
+                <CardErrorBoundary cardName="Швидка ціль">
+                  <QuickGoalCard accent={accent} startDate={startDate} isDocked={isQuickGoalDocked} />
+                </CardErrorBoundary>
                 {!isGoalsDocked && (
                   <CardErrorBoundary cardName="Ціль">
                     <GoalsSection
@@ -4579,20 +4415,9 @@ const CounterTabComponent: React.FC<CounterTabProps> = ({
         </div>
       )}
 
-      {/* 4. БЛОК: ВІДНОВЛЕННЯ ТА ВООЗ */}
-      {(!isBioPinned || !isWhoPinned) && (
-        <div className={`w-full max-w-md mx-auto mb-3 px-3 transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu will-change-[transform,opacity,filter] ${
-          introSec4Visible
-            ? 'opacity-100 translate-y-0 blur-0 pointer-events-auto'
-            : 'opacity-0 translate-y-4 blur-xl pointer-events-none'
-        }`}>
-          <CardErrorBoundary cardName="Регенерація та Рубежі ВООЗ">
-            <RecoveryPictogramsBlock
-              diffMs={diffMs}
-              onOpenHealthModal={handleHealthClick}
-            />
-          </CardErrorBoundary>
-        </div>
+      {/* When goals section is hidden because both are docked, maintain QuickGoalCard modal listener */}
+      {isQuickGoalDocked && isGoalsDocked && (
+        <QuickGoalCard accent={accent} startDate={startDate} isDocked={true} />
       )}
 
       {/* 5. БЛОК: ПРОСТІР СПОКОЮ */}
@@ -4855,67 +4680,6 @@ const CounterTabComponent: React.FC<CounterTabProps> = ({
         </div>
       )}
 
-
-
-      {/* Timer Interaction Info Modal */}
-      {isTimerInfoOpen && (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
-          <div 
-            className="bg-[#16161c] w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-zinc-800 animate-in zoom-in-95 duration-300"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex justify-between items-start mb-4">
-              <h3 className="text-lg font-bold text-white">Керування таймером</h3>
-              <button 
-                onClick={() => setIsTimerInfoOpen(false)}
-                className="p-1 rounded-full text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-zinc-800 border border-zinc-700/60 rounded-xl text-zinc-300">
-                  <MousePointer2 className="w-5 h-5 text-zinc-300" />
-                </div>
-                <div>
-                  <h4 className="font-semibold text-xs text-zinc-200">Подвійний клік</h4>
-                  <p className="text-xs text-zinc-400 mt-0.5 leading-relaxed">Миттєво приховує таймер. Повернути його можна кнопкою «Показати таймер».</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-zinc-800 border border-zinc-700/60 rounded-xl text-zinc-300">
-                  <MousePointer2 className="w-5 h-5 text-zinc-300" />
-                </div>
-                <div>
-                  <h4 className="font-semibold text-xs text-zinc-200">Один клік</h4>
-                  <p className="text-xs text-zinc-400 mt-0.5 leading-relaxed">Вмикає режим зміни стилю (з'явиться зелена рамка). Клікніть ще раз, щоб вийти.</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-zinc-800 border border-zinc-700/60 rounded-xl text-zinc-300">
-                  <ChevronRightIcon className="w-5 h-5 text-zinc-300" />
-                </div>
-                <div>
-                  <h4 className="font-semibold text-xs text-zinc-200">Свайп (у режимі зміни)</h4>
-                  <p className="text-xs text-zinc-400 mt-0.5 leading-relaxed">Гортайте вліво або вправо по таймеру, щоб швидко перемикати стилі.</p>
-                </div>
-              </div>
-            </div>
-
-            <button
-              onClick={() => setIsTimerInfoOpen(false)}
-              className="w-full mt-6 py-2.5 bg-zinc-100 text-zinc-900 rounded-xl font-bold hover:bg-white active:scale-95 transition-all text-xs cursor-pointer"
-            >
-              Зрозуміло
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Saved Trees Ecological Tip Modal */}
       {isTreeTipOpen && (
         <div 
@@ -4962,7 +4726,7 @@ const CounterTabComponent: React.FC<CounterTabProps> = ({
               <div className="pt-3 border-t border-zinc-800 flex items-center justify-between">
                 <span className="text-xs text-zinc-400 font-medium">Ваш екологічний внесок:</span>
                 <span className="text-sm font-bold font-mono text-zinc-100">
-                  ~{(cigsAvoided / 300).toFixed(1)} {((cigsAvoided / 300) >= 1 && (cigsAvoided / 300) < 5) ? 'дерева' : 'дерев'}
+                  ~{((isNaN(Number(cigsAvoided)) ? 0 : Number(cigsAvoided)) / 300).toFixed(1)} {(((isNaN(Number(cigsAvoided)) ? 0 : Number(cigsAvoided)) / 300) >= 1 && ((isNaN(Number(cigsAvoided)) ? 0 : Number(cigsAvoided)) / 300) < 5) ? 'дерева' : 'дерев'}
                 </span>
               </div>
 

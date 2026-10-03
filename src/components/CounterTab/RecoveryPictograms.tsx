@@ -309,17 +309,6 @@ export const RecoveryPictogramsBlock: React.FC<RecoveryPictogramsBlockProps> = R
                       Регенерація систем
                     </h3>
                   </div>
-
-                  <div className="flex items-center gap-1">
-                    <button
-                      type="button"
-                      onClick={handlePinBio}
-                      className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center p-1.5 -mr-1 -my-1 text-zinc-400 hover:text-zinc-200 cursor-pointer rounded-xl hover:bg-zinc-800/60 active:scale-90 transition-all"
-                      title="Закріпити під блискавкою"
-                    >
-                      <Pin className="w-4 h-4" />
-                    </button>
-                  </div>
                 </div>
 
                 {/* Content: Exact active system & details */}
@@ -383,17 +372,6 @@ export const RecoveryPictogramsBlock: React.FC<RecoveryPictogramsBlockProps> = R
                         {achievedMilestonesCount}/{HEALTH_MILESTONES.length}
                       </span>
                     </div>
-                  </div>
-
-                  <div className="flex items-center gap-1">
-                    <button
-                      type="button"
-                      onClick={handlePinWho}
-                      className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center p-1.5 -mr-1 -my-1 text-zinc-400 hover:text-zinc-200 cursor-pointer rounded-xl hover:bg-zinc-800/60 active:scale-90 transition-all"
-                      title="Закріпити під блискавкою"
-                    >
-                      <Pin className="w-4 h-4" />
-                    </button>
                   </div>
                 </div>
 

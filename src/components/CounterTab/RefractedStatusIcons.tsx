@@ -23,23 +23,23 @@ export const RefractedPrismGiftIcon: React.FC<RefractedStatusIconProps> = ({
     @keyframes refractGiftLevitate {
       0%, 100% {
         transform: translateY(0px) scale(0.97);
-        filter: drop-shadow(0 0 2px rgba(255, 253, 208, 0.6)) drop-shadow(0 0 6px rgba(56, 189, 248, 0.35));
+        filter: drop-shadow(0 0 2px rgba(254, 240, 138, 0.75)) drop-shadow(0 0 6px rgba(245, 158, 11, 0.45));
       }
       50% {
         transform: translateY(-1.5px) scale(1.04);
-        filter: drop-shadow(0 0 4px rgba(254, 240, 138, 0.95)) drop-shadow(0 0 10px rgba(192, 132, 252, 0.6));
+        filter: drop-shadow(0 0 4px rgba(253, 224, 71, 0.95)) drop-shadow(0 0 12px rgba(245, 158, 11, 0.75));
       }
     }
 
     @keyframes refractGiftBowSparkle {
       0%, 100% {
         transform: scale(0.9);
-        opacity: 0.75;
+        opacity: 0.8;
       }
       50% {
         transform: scale(1.25);
         opacity: 1;
-        filter: drop-shadow(0 0 4px #ffffff);
+        filter: drop-shadow(0 0 4px #ffffff) drop-shadow(0 0 6px #fde047);
       }
     }
 
@@ -86,42 +86,42 @@ export const RefractedPrismGiftIcon: React.FC<RefractedStatusIconProps> = ({
     >
       <style>{styleTag}</style>
       <defs>
-        {/* Prismatic Gold Gradient: Diamond White -> Ivory Cream -> Golden Champagne -> Amber */}
+        {/* Prismatic Deep Yellow & Amber Gold Gradient */}
         <linearGradient id="rStatGiftGold" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.95" />
-          <stop offset="25%" stopColor="#FFFDD0" stopOpacity="0.9" />
-          <stop offset="65%" stopColor="#FEF08A" stopOpacity="0.8" />
-          <stop offset="100%" stopColor="#F59E0B" stopOpacity="0.5" />
+          <stop offset="25%" stopColor="#FFFDD0" stopOpacity="0.95" />
+          <stop offset="60%" stopColor="#FDE047" stopOpacity="0.9" />
+          <stop offset="100%" stopColor="#F59E0B" stopOpacity="0.75" />
         </linearGradient>
 
-        {/* Prismatic Cyan-Violet Gradient: Pure White -> Ice Sky -> Sky Cyan -> Electric Indigo */}
-        <linearGradient id="rStatGiftCyan" x1="100%" y1="0%" x2="0%" y2="100%">
+        {/* Luminous Warm Yellow Prismatic Gradient (Warm Yellow Tint) */}
+        <linearGradient id="rStatGiftYellow" x1="100%" y1="0%" x2="0%" y2="100%">
           <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.95" />
-          <stop offset="40%" stopColor="#38BDF8" stopOpacity="0.85" />
-          <stop offset="85%" stopColor="#818CF8" stopOpacity="0.6" />
-          <stop offset="100%" stopColor="#C084FC" stopOpacity="0.4" />
+          <stop offset="35%" stopColor="#FEF08A" stopOpacity="0.9" />
+          <stop offset="70%" stopColor="#FACC15" stopOpacity="0.85" />
+          <stop offset="100%" stopColor="#D97706" stopOpacity="0.65" />
         </linearGradient>
       </defs>
 
       <g className="animate-gift-float">
-        {/* Ambient diagonal refraction ray */}
+        {/* Ambient diagonal refraction ray with warm yellow glow */}
         <line
           x1="2"
           y1="22"
           x2="22"
           y2="2"
-          stroke="url(#rStatGiftCyan)"
-          strokeWidth="0.7"
+          stroke="url(#rStatGiftYellow)"
+          strokeWidth="0.8"
           strokeLinecap="round"
           className="animate-gift-ray-stream"
         />
 
-        {/* Box Body (Crisp faceted glass) */}
+        {/* Box Body (Crisp faceted glass with warm yellow-gold fill) */}
         <path
           d="M 4.5 11 L 19.5 11 L 18 20.5 C 18 21.3 17.2 22 16.3 22 L 7.7 22 C 6.8 22 6 21.3 6 20.5 Z"
           fill="url(#rStatGiftGold)"
-          fillOpacity="0.35"
-          stroke="#FFFDD0"
+          fillOpacity="0.45"
+          stroke="#FDE047"
           strokeWidth="1.2"
           strokeLinejoin="round"
         />
@@ -129,10 +129,10 @@ export const RefractedPrismGiftIcon: React.FC<RefractedStatusIconProps> = ({
         {/* Inner Refraction Facets */}
         <path
           d="M 6.5 14 L 17.5 14 M 7.5 17.5 L 16.5 17.5"
-          stroke="#FFFFFF"
-          strokeWidth="0.6"
+          stroke="#FEF08A"
+          strokeWidth="0.7"
           strokeLinecap="round"
-          opacity="0.5"
+          opacity="0.6"
         />
 
         {/* Vertical Prismatic Ribbon */}
@@ -146,16 +146,16 @@ export const RefractedPrismGiftIcon: React.FC<RefractedStatusIconProps> = ({
           strokeLinecap="round"
         />
 
-        {/* Box Lid (Beveled crystal cap) */}
+        {/* Box Lid (Beveled crystal cap with luminous yellow tint) */}
         <rect
           x="3.5"
           y="7"
           width="17"
           height="4"
           rx="1"
-          fill="url(#rStatGiftCyan)"
-          fillOpacity="0.45"
-          stroke="#FFFFFF"
+          fill="url(#rStatGiftYellow)"
+          fillOpacity="0.55"
+          stroke="#FDE047"
           strokeWidth="1.2"
           strokeLinejoin="round"
         />
@@ -169,20 +169,20 @@ export const RefractedPrismGiftIcon: React.FC<RefractedStatusIconProps> = ({
           strokeLinecap="round"
         />
 
-        {/* Diamond Bow Loops */}
+        {/* Diamond Bow Loops with Yellow Highlights */}
         <path
           d="M 12 7 C 10 3.2 5.5 3.2 4.5 5 C 3.6 6.8 6.5 7.5 12 7 Z"
           fill="url(#rStatGiftGold)"
-          fillOpacity="0.65"
-          stroke="#FFFFFF"
+          fillOpacity="0.75"
+          stroke="#FEF08A"
           strokeWidth="1.1"
           strokeLinejoin="round"
         />
         <path
           d="M 12 7 C 14 3.2 18.5 3.2 19.5 5 C 20.4 6.8 17.5 7.5 12 7 Z"
-          fill="url(#rStatGiftCyan)"
-          fillOpacity="0.65"
-          stroke="#FFFFFF"
+          fill="url(#rStatGiftYellow)"
+          fillOpacity="0.75"
+          stroke="#FDE047"
           strokeWidth="1.1"
           strokeLinejoin="round"
         />
@@ -192,17 +192,17 @@ export const RefractedPrismGiftIcon: React.FC<RefractedStatusIconProps> = ({
           <polygon
             points="12,5.5 13.5,7 12,8.5 10.5,7"
             fill="#FFFFFF"
-            stroke="#FFFDD0"
-            strokeWidth="0.4"
+            stroke="#FDE047"
+            strokeWidth="0.5"
           />
-          <circle cx="12" cy="7" r="0.75" fill="#FEF08A" />
+          <circle cx="12" cy="7" r="0.85" fill="#FACC15" />
         </g>
 
         {/* Corner Micro Glints */}
-        <circle cx="4.5" cy="7" r="0.8" fill="#FFFFFF" opacity="0.9" />
-        <circle cx="19.5" cy="7" r="0.8" fill="#38BDF8" opacity="0.9" />
-        <circle cx="7.7" cy="22" r="0.6" fill="#FFFDD0" opacity="0.8" />
-        <circle cx="16.3" cy="22" r="0.6" fill="#FFFDD0" opacity="0.8" />
+        <circle cx="4.5" cy="7" r="0.8" fill="#FFFFFF" opacity="0.95" />
+        <circle cx="19.5" cy="7" r="0.8" fill="#FDE047" opacity="0.95" />
+        <circle cx="7.7" cy="22" r="0.65" fill="#FEF08A" opacity="0.85" />
+        <circle cx="16.3" cy="22" r="0.65" fill="#FEF08A" opacity="0.85" />
       </g>
     </svg>
   );
@@ -211,7 +211,7 @@ export const RefractedPrismGiftIcon: React.FC<RefractedStatusIconProps> = ({
 /**
  * 2. БЛИСКАВКА / ЦІЛЬ (Refracted Prism Lightning Icon)
  * Стилістика заломленого крізь призму світла (як Зірка та Інь-Ян):
- * - Чіткі кристалічні ребра, електричний спектральний розряд
+ * - Фіолетово-світло: електричний спектральний розряд ніжного та яскравого фіолетового сяйва
  * - Унікальна анімація: високовольтний мікро-імпульс, каустичні спалахи в кутах зламу
  */
 export const RefractedPrismLightningIcon: React.FC<RefractedStatusIconProps> = ({
@@ -224,14 +224,14 @@ export const RefractedPrismLightningIcon: React.FC<RefractedStatusIconProps> = (
     @keyframes refractZapDischarge {
       0%, 100% {
         transform: scale(0.96);
-        filter: drop-shadow(0 0 2px rgba(255, 253, 208, 0.6)) drop-shadow(0 0 6px rgba(56, 189, 248, 0.4));
+        filter: drop-shadow(0 0 2px rgba(233, 213, 255, 0.7)) drop-shadow(0 0 6px rgba(192, 132, 252, 0.5));
       }
       45% {
         transform: scale(1.02);
       }
       50% {
         transform: scale(1.12);
-        filter: drop-shadow(0 0 5px #ffffff) drop-shadow(0 0 12px rgba(254, 240, 138, 0.95)) drop-shadow(0 0 16px rgba(56, 189, 248, 0.8));
+        filter: drop-shadow(0 0 5px #ffffff) drop-shadow(0 0 12px rgba(216, 180, 254, 0.95)) drop-shadow(0 0 18px rgba(168, 85, 247, 0.85));
       }
       55% {
         transform: scale(1.03);
@@ -241,14 +241,14 @@ export const RefractedPrismLightningIcon: React.FC<RefractedStatusIconProps> = (
     @keyframes refractZapArcStream {
       0% {
         stroke-dashoffset: 0;
-        opacity: 0.3;
+        opacity: 0.35;
       }
       50% {
         opacity: 0.95;
       }
       100% {
         stroke-dashoffset: -20;
-        opacity: 0.3;
+        opacity: 0.35;
       }
     }
 
@@ -260,7 +260,7 @@ export const RefractedPrismLightningIcon: React.FC<RefractedStatusIconProps> = (
       50% {
         opacity: 1;
         transform: scale(1.35);
-        filter: drop-shadow(0 0 4px #ffffff);
+        filter: drop-shadow(0 0 4px #ffffff) drop-shadow(0 0 6px #c084fc);
       }
     }
 
@@ -293,49 +293,49 @@ export const RefractedPrismLightningIcon: React.FC<RefractedStatusIconProps> = (
     >
       <style>{styleTag}</style>
       <defs>
-        {/* Golden Refraction Gradient */}
-        <linearGradient id="rStatZapGold" x1="0%" y1="0%" x2="100%" y2="100%">
+        {/* Luminous Light Violet High-Voltage Gradient (Фіолетово-світло) */}
+        <linearGradient id="rStatZapVioletLight" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#FFFFFF" stopOpacity="1" />
-          <stop offset="25%" stopColor="#FFFDD0" stopOpacity="0.95" />
-          <stop offset="65%" stopColor="#FEF08A" stopOpacity="0.85" />
-          <stop offset="100%" stopColor="#F59E0B" stopOpacity="0.5" />
+          <stop offset="25%" stopColor="#F3E8FF" stopOpacity="0.95" />
+          <stop offset="60%" stopColor="#D8B4FE" stopOpacity="0.9" />
+          <stop offset="100%" stopColor="#A855F7" stopOpacity="0.75" />
         </linearGradient>
 
-        {/* Violet-Cyan High Voltage Dispersion */}
-        <linearGradient id="rStatZapViolet" x1="100%" y1="0%" x2="0%" y2="100%">
+        {/* Deep Radiant Violet Core */}
+        <linearGradient id="rStatZapVioletCore" x1="100%" y1="0%" x2="0%" y2="100%">
           <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.95" />
-          <stop offset="45%" stopColor="#C084FC" stopOpacity="0.85" />
-          <stop offset="80%" stopColor="#38BDF8" stopOpacity="0.75" />
-          <stop offset="100%" stopColor="#818CF8" stopOpacity="0.4" />
+          <stop offset="35%" stopColor="#E9D5FF" stopOpacity="0.9" />
+          <stop offset="75%" stopColor="#C084FC" stopOpacity="0.8" />
+          <stop offset="100%" stopColor="#7E22CE" stopOpacity="0.5" />
         </linearGradient>
       </defs>
 
       <g className="animate-zap-core">
-        {/* Diagonal high-energy orbital ray */}
+        {/* Diagonal high-energy orbital ray in light violet */}
         <path
           d="M 20 2 L 4 22"
-          stroke="url(#rStatZapViolet)"
-          strokeWidth="0.7"
+          stroke="url(#rStatZapVioletLight)"
+          strokeWidth="0.8"
           strokeLinecap="round"
           className="animate-zap-arc"
         />
 
-        {/* Main Razor-Sharp Faceted Lightning Bolt */}
+        {/* Main Razor-Sharp Faceted Lightning Bolt in Luminous Violet-Light */}
         <path
           d="M 13.5 1.5 L 4.5 12.5 L 11.5 12.5 L 9.5 22.5 L 19.5 10.5 L 12.5 10.5 L 14.5 1.5 Z"
-          fill="url(#rStatZapGold)"
-          fillOpacity="0.4"
-          stroke="#FFFFFF"
+          fill="url(#rStatZapVioletLight)"
+          fillOpacity="0.55"
+          stroke="#E9D5FF"
           strokeWidth="1.2"
           strokeLinejoin="round"
         />
 
-        {/* Internal Laser Filament Core */}
+        {/* Internal Laser Filament Core in Electric Light Violet */}
         <path
           d="M 13 4 L 7.5 11.5 L 12 11.5 L 10.5 19 L 16.5 11.5 L 12 11.5 Z"
-          fill="url(#rStatZapViolet)"
-          fillOpacity="0.6"
-          stroke="#FFFDD0"
+          fill="url(#rStatZapVioletCore)"
+          fillOpacity="0.75"
+          stroke="#FFFFFF"
           strokeWidth="0.8"
           strokeLinejoin="round"
         />
@@ -343,8 +343,8 @@ export const RefractedPrismLightningIcon: React.FC<RefractedStatusIconProps> = (
         {/* Diamond Sparklets on Lightning Vertices */}
         <circle cx="13.5" cy="1.5" r="1.1" fill="#FFFFFF" className="animate-zap-spark" />
         <circle cx="9.5" cy="22.5" r="1.2" fill="#FFFFFF" className="animate-zap-spark" />
-        <circle cx="19.5" cy="10.5" r="1.0" fill="#38BDF8" />
-        <circle cx="4.5" cy="12.5" r="0.9" fill="#FFFDD0" />
+        <circle cx="19.5" cy="10.5" r="1.0" fill="#E9D5FF" />
+        <circle cx="4.5" cy="12.5" r="0.9" fill="#D8B4FE" />
       </g>
     </svg>
   );
@@ -828,6 +828,285 @@ export const RefractedPrismBookIcon: React.FC<RefractedStatusIconProps> = ({
         <line x1="7.5" y1="8" x2="16.5" y2="8" stroke="#FFFDD0" strokeWidth="1" strokeLinecap="round" />
         <line x1="7.5" y1="11.5" x2="14" y2="11.5" stroke="#FFFDD0" strokeWidth="1" strokeLinecap="round" />
         <circle cx="17" cy="11.5" r="1.1" fill="#FFFFFF" />
+      </g>
+    </svg>
+  );
+};
+
+/**
+ * 8. ЗІРКА МЕДИТАЦІЇ (Refracted Prism Meditation Star Icon)
+ * Стилістика заломленого крізь призму світла:
+ * - Спектральне світіння, розмиття кольору (жовтий, блакитний, білий)
+ * - Чіткі фасети, алмазне ядро, спалахи променів та левітація
+ */
+export const RefractedPrismStarIcon: React.FC<RefractedStatusIconProps> = ({
+  className = "w-5 h-5",
+  size,
+  style,
+  onClick
+}) => {
+  const styleTag = `
+    @keyframes refractStarBreathing {
+      0%, 100% {
+        transform: scale(0.96);
+        filter: drop-shadow(0 0 2px rgba(255, 253, 208, 0.75)) drop-shadow(0 0 6px rgba(56, 189, 248, 0.5)) drop-shadow(0 0 10px rgba(168, 85, 247, 0.35));
+      }
+      50% {
+        transform: scale(1.08);
+        filter: drop-shadow(0 0 4px #ffffff) drop-shadow(0 0 10px rgba(254, 240, 138, 0.95)) drop-shadow(0 0 16px rgba(56, 189, 248, 0.8));
+      }
+    }
+
+    @keyframes refractStarSparks {
+      0%, 100% {
+        transform: scale(0.85);
+        opacity: 0.7;
+      }
+      50% {
+        transform: scale(1.25);
+        opacity: 1;
+        filter: drop-shadow(0 0 4px #ffffff) drop-shadow(0 0 6px #38bdf8);
+      }
+    }
+
+    @keyframes refractStarRayStream {
+      0% {
+        stroke-dashoffset: 0;
+        opacity: 0.35;
+      }
+      50% {
+        opacity: 0.95;
+      }
+      100% {
+        stroke-dashoffset: -18;
+        opacity: 0.35;
+      }
+    }
+
+    .animate-star-core {
+      animation: refractStarBreathing 3.6s ease-in-out infinite;
+      transform-origin: 12px 12px;
+    }
+
+    .animate-star-spark {
+      animation: refractStarSparks 2.2s ease-in-out infinite;
+      transform-origin: center;
+    }
+
+    .animate-star-ray {
+      animation: refractStarRayStream 3.8s linear infinite;
+      stroke-dasharray: 4 2.5;
+    }
+  `;
+
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      width={size}
+      height={size}
+      className={`overflow-visible select-none inline-block align-middle transition-all duration-300 ${className}`}
+      style={style}
+      onClick={onClick}
+      aria-label="Зірка медитації"
+    >
+      <style>{styleTag}</style>
+      <defs>
+        {/* Celestial Star Prism Gradient */}
+        <linearGradient id="rStatStarLight" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#FFFFFF" stopOpacity="1" />
+          <stop offset="25%" stopColor="#FFFDD0" stopOpacity="0.95" />
+          <stop offset="60%" stopColor="#38BDF8" stopOpacity="0.9" />
+          <stop offset="100%" stopColor="#818CF8" stopOpacity="0.65" />
+        </linearGradient>
+
+        {/* Warm Golden Star Core Gradient */}
+        <linearGradient id="rStatStarGold" x1="100%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.95" />
+          <stop offset="35%" stopColor="#FEF08A" stopOpacity="0.9" />
+          <stop offset="70%" stopColor="#FACC15" stopOpacity="0.85" />
+          <stop offset="100%" stopColor="#F59E0B" stopOpacity="0.6" />
+        </linearGradient>
+      </defs>
+
+      <g className="animate-star-core">
+        {/* Ambient diagonal orbital stream ray */}
+        <line
+          x1="2"
+          y1="22"
+          x2="22"
+          y2="2"
+          stroke="url(#rStatStarLight)"
+          strokeWidth="0.8"
+          strokeLinecap="round"
+          className="animate-star-ray"
+        />
+
+        {/* 4-Point Faceted Diamond Prism Star Body */}
+        <path
+          d="M 12 2 C 12 7.5 16.5 12 22 12 C 16.5 12 12 16.5 12 22 C 12 16.5 7.5 12 2 12 C 7.5 12 12 7.5 12 2 Z"
+          fill="url(#rStatStarLight)"
+          fillOpacity="0.55"
+          stroke="#FFFFFF"
+          strokeWidth="1.2"
+          strokeLinejoin="round"
+        />
+
+        {/* Inner Diamond Core */}
+        <polygon
+          points="12,5.5 18.5,12 12,18.5 5.5,12"
+          fill="url(#rStatStarGold)"
+          fillOpacity="0.75"
+          stroke="#FEF08A"
+          strokeWidth="0.8"
+          strokeLinejoin="round"
+        />
+
+        {/* Cross Ray Highlights */}
+        <line x1="12" y1="3" x2="12" y2="21" stroke="#FFFFFF" strokeWidth="0.7" strokeLinecap="round" opacity="0.8" />
+        <line x1="3" y1="12" x2="21" y2="12" stroke="#FFFFFF" strokeWidth="0.7" strokeLinecap="round" opacity="0.8" />
+
+        {/* Micro Diamond Sparkles */}
+        <circle cx="12" cy="12" r="1.4" fill="#FFFFFF" className="animate-star-spark" />
+        <circle cx="12" cy="2" r="0.8" fill="#FFFDD0" />
+        <circle cx="22" cy="12" r="0.8" fill="#38BDF8" />
+        <circle cx="12" cy="22" r="0.8" fill="#FEF08A" />
+        <circle cx="2" cy="12" r="0.8" fill="#38BDF8" />
+      </g>
+    </svg>
+  );
+};
+
+/**
+ * 9. ІНЬ-ЯН / ГАРМОНІЯ (Refracted Prism Yin-Yang Icon)
+ * Класичний біло-чорний монохром зі світловим розмиттям та сяйвом:
+ * - Біла (Ян) та глибока чорна (Інь) грані з чіткими кристалічними ребрами
+ * - Білі та чорні контрастні центри-лінзи
+ * - Сяюче біле розмиття drop-shadow та орбітальний промінь
+ */
+export const RefractedPrismYinYangIcon: React.FC<RefractedStatusIconProps> = ({
+  className = "w-5 h-5",
+  size,
+  style,
+  onClick
+}) => {
+  const styleTag = `
+    @keyframes refractYinYangPulse {
+      0%, 100% {
+        transform: scale(0.96);
+        filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.85)) drop-shadow(0 0 6px rgba(255, 255, 255, 0.45)) drop-shadow(0 0 10px rgba(0, 0, 0, 0.8));
+      }
+      50% {
+        transform: scale(1.08);
+        filter: drop-shadow(0 0 4px #ffffff) drop-shadow(0 0 10px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 16px rgba(255, 255, 255, 0.6));
+      }
+    }
+
+    @keyframes refractYinYangRayStream {
+      0% {
+        stroke-dashoffset: 0;
+        opacity: 0.35;
+      }
+      50% {
+        opacity: 0.95;
+      }
+      100% {
+        stroke-dashoffset: -18;
+        opacity: 0.35;
+      }
+    }
+
+    .animate-yinyang-prism-core {
+      animation: refractYinYangPulse 3.5s ease-in-out infinite;
+      transform-origin: 12px 12px;
+    }
+
+    .animate-yinyang-ray {
+      animation: refractYinYangRayStream 3.8s linear infinite;
+      stroke-dasharray: 4 2.5;
+    }
+  `;
+
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      width={size}
+      height={size}
+      className={`overflow-visible select-none inline-block align-middle transition-all duration-300 ${className}`}
+      style={style}
+      onClick={onClick}
+      aria-label="Інь-Ян гармонія"
+    >
+      <style>{styleTag}</style>
+      <defs>
+        {/* Yang Pure White & Silver Gradient */}
+        <linearGradient id="rStatYinYangWhite" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#FFFFFF" stopOpacity="1" />
+          <stop offset="60%" stopColor="#F4F4F5" stopOpacity="0.95" />
+          <stop offset="100%" stopColor="#D4D4D8" stopOpacity="0.85" />
+        </linearGradient>
+
+        {/* Yin Deep Obsidian Black Gradient */}
+        <linearGradient id="rStatYinYangBlack" x1="100%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#27272A" stopOpacity="0.95" />
+          <stop offset="50%" stopColor="#18181B" stopOpacity="1" />
+          <stop offset="100%" stopColor="#09090B" stopOpacity="1" />
+        </linearGradient>
+      </defs>
+
+      <g className="animate-yinyang-prism-core">
+        {/* Diagonal high-energy orbital ray */}
+        <line
+          x1="2"
+          y1="22"
+          x2="22"
+          y2="2"
+          stroke="#FFFFFF"
+          strokeWidth="0.8"
+          strokeLinecap="round"
+          className="animate-yinyang-ray"
+        />
+
+        {/* Base Circle: Pure Crisp White (Yang) */}
+        <circle
+          cx="12"
+          cy="12"
+          r="9.5"
+          fill="#FFFFFF"
+        />
+
+        {/* Yin Teardrop Half: Deep Obsidian Black */}
+        <path
+          d="M 12 2.5 A 9.5 9.5 0 0 0 12 21.5 A 4.75 4.75 0 0 0 12 12 A 4.75 4.75 0 0 1 12 2.5 Z"
+          fill="#000000"
+        />
+
+        {/* Top Dot (Black circle on White bulge) */}
+        <circle
+          cx="12"
+          cy="7.25"
+          r="1.65"
+          fill="#000000"
+        />
+
+        {/* Bottom Dot (White circle on Black bulge) */}
+        <circle
+          cx="12"
+          cy="16.75"
+          r="1.65"
+          fill="#FFFFFF"
+        />
+
+        {/* Outer Circular Crystal Rim */}
+        <circle
+          cx="12"
+          cy="12"
+          r="9.5"
+          stroke="#FFFFFF"
+          strokeWidth="1.1"
+          fill="none"
+        />
       </g>
     </svg>
   );

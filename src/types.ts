@@ -1,4 +1,4 @@
-export type TabType = 'counter' | 'health' | 'money' | 'state' | 'tree' | 'sand' | 'orbit' | 'unicorn' | 'more' | 'sos';
+export type TabType = 'counter' | 'health' | 'money' | 'state' | 'tree' | 'sand' | 'orbit' | 'more' | 'sos';
 
 export interface DailyMicroStep {
   id: string;

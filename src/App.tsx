@@ -58,9 +58,7 @@ const SandTab = React.lazy(() =>
 const OrbitVoyageTab = React.lazy(() => 
   import('./components/OrbitVoyageTab').then(m => ({ default: m.OrbitVoyageTab }))
 );
-const UnicornChessTab = React.lazy(() => 
-  import('./components/UnicornChessTab').then(m => ({ default: m.UnicornChessTab }))
-);
+
 const MoreTab = React.lazy(() => 
   import('./components/MoreTab').then(m => ({ default: m.MoreTab }))
 );
@@ -283,7 +281,7 @@ function AppContent() {
     };
   }, []);
 
-  const isGameActive = activeTab === 'unicorn' || activeTab === 'sand' || activeTab === 'orbit' || activeTab === 'tree';
+  const isGameActive = activeTab === 'sand' || activeTab === 'orbit' || activeTab === 'tree';
   const isGameEcoSuspended = isGameActive && isGameOptimizationActive;
 
   React.useEffect(() => {
@@ -1583,27 +1581,7 @@ function AppContent() {
               />
             )}
 
-            {activeTab === 'unicorn' && (
-              <UnicornChessTab
-                onSwitchTab={setActiveTab}
-                diffMs={diffMs}
-                startDate={startDate}
-                money={money}
-                totalSaved={totalSaved}
-                cigsAvoided={cigsAvoided}
-                totalSeconds={totalSeconds}
-                activeGoalName={goals.queue[0]?.name}
-                activeGoalPct={activeGoalPct}
-                isGameOptimizationActive={isGameOptimizationActive}
-                onToggleGameOptimization={(val) => {
-                  try {
-                    localStorage.setItem('quit-smoking:game-eco-optimization', String(val));
-                    setIsGameOptimizationActive(val);
-                    window.dispatchEvent(new CustomEvent('game-eco-optimization-change', { detail: val }));
-                  } catch {}
-                }}
-              />
-            )}
+
 
             {activeTab === 'sos' && (
               <SosTab
@@ -1716,7 +1694,7 @@ function AppContent() {
       </main>
 
       {/* Persistent Bottom Navigation Bar (Hidden at very top, smoothly appears on touch drag / scroll down, dynamically scaling) */}
-      {!['tree', 'sand', 'orbit', 'unicorn'].includes(activeTab) && !isZenMode && !isEverythingHidden && (
+      {!['tree', 'sand', 'orbit'].includes(activeTab) && !isZenMode && !isEverythingHidden && (
         <div 
           className={`fixed bottom-3 left-1/2 z-40 transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu will-change-[transform,opacity] w-[calc(100%-1.25rem)] max-w-md ${
             !showBottomNav || isIntroDialogueActive

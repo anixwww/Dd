@@ -112,8 +112,7 @@ const getSectionRefractedPictogram = (key: string, cls: string = 'w-5 h-5') => {
 import { 
   RefractedSandglassIcon, 
   RefractedTreeOfLifeIcon, 
-  RefractedOrbitSphereIcon,
-  RefractedUnicornIcon
+  RefractedOrbitSphereIcon
 } from '../RefractedGameIcons';
 
 /**
@@ -2876,14 +2875,6 @@ const CounterTabComponent: React.FC<CounterTabProps> = ({
         icon: <RefractedOrbitSphereIcon className="w-5 h-5 select-none" />,
         bgClass: 'bg-slate-50/70 hover:bg-slate-100/80 dark:bg-zinc-900/60 dark:hover:bg-zinc-900/90 border-slate-200/80 dark:border-zinc-800',
         iconBgClass: 'bg-indigo-500/10 dark:bg-indigo-500/15 border-indigo-500/25 group-hover:border-indigo-500/45 transition-colors',
-      },
-      {
-        id: 'unicorn',
-        title: 'Білий Єдиноріг',
-        desc: 'Вільний 3D-симулятор ходіння єдинорогом по шахівниці в тумані з ніжними дзвіночками, що тануть вдалині.',
-        icon: <RefractedUnicornIcon className="w-5 h-5 select-none" />,
-        bgClass: 'bg-slate-50/70 hover:bg-slate-100/80 dark:bg-zinc-900/60 dark:hover:bg-zinc-900/90 border-slate-200/80 dark:border-zinc-800',
-        iconBgClass: 'bg-cyan-500/10 dark:bg-cyan-500/15 border-cyan-500/25 group-hover:border-cyan-500/45 transition-colors',
       }
     ];
 

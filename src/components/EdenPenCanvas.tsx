@@ -3,7 +3,58 @@ import {
   X, RotateCcw, Trash2, Save, Image as ImageIcon, 
   PenTool, Eraser, Sun, Sliders, ChevronDown, Palette, Pipette
 } from 'lucide-react';
-import { YinYangGalleryModal, saveArtworkToStorage } from './YinYangGalleryModal';
+interface ArtworkData {
+  title: string;
+  dateStr: string;
+  dataUrl: string;
+  strokeCount: number;
+  spectrumType: string;
+  description: string;
+}
+
+const saveArtworkToStorage = (artwork: ArtworkData) => {
+  try {
+    const list = JSON.parse(localStorage.getItem('quit-smoking:eden-artworks') || '[]');
+    localStorage.setItem('quit-smoking:eden-artworks', JSON.stringify([artwork, ...list]));
+  } catch {}
+};
+
+const YinYangGalleryModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
+  if (!isOpen) return null;
+  let artworks: ArtworkData[] = [];
+  try {
+    artworks = JSON.parse(localStorage.getItem('quit-smoking:eden-artworks') || '[]');
+  } catch {}
+
+  return (
+    <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+      <div className="bg-[#18181f] border border-zinc-700/80 rounded-2xl max-w-xl w-full max-h-[85vh] overflow-y-auto p-5 text-white">
+        <div className="flex items-center justify-between pb-3 mb-4 border-b border-zinc-800">
+          <h3 className="font-bold text-base flex items-center gap-2">
+            <ImageIcon className="w-5 h-5 text-amber-400" />
+            Галерея візерунків гармонії
+          </h3>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-white">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        {artworks.length === 0 ? (
+          <p className="text-sm text-zinc-400 text-center py-8">Галерея порожня. Збережіть свій перший малюнок пензлем гармонії!</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {artworks.map((art, idx) => (
+              <div key={idx} className="bg-zinc-900 rounded-xl overflow-hidden border border-zinc-800 p-2">
+                <img src={art.dataUrl} alt={art.title} className="w-full h-32 object-contain bg-black/40 rounded-lg mb-2" />
+                <h4 className="text-xs font-bold truncate">{art.title}</h4>
+                <p className="text-[10px] text-zinc-400">{art.dateStr}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 interface EdenPenCanvasProps {
   isActive: boolean;

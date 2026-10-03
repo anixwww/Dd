@@ -54,11 +54,13 @@ import {
   Heart,
   FileText,
   Download,
-  Coffee
+  Coffee,
+  Star,
+  Sun,
+  Sliders
 } from 'lucide-react';
 
 import { IndicatorSettingsModal } from '../IndicatorSettingsModal';
-import { getSectionRefractedPictogram } from '../RefractedSectionPictograms';
 import { DailyStepsSection } from '../DailyStepsSection';
 import { MentalHealthCard } from '../MentalHealthCard';
 import { GratitudeJournalCard } from '../GratitudeJournalCard';
@@ -67,9 +69,46 @@ import { restoreAllWindowsToFeed } from '../../utils/cardStorageSafety';
 import { AnalyzerTip } from '../AnalyzerTip';
 import { MotivationalPhrasesModal, MotivationStyle } from '../MotivationalPhrasesModal';
 import { GoalSettingsModal } from '../GoalSettingsModal';
-import { RefractedYinYangIcon } from '../RefractedYinYangIcon';
-import { RefractedMeditationStarIcon } from '../RefractedMeditationStarIcon';
-import { RefractedTimerShell } from '../RefractedTimerShell';
+
+const RefractedYinYangIcon: React.FC<{ className?: string; isDecomposing?: boolean }> = ({ className = 'w-5 h-5' }) => (
+  <div className={`relative flex items-center justify-center ${className}`}>
+    <svg viewBox="0 0 24 24" className="w-full h-full fill-current">
+      <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M12 2a10 10 0 0 0 0 20 5 5 0 0 0 0-10 5 5 0 0 1 0-10z" fill="currentColor" />
+      <circle cx="12" cy="7" r="1.5" fill="none" stroke="currentColor" strokeWidth="1.5" />
+      <circle cx="12" cy="17" r="1.5" fill="currentColor" />
+    </svg>
+  </div>
+);
+
+const RefractedMeditationStarIcon: React.FC<{ className?: string; style?: React.CSSProperties; isDecomposing?: boolean }> = ({ className = 'w-5 h-5', style }) => (
+  <Star className={className} style={style} />
+);
+
+const RefractedTimerShell: React.FC<{ children?: React.ReactNode; className?: string; style?: React.CSSProperties }> = ({ children, className = '', style }) => (
+  <div className={className} style={style}>{children}</div>
+);
+
+const getSectionRefractedPictogram = (key: string, cls: string = 'w-5 h-5') => {
+  switch (key) {
+    case 'calc': return <Calculator className={cls} />;
+    case 'presets': return <Sliders className={cls} />;
+    case 'themes': return <Palette className={cls} />;
+    case 'timer_skins': return <Clock className={cls} />;
+    case 'theme': return <Sun className={cls} />;
+    case 'frameless_style': return <Sparkles className={cls} />;
+    case 'gratitude_journal': return <Heart className={cls} />;
+    case 'daily_steps': return <CheckSquare className={cls} />;
+    case 'mental_health': return <Brain className={cls} />;
+    case 'notes': return <BookOpen className={cls} />;
+    case 'analyzer_thoughts_db': return <FileText className={cls} />;
+    case 'backup': return <Download className={cls} />;
+    case 'perf_optimization': return <Zap className={cls} />;
+    case 'cache_cleanup': return <Trash2 className={cls} />;
+    case 'monitor': return <Activity className={cls} />;
+    default: return <Sparkles className={cls} />;
+  }
+};
 import { 
   RefractedSandglassIcon, 
   RefractedTreeOfLifeIcon, 

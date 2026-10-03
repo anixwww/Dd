@@ -62,7 +62,27 @@ import { TIMER_STYLES, getTimerStyleCssClass } from './CounterTab/TimerStyles';
 import { TimerSkinModal } from './CounterTab/TimerSkinModal';
 import { GratitudeJournalCard } from './GratitudeJournalCard';
 import { DailyStepsSection } from './DailyStepsSection';
-import { getSectionRefractedPictogram } from './RefractedSectionPictograms';
+const getSectionRefractedPictogram = (key: string, cls: string = 'w-5 h-5') => {
+  switch (key) {
+    case 'calc': return <Calculator className={cls} />;
+    case 'presets': return <Target className={cls} />;
+    case 'themes': return <Palette className={cls} />;
+    case 'timer_skins': return <Clock className={cls} />;
+    case 'theme': return <Sun className={cls} />;
+    case 'frameless_style': return <Sparkles className={cls} />;
+    case 'gratitude_journal': return <Heart className={cls} />;
+    case 'daily_steps': return <Check className={cls} />;
+    case 'mental_health': return <Brain className={cls} />;
+    case 'notes': return <BookOpen className={cls} />;
+    case 'analyzer_thoughts_db': return <FileText className={cls} />;
+    case 'backup': return <Download className={cls} />;
+    case 'perf_optimization': return <Zap className={cls} />;
+    case 'cache_cleanup': return <Trash2 className={cls} />;
+    case 'monitor': return <Activity className={cls} />;
+    case 'developer': return <Cpu className={cls} />;
+    default: return <Sparkles className={cls} />;
+  }
+};
 import { MentalHealthCard } from './MentalHealthCard';
 import { AnalyzerThoughtsDatabase } from './AnalyzerThoughtsDatabase';
 import { restoreAllWindowsToFeed, verifyAndRepairDataIntegrity } from '../utils/cardStorageSafety';

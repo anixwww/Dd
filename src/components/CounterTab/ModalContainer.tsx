@@ -9,8 +9,75 @@ import { IndicatorSettingsModal } from '../IndicatorSettingsModal';
 import { CoffeeBreakfastModal } from '../CoffeeBreakfastModal';
 import { StateChartModal } from '../StateChartModal';
 import { HealthAnalyzerModal } from '../HealthAnalyzerModal';
-import { SystemsRecoveryModal } from '../SystemsRecoveryModal';
-import { WhoMilestonesModal } from '../WhoMilestonesModal';
+import { getBodySystemsRecovery, HEALTH_MILESTONES } from '../../data/healthData';
+import { HeartPulse, Activity } from 'lucide-react';
+
+const SystemsRecoveryModal: React.FC<{ isOpen: boolean; onClose: () => void; diffMs?: number }> = ({ isOpen, onClose, diffMs = 0 }) => {
+  if (!isOpen) return null;
+  const systems = getBodySystemsRecovery(diffMs);
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs">
+      <div className="bg-[#18181f] border border-zinc-700/80 rounded-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto p-5 text-white">
+        <div className="flex items-center justify-between pb-3 mb-3 border-b border-zinc-800">
+          <h3 className="font-bold text-base flex items-center gap-2">
+            <HeartPulse className="w-5 h-5 text-rose-400" />
+            Регенерація систем організму
+          </h3>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-white">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <div className="space-y-3">
+          {systems.map((s, idx) => (
+            <div key={idx} className="p-3 bg-zinc-900/80 rounded-xl border border-zinc-800">
+              <div className="flex justify-between text-xs mb-1 font-medium">
+                <span>{s.name}</span>
+                <span className="text-emerald-400 font-bold">{Math.round(s.progress)}%</span>
+              </div>
+              <div className="w-full bg-zinc-800 h-2 rounded-full overflow-hidden">
+                <div className="bg-emerald-500 h-full rounded-full transition-all" style={{ width: `${s.progress}%` }} />
+              </div>
+              <p className="text-[11px] text-zinc-400 mt-1.5">{s.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const WhoMilestonesModal: React.FC<{ isOpen: boolean; onClose: () => void; diffMs?: number }> = ({ isOpen, onClose, diffMs = 0 }) => {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs">
+      <div className="bg-[#18181f] border border-zinc-700/80 rounded-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto p-5 text-white">
+        <div className="flex items-center justify-between pb-3 mb-3 border-b border-zinc-800">
+          <h3 className="font-bold text-base flex items-center gap-2">
+            <Activity className="w-5 h-5 text-amber-400" />
+            Рубежі одужання за ВООЗ
+          </h3>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-white">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <div className="space-y-3">
+          {HEALTH_MILESTONES.map((m, idx) => {
+            const isDone = diffMs >= m.t;
+            return (
+              <div key={idx} className={`p-3 rounded-xl border ${isDone ? 'bg-emerald-950/20 border-emerald-800/40 text-emerald-200' : 'bg-zinc-900/80 border-zinc-800 text-zinc-400'}`}>
+                <div className="flex justify-between text-xs font-bold mb-1">
+                  <span>{m.title}</span>
+                  <span>{isDone ? '✓ Досягнуто' : 'В процесі'}</span>
+                </div>
+                <p className="text-[11px] leading-relaxed">{m.description}</p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
 import { MoneySettings, GoalsState, Streak } from '../../types';
 
 interface ModalContainerProps {

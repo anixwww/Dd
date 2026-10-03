@@ -7,7 +7,24 @@ import {
   getInterleavedThoughtStream,
   matchesCategory
 } from '../data/analyzerThoughts';
-import { RefractedCategoryIcon } from './RefractedCategoryIcons';
+const RefractedCategoryIcon: React.FC<{ category?: string; className?: string }> = ({ category, className }) => {
+  switch (category) {
+    case 'health_advice': return <Heart className={className} />;
+    case 'app_guide': return <Smartphone className={className} />;
+    case 'science': return <Atom className={className} />;
+    case 'nature_wildlife':
+    case 'nature': return <Leaf className={className} />;
+    case 'subtle_mundane':
+    case 'mundane': return <Moon className={className} />;
+    case 'poetic': return <Feather className={className} />;
+    case 'absurd': return <Sparkles className={className} />;
+    case 'jokes':
+    case 'humor': return <Smile className={className} />;
+    case 'hidden_coziness':
+    case 'unobvious': return <Brain className={className} />;
+    default: return <Sparkles className={className} />;
+  }
+};
 import { BotanicalCurlyBracket } from './AnalyzerTip';
 import { 
   Brain, 

@@ -16,9 +16,33 @@ import {
   Feather, Heart, Smartphone, SlidersHorizontal, CircleDot, Cat
 } from 'lucide-react';
 import { ShatteredDialogueText } from './ShatteredDialogueText';
-import { SparklerThoughtCanvas } from './SparklerThoughtCanvas';
+const SparklerThoughtCanvas: React.FC<{
+  active?: boolean;
+  originCoords?: { x: number; y: number } | null;
+  originXPercent?: number;
+  originYPercent?: number;
+  mode?: string;
+}> = () => null;
+
+const RefractedCategoryIcon: React.FC<{ category?: string; className?: string }> = ({ category, className }) => {
+  switch (category) {
+    case 'health_advice': return <Heart className={className} />;
+    case 'app_guide': return <Sparkles className={className} />;
+    case 'science': return <Atom className={className} />;
+    case 'nature_wildlife':
+    case 'nature': return <Leaf className={className} />;
+    case 'subtle_mundane':
+    case 'mundane': return <Compass className={className} />;
+    case 'poetic': return <Feather className={className} />;
+    case 'absurd': return <Zap className={className} />;
+    case 'jokes':
+    case 'humor': return <Smile className={className} />;
+    case 'hidden_coziness':
+    case 'unobvious': return <Coffee className={className} />;
+    default: return <Sparkles className={className} />;
+  }
+};
 import { AnimatedAnalyzerIcon } from './AnimatedAnalyzerIcon';
-import { RefractedCategoryIcon } from './RefractedCategoryIcons';
 import { QuickHourlySliceModal } from './QuickHourlySliceModal';
 import { DailyLungTestModal } from './DailyLungTestModal';
 import {

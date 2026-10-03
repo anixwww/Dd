@@ -18,7 +18,13 @@ const RelapseModal = React.lazy(() => import('./components/Modals').then(m => ({
 const OnboardingModal = React.lazy(() => import('./components/OnboardingModal').then(m => ({ default: m.OnboardingModal })));
 const GuidedTourModal = React.lazy(() => import('./components/GuidedTourModal').then(m => ({ default: m.GuidedTourModal })));
 const AnalyzerNamingModal = React.lazy(() => import('./components/AnalyzerNamingModal').then(m => ({ default: m.AnalyzerNamingModal })));
-const SosCravingTimerModal = React.lazy(() => import('./components/SosCravingTimerModal').then(m => ({ default: m.SosCravingTimerModal })));
+const SosCravingTimerModal: React.FC<{
+  isOpen: boolean;
+  onClose: () => void;
+  onVictory?: () => void;
+  onGoToHome?: () => void;
+  onOpenFullSos?: () => void;
+}> = () => null;
 import { calculateCigsAvoided, calculateTotalSaved } from './utils/moneyCalculator';
 import { checkAndApplyAutoEco } from './utils/autoEcoManager';
 const SosOverlayModal = React.lazy(() => import('./components/SosOverlayModal').then(m => ({ default: m.SosOverlayModal })));
@@ -98,12 +104,31 @@ const STORAGE_KEYS = {
   ANALYZER_STYLE: 'quit-smoking:analyzer-style'
 };
 
-import { useUIStore } from './store/useUIStore';
-import { useSettingsStore } from './store/useSettingsStore';
-
 function AppContent() {
-  const { activeTab, setActiveTab, showBottomNav, setShowBottomNav } = useUIStore();
-  const { money, economyMode, appTheme, setMoney, setEconomyMode, setAppTheme } = useSettingsStore();
+  const [activeTab, setActiveTab] = React.useState<TabType>('counter');
+  const [showBottomNav, setShowBottomNav] = React.useState<boolean>(true);
+  const [money, setMoney] = React.useState<MoneySettings>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.MONEY);
+      return saved ? JSON.parse(saved) : { pricePerPack: 100, cigsPerPack: 20, cigsPerDay: 20, currency: '₴' };
+    } catch {
+      return { pricePerPack: 100, cigsPerPack: 20, cigsPerDay: 20, currency: '₴' };
+    }
+  });
+  const [economyMode, setEconomyMode] = React.useState<boolean>(() => {
+    try {
+      return localStorage.getItem('quit-smoking:eco-mode') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const [appTheme, setAppTheme] = React.useState<string>(() => {
+    try {
+      return localStorage.getItem(STORAGE_KEYS.APP_THEME) || 'standard';
+    } catch {
+      return 'standard';
+    }
+  });
 
   // Local state that is not yet migrated
   const [startDate, setStartDate] = React.useState<number>(() => {

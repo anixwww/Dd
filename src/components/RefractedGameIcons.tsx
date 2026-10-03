@@ -360,5 +360,194 @@ export const RefractedOrbitSphereIcon: React.FC<RefractedGameIconProps> = ({
   );
 };
 
+/**
+ * 4. Заломлена Тибетська Співоча Чаша (Refracted Singing Bowl Icon)
+ * Для дзен-гри "Співочі чаші"
+ */
+export const RefractedSingingBowlIcon: React.FC<RefractedGameIconProps> = ({
+  className = 'w-4 h-4',
+  size,
+  style
+}) => {
+  const css = `
+    @keyframes bowlHarmonicPulse {
+      0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 2px rgba(234, 179, 8, 0.4)) drop-shadow(0 0 6px rgba(217, 119, 6, 0.2));
+      }
+      50% {
+        transform: scale(1.04);
+        filter: drop-shadow(0 0 6px rgba(253, 224, 71, 0.8)) drop-shadow(0 0 12px rgba(234, 179, 8, 0.5));
+      }
+    }
 
+    @keyframes soundWaveEmit {
+      0% {
+        r: 10px;
+        opacity: 0.8;
+      }
+      100% {
+        r: 15px;
+        opacity: 0;
+      }
+    }
+
+    .animate-bowl-pulse {
+      animation: bowlHarmonicPulse 4s ease-in-out infinite;
+      transform-origin: 16px 17px;
+    }
+
+    .animate-soundwave {
+      animation: soundWaveEmit 2.5s cubic-bezier(0.1, 0.8, 0.2, 1) infinite;
+    }
+  `;
+
+  return (
+    <svg
+      viewBox="0 0 32 32"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={`${className} ${!size ? '' : ''}`}
+      style={{
+        width: size ? `${size}px` : undefined,
+        height: size ? `${size}px` : undefined,
+        ...style
+      }}
+    >
+      <style>{css}</style>
+      <defs>
+        <linearGradient id="bowlBronzeGrad" x1="4" y1="12" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FDE047" />
+          <stop offset="35%" stopColor="#EAB308" />
+          <stop offset="70%" stopColor="#B45309" />
+          <stop offset="100%" stopColor="#78350F" />
+        </linearGradient>
+        <linearGradient id="bowlRimGrad" x1="4" y1="12" x2="28" y2="12" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FEF08A" />
+          <stop offset="50%" stopColor="#FDE047" />
+          <stop offset="100%" stopColor="#CA8A04" />
+        </linearGradient>
+        <radialGradient id="bowlWaterGlow" cx="16" cy="15" r="8" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#38BDF8" stopOpacity="0.8" />
+          <stop offset="60%" stopColor="#0284C7" stopOpacity="0.4" />
+          <stop offset="100%" stopColor="#0369A1" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+
+      {/* Акустичні звукові хвилі */}
+      <ellipse cx="16" cy="15" rx="14" ry="6" fill="none" stroke="#FDE047" strokeWidth="0.75" strokeDasharray="3 2" className="animate-soundwave" opacity="0.6" />
+
+      <g className="animate-bowl-pulse">
+        {/* Тіло чаші */}
+        <path
+          d="M 5,14 C 5,23 11,26 16,26 C 21,26 27,23 27,14 Z"
+          fill="url(#bowlBronzeGrad)"
+          stroke="#FACC15"
+          strokeWidth="0.8"
+        />
+
+        {/* Водяна гладь всередині чаші */}
+        <ellipse cx="16" cy="14" rx="10" ry="3.5" fill="url(#bowlWaterGlow)" />
+
+        {/* Вінчик чаші */}
+        <ellipse
+          cx="16"
+          cy="14"
+          rx="11"
+          ry="3.8"
+          fill="none"
+          stroke="url(#bowlRimGrad)"
+          strokeWidth="1.2"
+        />
+
+        {/* Малет (Дерев'яна паличка) */}
+        <line x1="22" y1="5" x2="16" y2="15" stroke="#78350F" strokeWidth="1.8" strokeLinecap="round" />
+        <line x1="22" y1="5" x2="19" y2="10" stroke="#FBBF24" strokeWidth="1.2" strokeLinecap="round" />
+
+        {/* Дзен-іскра резонансу */}
+        <circle cx="16" cy="14" r="1.5" fill="#FFFFFF" opacity="0.9" />
+      </g>
+    </svg>
+  );
+};
+
+/**
+ * 5. Заломлена Зернина Нескінченного Росту (Refracted Infinite Sprout / Tree of Infinity Icon)
+ * Для гри "Медитативне Дерево Нескінченності"
+ */
+export const RefractedInfiniteSproutIcon: React.FC<RefractedGameIconProps> = ({
+  className = 'w-4 h-4',
+  size,
+  style
+}) => {
+  const css = `
+    @keyframes sproutPulse {
+      0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 2px rgba(16, 185, 129, 0.4));
+      }
+      50% {
+        transform: scale(1.06);
+        filter: drop-shadow(0 0 6px rgba(52, 211, 153, 0.8)) drop-shadow(0 0 12px rgba(16, 185, 129, 0.4));
+      }
+    }
+    @keyframes seedGlow {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; }
+    }
+    .animate-sprout-pulse {
+      animation: sproutPulse 4s ease-in-out infinite;
+      transform-origin: 16px 22px;
+    }
+    .animate-seed-glow {
+      animation: seedGlow 3s ease-in-out infinite;
+    }
+  `;
+
+  return (
+    <svg
+      viewBox="0 0 32 32"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={`${className} ${size ? `w-[${size}px] h-[${size}px]` : ''}`}
+      style={style}
+    >
+      <style dangerouslySetInnerHTML={{ __html: css }} />
+      <defs>
+        <linearGradient id="sproutTrunkGrad" x1="16" y1="26" x2="16" y2="6" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#059669" />
+          <stop offset="50%" stopColor="#10B981" />
+          <stop offset="100%" stopColor="#34D399" />
+        </linearGradient>
+        <radialGradient id="sproutSeedGrad" cx="16" cy="24" r="5" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FDE047" />
+          <stop offset="60%" stopColor="#D97706" />
+          <stop offset="100%" stopColor="#78350F" />
+        </radialGradient>
+      </defs>
+
+      {/* Сяючий ореол зернини */}
+      <circle cx="16" cy="24" r="6.5" fill="none" stroke="#34D399" strokeWidth="0.7" opacity="0.4" strokeDasharray="2 2" className="animate-seed-glow" />
+
+      <g className="animate-sprout-pulse">
+        {/* Паросток та розгалуження вгору */}
+        <path
+          d="M 16,24 C 16,19 14,15 16,10 C 17,7 19,6 21,5 M 16,14 C 14,12 11,11 9,11 M 16,10 C 15,9 13,8 12,7"
+          stroke="url(#sproutTrunkGrad)"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+        />
+
+        {/* Листочки на кінцях гілок */}
+        <ellipse cx="22" cy="5" rx="2.5" ry="1.4" transform="rotate(-30 22 5)" fill="#34D399" opacity="0.9" />
+        <ellipse cx="8.5" cy="11" rx="2" ry="1.2" transform="rotate(35 8.5 11)" fill="#6EE7B7" opacity="0.9" />
+        <ellipse cx="11.5" cy="6.5" rx="1.8" ry="1" transform="rotate(-20 11.5 6.5)" fill="#A7F3D0" opacity="0.85" />
+
+        {/* Зернина в основі */}
+        <ellipse cx="16" cy="24" rx="4" ry="2.6" fill="url(#sproutSeedGrad)" stroke="#FBBF24" strokeWidth="0.8" />
+        <circle cx="15.5" cy="23.5" r="1" fill="#FFFFFF" opacity="0.85" />
+      </g>
+    </svg>
+  );
+};
 

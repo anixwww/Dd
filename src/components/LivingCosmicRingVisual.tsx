@@ -865,10 +865,10 @@ export const LivingCosmicRingVisual: React.FC<LivingCosmicRingVisualProps> = ({
         const saved = localStorage.getItem('quit-smoking:analyzer-ring-stars-count');
         if (saved !== null) {
           const val = parseInt(saved, 10);
-          if (!isNaN(val)) return Math.max(1, Math.min(80, val));
+          if (!isNaN(val)) return Math.max(1, Math.min(200, val));
         }
       } catch {}
-      return 40;
+      return 80; // Default initial star count: 80 stars
     };
 
     const initStars = () => {

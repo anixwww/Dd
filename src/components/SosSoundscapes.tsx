@@ -12,22 +12,10 @@ interface SoundscapeTrack {
   scientificBenefit: string;
   color: string;
   activeColor: string;
-  type: 'rain' | 'ocean' | 'forest' | 'bowls' | 'fire' | 'cosmic' | 'chimes';
+  type: 'rain' | 'ocean' | 'forest' | 'fire' | 'cosmic' | 'chimes';
 }
 
 const TRACKS: SoundscapeTrack[] = [
-  {
-    id: 'bowls',
-    name: 'Тибетські чаші 432 Гц',
-    category: 'Глибокий спокій',
-    emoji: '🔔',
-    icon: Bell,
-    description: 'Гармонійний тета-резонанс для миттєвого зниження тиску',
-    scientificBenefit: 'Знижує рівень кортизолу на 30% та уповільнює пульс',
-    color: 'border-amber-500/20 text-amber-500 bg-amber-500/5 hover:bg-amber-500/10',
-    activeColor: 'border-amber-500/60 bg-amber-500/15 text-amber-600 dark:text-amber-400 ring-1 ring-amber-500/30',
-    type: 'bowls'
-  },
   {
     id: 'ocean',
     name: 'Ритмічні хвилі океану',
@@ -345,40 +333,6 @@ export const SosSoundscapes: React.FC = () => {
           osc.stop(chirpTime + 0.08);
         }
       }, 1600);
-
-    } else if (trackType === 'bowls') {
-      // 432 Hz Solfeggio Harmonic Tibetan Singing Bowls + Binaural Theta Beating
-      const harmonics = [
-        { freq: 432, gain: 0.35 },    // Fundamental
-        { freq: 436, gain: 0.30 },    // 4Hz Theta beat
-        { freq: 864, gain: 0.18 },    // 2nd harmonic
-        { freq: 1296, gain: 0.10 },   // 3rd harmonic
-        { freq: 1728, gain: 0.05 },   // 4th harmonic
-        { freq: 216, gain: 0.22 },    // Warm sub-octave
-      ];
-
-      harmonics.forEach(h => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(h.freq, ctx.currentTime);
-
-        // Gentle cosmic shimmer LFO
-        const tremolo = ctx.createOscillator();
-        const tremoloGain = ctx.createGain();
-        tremolo.frequency.setValueAtTime(0.12 + Math.random() * 0.08, ctx.currentTime);
-        tremoloGain.gain.setValueAtTime(h.gain * 0.3, ctx.currentTime);
-        tremolo.connect(tremoloGain);
-        tremoloGain.connect(gain.gain);
-
-        gain.gain.setValueAtTime(h.gain, ctx.currentTime);
-        osc.connect(gain);
-        gain.connect(trackGain);
-
-        osc.start();
-        tremolo.start();
-        cleanupNodes.push(osc, tremolo);
-      });
 
     } else if (trackType === 'fire') {
       // 1. Warm Acoustic Fire Rumbling & Hiss

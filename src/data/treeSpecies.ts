@@ -13,7 +13,7 @@ export const TREE_SPECIES: Record<TreeSpeciesId, TreeSpeciesInfo> = {
     leafColor2: '#41A870',
     trunkColor: '#6B4829',
     specialDetail: 'Жолуді та розлога кована крона',
-    growDaysRealistic: 20
+    growDaysRealistic: 21
   },
   sakura: {
     id: 'sakura',
@@ -27,7 +27,7 @@ export const TREE_SPECIES: Record<TreeSpeciesId, TreeSpeciesInfo> = {
     leafColor2: '#F4A3C2',
     trunkColor: '#5C4436',
     specialDetail: 'Хмари ніжних рожевих пелюсток',
-    growDaysRealistic: 20
+    growDaysRealistic: 21
   },
   pine: {
     id: 'pine',
@@ -41,7 +41,7 @@ export const TREE_SPECIES: Record<TreeSpeciesId, TreeSpeciesInfo> = {
     leafColor2: '#2F9360',
     trunkColor: '#85532F',
     specialDetail: 'Вічнозелена хвоя та молоді шишки',
-    growDaysRealistic: 20
+    growDaysRealistic: 21
   },
   apple: {
     id: 'apple',
@@ -55,7 +55,7 @@ export const TREE_SPECIES: Record<TreeSpeciesId, TreeSpeciesInfo> = {
     leafColor2: '#57B97E',
     trunkColor: '#664C35',
     specialDetail: 'Соковиті червоні яблука серед листя',
-    growDaysRealistic: 20
+    growDaysRealistic: 21
   },
   maple: {
     id: 'maple',
@@ -69,7 +69,7 @@ export const TREE_SPECIES: Record<TreeSpeciesId, TreeSpeciesInfo> = {
     leafColor2: '#F5B041',
     trunkColor: '#73523B',
     specialDetail: 'Золотаве різьблене осіннє листя',
-    growDaysRealistic: 20
+    growDaysRealistic: 21
   }
 };
 
@@ -125,7 +125,7 @@ export const TREE_STAGES: TreeGrowthStage[] = [
     minGrowth: 90,
     maxGrowth: 100,
     name: 'Доросле дозріле дерево',
-    approxDays: '19–20 днів',
+    approxDays: '19–21 день',
     description: 'Дерево повністю дозріло! Воно сповнене життєвої сили та готове перейти у ваш Затишний ліс.',
     careTip: 'Відправте дозріле дерево у Затишний ліс і оберіть нову насінину за наступні 300 сигарет.'
   }

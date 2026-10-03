@@ -24,6 +24,8 @@ import { checkAndApplyAutoEco } from './utils/autoEcoManager';
 const SosOverlayModal = React.lazy(() => import('./components/SosOverlayModal').then(m => ({ default: m.SosOverlayModal })));
 import { MiniResourceBar } from './components/MiniResourceBar';
 import { LivingCosmicRingVisual } from './components/LivingCosmicRingVisual';
+import { HourlyAchievementModal } from './components/HourlyAchievementModal';
+import { CurrentAchievementBadge } from './components/CurrentAchievementBadge';
 
 // Heavy Background Animations Lazy Imports
 const StardustBackground = React.lazy(() => 
@@ -58,6 +60,13 @@ const SandTab = React.lazy(() =>
 const OrbitVoyageTab = React.lazy(() => 
   import('./components/OrbitVoyageTab').then(m => ({ default: m.OrbitVoyageTab }))
 );
+const SingingBowlsTab = React.lazy(() => 
+  import('./components/SingingBowlsTab').then(m => ({ default: m.SingingBowlsTab }))
+);
+const SproutTreeTab = React.lazy(() => 
+  import('./components/SproutTreeTab').then(m => ({ default: m.SproutTreeTab }))
+);
+
 
 const MoreTab = React.lazy(() => 
   import('./components/MoreTab').then(m => ({ default: m.MoreTab }))
@@ -281,7 +290,7 @@ function AppContent() {
     };
   }, []);
 
-  const isGameActive = activeTab === 'sand' || activeTab === 'orbit' || activeTab === 'tree';
+  const isGameActive = activeTab === 'sand' || activeTab === 'orbit' || activeTab === 'bowls' || activeTab === 'sprout';
   const isGameEcoSuspended = isGameActive && isGameOptimizationActive;
 
   React.useEffect(() => {
@@ -1581,6 +1590,14 @@ function AppContent() {
               />
             )}
 
+            {activeTab === 'bowls' && (
+              <SingingBowlsTab onSwitchTab={setActiveTab} />
+            )}
+
+            {activeTab === 'sprout' && (
+              <SproutTreeTab onSwitchTab={setActiveTab} />
+            )}
+
 
 
             {activeTab === 'sos' && (
@@ -1694,7 +1711,7 @@ function AppContent() {
       </main>
 
       {/* Persistent Bottom Navigation Bar (Hidden at very top, smoothly appears on touch drag / scroll down, dynamically scaling) */}
-      {!['tree', 'sand', 'orbit'].includes(activeTab) && !isZenMode && !isEverythingHidden && (
+      {!['sand', 'orbit', 'bowls', 'sprout'].includes(activeTab) && !isZenMode && !isEverythingHidden && (
         <div 
           className={`fixed bottom-3 left-1/2 z-40 transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu will-change-[transform,opacity] w-[calc(100%-1.25rem)] max-w-md ${
             !showBottomNav || isIntroDialogueActive
@@ -2062,6 +2079,9 @@ function AppContent() {
         document.body
       )}
 
+      {/* Floating Current Achievement Badge in Top Right Corner */}
+      <CurrentAchievementBadge startDate={startDate} />
+
       {/* Floating Notification Toast */}
       {appToast && (
         <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-[#12302B] dark:bg-[#1E8A69] text-white text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-full shadow-xl border border-white/20 animate-fade-in flex items-center gap-2">
@@ -2142,6 +2162,8 @@ function AppContent() {
             setActiveTab('sos');
           }}
         />
+
+        <HourlyAchievementModal startDate={startDate} />
       </React.Suspense>
 
       {/* INITIAL FIRST LAUNCH RING REVEAL LOADING OVERLAY */}

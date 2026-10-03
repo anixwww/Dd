@@ -112,7 +112,9 @@ const getSectionRefractedPictogram = (key: string, cls: string = 'w-5 h-5') => {
 import { 
   RefractedSandglassIcon, 
   RefractedTreeOfLifeIcon, 
-  RefractedOrbitSphereIcon
+  RefractedOrbitSphereIcon,
+  RefractedSingingBowlIcon,
+  RefractedInfiniteSproutIcon
 } from '../RefractedGameIcons';
 
 /**
@@ -457,7 +459,7 @@ const getSectionVisual = (key: string): SectionVisualInfo => {
     case "developer":
       return {
         ...baseVisual,
-        title: "Про розробника та підтримка",
+        title: "Підтримка розробника",
         desc: "Автор проекту та банка Monobank"
       };
     case "cache_cleanup":
@@ -516,6 +518,13 @@ const getSectionVisual = (key: string): SectionVisualInfo => {
         ...baseVisual,
         title: "Холодовий шок нирця",
         desc: "Миттєве перезавантаження блукаючого нерва"
+      };
+    case "bowls":
+    case "sos_bowls":
+      return {
+        ...baseVisual,
+        title: "Співочі чаші",
+        desc: "Акустична дзен-симуляція звучання тибетських чаш"
       };
     case "sos_log":
       return {
@@ -1651,7 +1660,7 @@ const CounterTabComponent: React.FC<CounterTabProps> = ({
       const saved = localStorage.getItem('quit-smoking:game-playtimes');
       if (saved) return JSON.parse(saved);
     } catch {}
-    return { tree: 144, orbit: 12, sand: 8 };
+    return { tree: 144, bowls: 48, orbit: 12, sand: 8 };
   });
 
   const handlePlayGame = (gameId: string) => {
@@ -2875,6 +2884,22 @@ const CounterTabComponent: React.FC<CounterTabProps> = ({
         icon: <RefractedOrbitSphereIcon className="w-5 h-5 select-none" />,
         bgClass: 'bg-slate-50/70 hover:bg-slate-100/80 dark:bg-zinc-900/60 dark:hover:bg-zinc-900/90 border-slate-200/80 dark:border-zinc-800',
         iconBgClass: 'bg-indigo-500/10 dark:bg-indigo-500/15 border-indigo-500/25 group-hover:border-indigo-500/45 transition-colors',
+      },
+      {
+        id: 'sprout',
+        title: 'Дерево Нескінченності',
+        desc: 'Медитативне проростання зернини у височінь. Нескінченне розгалуження, цвітіння та перелив дзен-передзвонів.',
+        icon: <RefractedInfiniteSproutIcon className="w-5 h-5 select-none" />,
+        bgClass: 'bg-slate-50/70 hover:bg-slate-100/80 dark:bg-zinc-900/60 dark:hover:bg-zinc-900/90 border-slate-200/80 dark:border-zinc-800',
+        iconBgClass: 'bg-emerald-500/10 dark:bg-emerald-500/15 border-emerald-500/25 group-hover:border-emerald-500/45 transition-colors',
+      },
+      {
+        id: 'bowls',
+        title: 'Співочі чаші',
+        desc: 'Фізична дзен-симуляція звучання тибетських і кришталевих чаш. Спів по вінцю, вібрація води та медитація.',
+        icon: <RefractedSingingBowlIcon className="w-5 h-5 select-none" />,
+        bgClass: 'bg-slate-50/70 hover:bg-slate-100/80 dark:bg-zinc-900/60 dark:hover:bg-zinc-900/90 border-slate-200/80 dark:border-zinc-800',
+        iconBgClass: 'bg-amber-500/10 dark:bg-amber-500/15 border-amber-500/25 group-hover:border-amber-500/45 transition-colors',
       }
     ];
 

@@ -30,6 +30,7 @@ import { HealthyReplacements } from './HealthyReplacements';
 import { AntiStressBubbles } from './AntiStressBubbles';
 import { CopingCardsWidget } from './CopingCardsWidget';
 import { MonolithicSegmentedControl } from './MonolithicSegmentedControl';
+import { RefractedSingingBowlIcon } from './RefractedGameIcons';
 
 export interface SosCrisisEntry {
   id: string;
@@ -62,7 +63,6 @@ export const SosTab: React.FC<SosTabProps> = React.memo(({
 }) => {
   const [mode, setMode] = useState<SosMode>('menu');
   const [activeProtocol, setActiveProtocol] = useState<string>('Загальний виклик SOS');
-  const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
 
   // Quick access pinned sections state
   const [pinnedSections, setPinnedSections] = useState<string[]>(() => {
@@ -131,19 +131,6 @@ export const SosTab: React.FC<SosTabProps> = React.memo(({
       localStorage.setItem('quit-smoking:sos-phone', trimmed);
     } catch {}
     setIsEditingPhone(false);
-  };
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setElapsedSeconds((prev) => prev + 1);
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const formatElapsed = (totalSec: number) => {
-    const mins = Math.floor(totalSec / 60);
-    const secs = totalSec % 60;
-    return `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
 
   // Crisis Log History State
@@ -351,13 +338,14 @@ export const SosTab: React.FC<SosTabProps> = React.memo(({
       action: 'Почати дихати',
       icon: Wind,
       svg: (
-        <svg viewBox="0 0 60 60" className="w-10 h-10 select-none opacity-80 group-hover:opacity-100 transition-opacity">
-          <circle cx="30" cy="30" r="22" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="3 3" className="text-slate-400 dark:text-zinc-500 animate-spin" style={{ animationDuration: '18s' }} />
-          <circle cx="30" cy="30" r="14" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-emerald-500/60" />
-          <circle cx="30" cy="30" r="6" fill="currentColor" className="text-emerald-500" />
+        <svg viewBox="0 0 60 60" className="w-10 h-10 select-none opacity-85 group-hover:opacity-100 transition-opacity">
+          <circle cx="30" cy="30" r="22" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="3 3" className="text-zinc-600 animate-spin" style={{ animationDuration: '18s' }} />
+          <circle cx="30" cy="30" r="14" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-emerald-400/70" />
+          <circle cx="30" cy="30" r="5" fill="currentColor" className="text-emerald-400" />
         </svg>
       )
     },
+
     {
       id: 'wave',
       title: 'Серфінг хвилі',
@@ -365,10 +353,10 @@ export const SosTab: React.FC<SosTabProps> = React.memo(({
       action: 'Перечекати хвилю',
       icon: Waves,
       svg: (
-        <svg viewBox="0 0 60 60" className="w-10 h-10 select-none opacity-80 group-hover:opacity-100 transition-opacity">
-          <path d="M10,34 Q20,20 30,34 T50,34" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-teal-500" />
-          <path d="M12,40 Q22,26 32,40 T52,40" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" className="text-teal-400/50" />
-          <circle cx="30" cy="20" r="3" fill="currentColor" className="text-amber-400" />
+        <svg viewBox="0 0 60 60" className="w-10 h-10 select-none opacity-85 group-hover:opacity-100 transition-opacity">
+          <path d="M10,34 Q20,20 30,34 T50,34" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" className="text-teal-400/80" />
+          <path d="M12,40 Q22,26 32,40 T52,40" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" className="text-zinc-500" />
+          <circle cx="30" cy="20" r="3" fill="currentColor" className="text-amber-400/90" />
         </svg>
       )
     },
@@ -379,10 +367,10 @@ export const SosTab: React.FC<SosTabProps> = React.memo(({
       action: 'Увімкнути відчуття',
       icon: Eye,
       svg: (
-        <svg viewBox="0 0 60 60" className="w-10 h-10 select-none opacity-80 group-hover:opacity-100 transition-opacity">
-          <circle cx="30" cy="30" r="18" fill="none" stroke="currentColor" strokeWidth="1.2" className="text-slate-400 dark:text-zinc-500" />
-          <ellipse cx="30" cy="30" rx="14" ry="7" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-indigo-500" />
-          <circle cx="30" cy="30" r="4" fill="currentColor" className="text-indigo-500" />
+        <svg viewBox="0 0 60 60" className="w-10 h-10 select-none opacity-85 group-hover:opacity-100 transition-opacity">
+          <circle cx="30" cy="30" r="18" fill="none" stroke="currentColor" strokeWidth="1.2" className="text-zinc-600" />
+          <ellipse cx="30" cy="30" rx="14" ry="7" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-indigo-400/80" />
+          <circle cx="30" cy="30" r="3.5" fill="currentColor" className="text-zinc-200" />
         </svg>
       )
     },
@@ -393,11 +381,11 @@ export const SosTab: React.FC<SosTabProps> = React.memo(({
       action: 'Слухати звуки',
       icon: Music,
       svg: (
-        <svg viewBox="0 0 60 60" className="w-10 h-10 select-none opacity-80 group-hover:opacity-100 transition-opacity">
-          <circle cx="30" cy="30" r="18" fill="none" stroke="currentColor" strokeWidth="1" className="text-slate-400 dark:text-zinc-500" />
-          <rect x="22" y="24" width="3" height="12" rx="1.5" fill="currentColor" className="text-sky-500" />
-          <rect x="28" y="18" width="3" height="24" rx="1.5" fill="currentColor" className="text-sky-500" />
-          <rect x="34" y="22" width="3" height="16" rx="1.5" fill="currentColor" className="text-sky-500" />
+        <svg viewBox="0 0 60 60" className="w-10 h-10 select-none opacity-85 group-hover:opacity-100 transition-opacity">
+          <circle cx="30" cy="30" r="18" fill="none" stroke="currentColor" strokeWidth="1" className="text-zinc-600" />
+          <rect x="22" y="24" width="3" height="12" rx="1.5" fill="currentColor" className="text-sky-400/80" />
+          <rect x="28" y="18" width="3" height="24" rx="1.5" fill="currentColor" className="text-zinc-300" />
+          <rect x="34" y="22" width="3" height="16" rx="1.5" fill="currentColor" className="text-sky-400/80" />
         </svg>
       )
     },
@@ -408,11 +396,11 @@ export const SosTab: React.FC<SosTabProps> = React.memo(({
       action: 'Крутити колесо',
       icon: Compass,
       svg: (
-        <svg viewBox="0 0 60 60" className="w-10 h-10 select-none opacity-80 group-hover:opacity-100 transition-opacity">
-          <circle cx="30" cy="30" r="20" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-amber-500/70" />
-          <line x1="30" y1="10" x2="30" y2="50" stroke="currentColor" strokeWidth="1" className="text-slate-400 dark:text-zinc-600" />
-          <line x1="10" y1="30" x2="50" y2="30" stroke="currentColor" strokeWidth="1" className="text-slate-400 dark:text-zinc-600" />
-          <circle cx="30" cy="30" r="4" fill="currentColor" className="text-amber-500" />
+        <svg viewBox="0 0 60 60" className="w-10 h-10 select-none opacity-85 group-hover:opacity-100 transition-opacity">
+          <circle cx="30" cy="30" r="20" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-amber-400/70" />
+          <line x1="30" y1="10" x2="30" y2="50" stroke="currentColor" strokeWidth="1" className="text-zinc-600" />
+          <line x1="10" y1="30" x2="50" y2="30" stroke="currentColor" strokeWidth="1" className="text-zinc-600" />
+          <circle cx="30" cy="30" r="3.5" fill="currentColor" className="text-amber-400" />
         </svg>
       )
     },
@@ -423,10 +411,10 @@ export const SosTab: React.FC<SosTabProps> = React.memo(({
       action: 'Грати (1 хв)',
       icon: Gamepad2,
       svg: (
-        <svg viewBox="0 0 60 60" className="w-10 h-10 select-none opacity-80 group-hover:opacity-100 transition-opacity">
-          <circle cx="24" cy="26" r="10" fill="currentColor" className="text-indigo-500/30" stroke="currentColor" strokeWidth="1.2" />
-          <circle cx="38" cy="34" r="8" fill="currentColor" className="text-pink-500/30" stroke="currentColor" strokeWidth="1.2" />
-          <circle cx="22" cy="40" r="5" fill="currentColor" className="text-teal-500/30" stroke="currentColor" strokeWidth="1.2" />
+        <svg viewBox="0 0 60 60" className="w-10 h-10 select-none opacity-85 group-hover:opacity-100 transition-opacity">
+          <circle cx="24" cy="26" r="10" fill="none" stroke="currentColor" strokeWidth="1.3" className="text-indigo-400/70" />
+          <circle cx="38" cy="34" r="8" fill="none" stroke="currentColor" strokeWidth="1.3" className="text-zinc-400" />
+          <circle cx="22" cy="40" r="5" fill="currentColor" className="text-teal-400/60" />
         </svg>
       )
     },
@@ -437,10 +425,10 @@ export const SosTab: React.FC<SosTabProps> = React.memo(({
       action: 'Читати факти',
       icon: BookOpen,
       svg: (
-        <svg viewBox="0 0 60 60" className="w-10 h-10 select-none opacity-80 group-hover:opacity-100 transition-opacity">
-          <rect x="18" y="16" width="24" height="30" rx="3" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-rose-500/70" />
-          <line x1="23" y1="24" x2="37" y2="24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-slate-500 dark:text-zinc-400" />
-          <line x1="23" y1="30" x2="33" y2="30" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-slate-500 dark:text-zinc-400" />
+        <svg viewBox="0 0 60 60" className="w-10 h-10 select-none opacity-85 group-hover:opacity-100 transition-opacity">
+          <rect x="18" y="16" width="24" height="30" rx="3" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-zinc-400" />
+          <line x1="23" y1="24" x2="37" y2="24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-rose-400/70" />
+          <line x1="23" y1="30" x2="33" y2="30" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-zinc-500" />
         </svg>
       )
     },
@@ -451,16 +439,16 @@ export const SosTab: React.FC<SosTabProps> = React.memo(({
       action: 'Дізнатися кроки',
       icon: Droplets,
       svg: (
-        <svg viewBox="0 0 60 60" className="w-10 h-10 select-none opacity-80 group-hover:opacity-100 transition-opacity">
-          <path d="M30,14 C30,14 18,30 18,37 C18,44 23.4,49 30,49 C36.6,49 42,44 42,37 C42,30 30,14 30,14 Z" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-sky-500" />
-          <circle cx="28" cy="38" r="3" fill="currentColor" className="text-sky-400/50" />
+        <svg viewBox="0 0 60 60" className="w-10 h-10 select-none opacity-85 group-hover:opacity-100 transition-opacity">
+          <path d="M30,14 C30,14 18,30 18,37 C18,44 23.4,49 30,49 C36.6,49 42,44 42,37 C42,30 30,14 30,14 Z" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-sky-400/80" />
+          <circle cx="28" cy="38" r="3" fill="currentColor" className="text-zinc-200" />
         </svg>
       )
     }
   ];
 
   return (
-    <div className="flex flex-col flex-1 pb-6 max-w-md mx-auto w-full animate-fadeIn select-none">
+    <div className="flex flex-col flex-1 pb-6 max-w-md mx-auto w-full animate-fadeIn select-none pt-1">
       {/* Toast Notification */}
       {feedbackMsg && (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[200] max-w-sm w-[90%] p-3 bg-emerald-600 text-white rounded-2xl text-xs font-bold text-center shadow-xl animate-fadeIn flex items-center justify-center gap-2">
@@ -469,57 +457,10 @@ export const SosTab: React.FC<SosTabProps> = React.memo(({
         </div>
       )}
 
-      {/* 1. HERO ТАЙМЕР КРИЗИ В ТОЧНОМУ СТИЛІ ГОЛОВНОЇ */}
-      <div className="mb-4 p-4 flex flex-col justify-center items-center text-center relative">
-        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/10 dark:bg-rose-950/30 border border-rose-500/25 text-rose-600 dark:text-rose-400 text-xs font-bold mb-2">
-          <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
-          <span>Кризовий контроль у реальному часі</span>
-        </div>
-
-        {/* Великий цифровий таймер як на Головній */}
-        <h1 className="text-4xl sm:text-5xl font-black font-mono tracking-tight text-slate-800 dark:text-zinc-100 my-1 animate-pulse">
-          {formatElapsed(elapsedSeconds)}
-        </h1>
-
-        <p className="text-xs text-slate-500 dark:text-zinc-400 max-w-xs mx-auto leading-relaxed mt-1 font-medium">
-          Найгостріша фаза тяги триває лише <span className="font-bold text-slate-700 dark:text-zinc-200">3–5 хвилин</span>. Витримайте цей пік — і хвиля спаде.
-        </p>
-      </div>
-
-      {/* ШВИДКІ ІНСТРУМЕНТИ: ЖУРНАЛ КРИЗ ТА ДЗВІНОК ДРУГУ */}
+      {/* ШВИДКІ ІНСТРУМЕНТИ: 1. ДЗВІНОК ДРУГУ | 2. ЖУРНАЛ КРИЗ */}
       {mode === 'menu' && (
-        <div className="grid grid-cols-2 gap-2 mb-3 px-0.5">
-          <div 
-            onClick={() => handleSelectMode('log', 'Журнал звернень')}
-            className="p-3 rounded-2xl bg-white dark:bg-zinc-900/70 border border-slate-200/90 dark:border-zinc-800 flex items-center justify-between gap-2 cursor-pointer hover:bg-slate-50 dark:hover:bg-zinc-800/80 transition-all text-left shadow-2xs group"
-          >
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-7 h-7 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
-                <History className="w-4 h-4" />
-              </div>
-              <div className="min-w-0">
-                <div className="text-xs font-bold text-slate-800 dark:text-zinc-100 truncate group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
-                  Журнал криз
-                </div>
-                <div className="text-[10px] text-slate-400 dark:text-zinc-500 truncate">
-                  {crisisLog.length} записів
-                </div>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={(e) => togglePinSection('sos_log', e)}
-              className={`p-1.5 rounded-lg transition-all cursor-pointer ${
-                pinnedSections.includes('sos_log')
-                  ? 'bg-amber-500/20 text-amber-500 dark:text-amber-400 border border-amber-500/40'
-                  : 'text-slate-400 hover:text-slate-600 dark:text-zinc-500 dark:hover:text-zinc-300'
-              }`}
-              title={pinnedSections.includes('sos_log') ? "Прибрати зі Швидкого доступу" : "Закріпити у Швидкий доступ на Головній"}
-            >
-              <Pin className={`w-3.5 h-3.5 ${pinnedSections.includes('sos_log') ? 'fill-current' : ''}`} />
-            </button>
-          </div>
-
+        <div className="grid grid-cols-2 gap-2.5 mb-3.5 px-0.5">
+          {/* 1. ДЗВІНОК ДРУГУ (ПЕРША ВКЛАДКА) */}
           <div 
             onClick={() => {
               if (sosPhone) {
@@ -528,17 +469,17 @@ export const SosTab: React.FC<SosTabProps> = React.memo(({
                 setIsEditingPhone(true);
               }
             }}
-            className="p-3 rounded-2xl bg-white dark:bg-zinc-900/70 border border-slate-200/90 dark:border-zinc-800 flex items-center justify-between gap-2 cursor-pointer hover:bg-slate-50 dark:hover:bg-zinc-800/80 transition-all text-left shadow-2xs group"
+            className="p-3 rounded-2xl bg-white dark:bg-[#18181f]/90 border border-slate-200/90 dark:border-zinc-800/80 flex items-center justify-between gap-2 cursor-pointer hover:bg-slate-50 dark:hover:bg-[#1f1f27] transition-all text-left shadow-2xs group"
           >
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-7 h-7 rounded-xl bg-rose-500/15 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
-                <PhoneCall className="w-4 h-4" />
+              <div className="w-8 h-8 rounded-xl bg-zinc-800/80 text-zinc-200 border border-zinc-700/50 flex items-center justify-center shrink-0 shadow-xs group-hover:border-zinc-600 transition-colors">
+                <PhoneCall className="w-4 h-4 text-zinc-200" />
               </div>
               <div className="min-w-0">
-                <div className="text-xs font-bold text-slate-800 dark:text-zinc-100 truncate group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
+                <div className="text-xs font-bold text-slate-800 dark:text-zinc-100 truncate group-hover:text-zinc-200 transition-colors">
                   Дзвінок другу
                 </div>
-                <div className="text-[10px] text-slate-400 dark:text-zinc-500 truncate">
+                <div className="text-[10px] text-slate-400 dark:text-zinc-400 truncate">
                   {sosPhone || 'Налаштувати'}
                 </div>
               </div>
@@ -549,10 +490,42 @@ export const SosTab: React.FC<SosTabProps> = React.memo(({
                 e.stopPropagation();
                 setIsEditingPhone(true);
               }}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:text-zinc-500 dark:hover:text-zinc-300"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:text-zinc-400 dark:hover:text-zinc-200"
               title="Змінити номер"
             >
               <Edit3 className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          {/* 2. ЖУРНАЛ КРИЗ */}
+          <div 
+            onClick={() => handleSelectMode('log', 'Журнал звернень')}
+            className="p-3 rounded-2xl bg-white dark:bg-[#18181f]/90 border border-slate-200/90 dark:border-zinc-800/80 flex items-center justify-between gap-2 cursor-pointer hover:bg-slate-50 dark:hover:bg-[#1f1f27] transition-all text-left shadow-2xs group"
+          >
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-8 h-8 rounded-xl bg-zinc-800/80 text-zinc-200 border border-zinc-700/50 flex items-center justify-center shrink-0 shadow-xs group-hover:border-zinc-600 transition-colors">
+                <History className="w-4 h-4 text-zinc-200" />
+              </div>
+              <div className="min-w-0">
+                <div className="text-xs font-bold text-slate-800 dark:text-zinc-100 truncate group-hover:text-zinc-200 transition-colors">
+                  Журнал криз
+                </div>
+                <div className="text-[10px] text-slate-400 dark:text-zinc-400 truncate">
+                  {crisisLog.length} записів
+                </div>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={(e) => togglePinSection('sos_log', e)}
+              className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+                pinnedSections.includes('sos_log')
+                  ? 'bg-amber-500/20 text-amber-500 dark:text-amber-400 border border-amber-500/40'
+                  : 'text-slate-400 hover:text-slate-600 dark:text-zinc-400 dark:hover:text-zinc-200'
+              }`}
+              title={pinnedSections.includes('sos_log') ? "Прибрати зі Швидкого доступу" : "Закріпити у Швидкий доступ на Головній"}
+            >
+              <Pin className={`w-3.5 h-3.5 ${pinnedSections.includes('sos_log') ? 'fill-current' : ''}`} />
             </button>
           </div>
         </div>
@@ -560,18 +533,18 @@ export const SosTab: React.FC<SosTabProps> = React.memo(({
 
       {/* ФОРМА НАЛАШТУВАННЯ ТЕЛЕФОНУ */}
       {isEditingPhone && (
-        <div className="p-3.5 mb-3 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-left space-y-2 animate-fadeIn">
-          <div className="text-xs font-bold text-rose-700 dark:text-rose-300 flex items-center justify-between">
+        <div className="p-3.5 mb-3.5 rounded-2xl bg-zinc-800/60 border border-zinc-700/60 text-left space-y-2 animate-fadeIn">
+          <div className="text-xs font-bold text-zinc-200 flex items-center justify-between">
             <span>Номер екстреної підтримки</span>
             <button
               type="button"
               onClick={() => setIsEditingPhone(false)}
-              className="text-slate-400 hover:text-slate-600"
+              className="text-slate-400 hover:text-slate-600 dark:text-zinc-400 dark:hover:text-zinc-200"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
-          <p className="text-[10px] text-slate-600 dark:text-zinc-400">
+          <p className="text-[10px] text-slate-500 dark:text-zinc-400">
             Введіть номер близької людини чи гарячої лінії для швидкого дзвінка у момент кризи:
           </p>
           <div className="flex gap-2">
@@ -580,35 +553,15 @@ export const SosTab: React.FC<SosTabProps> = React.memo(({
               value={phoneInputText}
               onChange={(e) => setPhoneInputText(e.target.value)}
               placeholder="+380..."
-              className="flex-1 px-3 py-1.5 rounded-xl border border-rose-300 dark:border-rose-900 bg-white dark:bg-zinc-900 text-xs font-mono"
+              className="flex-1 px-3 py-1.5 rounded-xl border border-zinc-700 bg-white dark:bg-zinc-900 text-xs font-mono text-zinc-100"
             />
             <button
               type="button"
               onClick={() => saveSosPhone(phoneInputText)}
-              className="px-3 py-1.5 bg-rose-600 text-white rounded-xl text-xs font-bold cursor-pointer"
+              className="px-3.5 py-1.5 bg-zinc-700 hover:bg-zinc-600 text-white rounded-xl text-xs font-bold cursor-pointer transition-colors"
             >
               Зберегти
             </button>
-          </div>
-        </div>
-      )}
-
-      {/* 2. ІНФОРМАЦІЙНА ПІДКАЗКА ПРО ЗАКРІПЛЕННЯ У ШВИДКИЙ ДОСТУП */}
-      {mode === 'menu' && (
-        <div className="p-3.5 mb-4 rounded-3xl bg-gradient-to-r from-amber-500/10 via-purple-500/10 to-indigo-500/10 border border-amber-500/25 dark:border-amber-500/20 flex items-start gap-3 text-left shadow-xs">
-          <div className="w-8 h-8 rounded-2xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 mt-0.5">
-            <Pin className="w-4 h-4" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h4 className="text-xs font-bold text-slate-800 dark:text-zinc-100 flex items-center gap-1.5">
-              <span>Швидкий доступ на Головній</span>
-              <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 font-extrabold uppercase tracking-wider">
-                Підказка
-              </span>
-            </h4>
-            <p className="text-[11px] text-slate-600 dark:text-zinc-300 leading-relaxed mt-1">
-              Ви можете закріпити будь-яку картку чи практику з розділів <strong>«SOS»</strong> та <strong>«Ще»</strong> прямо у блок <strong>«Швидкий доступ»</strong> на головному екрані. Натискайте іконку шпильки <span className="inline-flex items-center text-amber-500 font-bold">📌</span> біля потрібної вкладки.
-            </p>
           </div>
         </div>
       )}
@@ -790,35 +743,115 @@ export const SosTab: React.FC<SosTabProps> = React.memo(({
             </div>
           )}
 
-          {/* ХОЛОДОВИЙ ШОК */}
+          {/* ХОЛОДОВИЙ РЕФЛЕКС НИРЦЯ */}
           {mode === 'cold' && (
-            <div className="p-5 rounded-3xl bg-white/80 dark:bg-[#18181c]/80 border border-slate-200/80 dark:border-zinc-800/80 space-y-4">
-              <div className="space-y-3">
-                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-zinc-900 border border-slate-200/50 dark:border-zinc-800 flex items-start gap-3.5 text-xs">
-                  <div className="w-6 h-6 rounded-lg bg-teal-500/10 dark:bg-teal-500/15 text-teal-600 dark:text-teal-400 flex items-center justify-center flex-none font-black">
+            <div className="p-5 rounded-3xl bg-white/80 dark:bg-[#18181c]/80 border border-slate-200/80 dark:border-zinc-800/80 space-y-4 animate-fadeIn">
+              {/* Header Badge & Title */}
+              <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-sky-500/10 dark:bg-sky-500/15 border border-sky-500/20">
+                <div className="w-10 h-10 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center flex-none font-bold">
+                  <Droplets className="w-5 h-5 text-sky-400" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-800 dark:text-zinc-100">
+                    Холодовий рефлекс нирця (Mammalian Dive Reflex)
+                  </h3>
+                  <p className="text-[11px] text-sky-600 dark:text-sky-300 font-medium">
+                    Миттєве фізіологічне гальмування паніки та гострої тяги
+                  </p>
+                </div>
+              </div>
+
+              {/* SECTION 1: Як це допомагає (Нейробіологія) */}
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-zinc-900/90 border border-slate-200/60 dark:border-zinc-800/80 space-y-2.5">
+                <div className="flex items-center gap-2 text-xs font-bold text-sky-600 dark:text-sky-400">
+                  <Sparkles className="w-4 h-4" />
+                  <span>Як це допомагає (Фізіологічний механізм):</span>
+                </div>
+                <ul className="space-y-2 text-xs text-slate-600 dark:text-zinc-300 leading-relaxed">
+                  <li className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-sky-400 mt-1.5 flex-none" />
+                    <span>
+                      <strong className="text-slate-800 dark:text-zinc-100">Активація блукаючого нерва (Nervus Vagus):</strong> Рецептори трійчастого нерва на обличчі (навколо очей, носа та щік) миттєво реагують на вплив холоду та вологи.
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-sky-400 mt-1.5 flex-none" />
+                    <span>
+                      <strong className="text-slate-800 dark:text-zinc-100">Зниження пульсу на 10–25%:</strong> Сигнал мозочка стимулює сповільнення серцебиття (брадикардію) за 10–20 секунд. Серце починає битися спокійніше.
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-sky-400 mt-1.5 flex-none" />
+                    <span>
+                      <strong className="text-slate-800 dark:text-zinc-100">Блокування адреналіну:</strong> Мозок перемикається зі стану тривоги «бий або біжи» на режим збереження ресурсів. У такому стані панічна атака чи гостра тяга біохімічно не можуть утримувати піковий рівень.
+                    </span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* SECTION 2: Що саме робити (Покроковий алгоритм) */}
+              <div className="space-y-2.5">
+                <h4 className="text-xs font-bold text-slate-800 dark:text-zinc-200 flex items-center gap-1.5">
+                  <span>Що саме робити (оберіть один із методів):</span>
+                </h4>
+
+                {/* Method 1 */}
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-zinc-900 border border-slate-200/50 dark:border-zinc-800/80 flex items-start gap-3 text-xs">
+                  <div className="w-6 h-6 rounded-lg bg-sky-500/15 text-sky-400 flex items-center justify-center flex-none font-bold text-[11px]">
                     1
                   </div>
-                  <p className="text-slate-600 dark:text-zinc-300 leading-relaxed font-medium">
-                    Повільно випийте склянку холодної води дрібними ковтками, фокусуючись на фізичному відчутті прохолоди в горлі.
-                  </p>
+                  <div className="space-y-1">
+                    <p className="font-bold text-slate-800 dark:text-zinc-200">
+                      Занурення або вмивання обличчя (Найпотужніший спосіб)
+                    </p>
+                    <p className="text-slate-600 dark:text-zinc-400 leading-relaxed text-[11px]">
+                      Наберіть у миску чи раковину холодної води (10–15°C). Затримайте подих і нахиліться, зануривши обличчя (щоки, ніс, під очима) на 10–15 секунд. Або інтенсивно ополосніть обличчя крижаною водою 3–5 разів.
+                    </p>
+                  </div>
                 </div>
 
-                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-zinc-900 border border-slate-200/50 dark:border-zinc-800 flex items-start gap-3.5 text-xs">
-                  <div className="w-6 h-6 rounded-lg bg-teal-500/10 dark:bg-teal-500/15 text-teal-600 dark:text-teal-400 flex items-center justify-center flex-none font-black">
+                {/* Method 2 */}
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-zinc-900 border border-slate-200/50 dark:border-zinc-800/80 flex items-start gap-3 text-xs">
+                  <div className="w-6 h-6 rounded-lg bg-sky-500/15 text-sky-400 flex items-center justify-center flex-none font-bold text-[11px]">
                     2
                   </div>
-                  <p className="text-slate-600 dark:text-zinc-300 leading-relaxed font-medium">
-                    Вмийте обличчя крижаною водою або прикладіть холодний рушник чи компрес до потилиці (це активує вазомоторний рефлекс нирця).
-                  </p>
+                  <div className="space-y-1">
+                    <p className="font-bold text-slate-800 dark:text-zinc-200">
+                      Холодний компрес / Лід під очі
+                    </p>
+                    <p className="text-slate-600 dark:text-zinc-400 leading-relaxed text-[11px]">
+                      Прикладіть пакет з льодом, заморожений продукт або холодну пляшку до вилиць та ділянки під очима на 15–30 секунд. Також можна прикласти холодний вологий рушник до бічних поверхонь шиї.
+                    </p>
+                  </div>
                 </div>
+
+                {/* Method 3 */}
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-zinc-900 border border-slate-200/50 dark:border-zinc-800/80 flex items-start gap-3 text-xs">
+                  <div className="w-6 h-6 rounded-lg bg-sky-500/15 text-sky-400 flex items-center justify-center flex-none font-bold text-[11px]">
+                    3
+                  </div>
+                  <div className="space-y-1">
+                    <p className="font-bold text-slate-800 dark:text-zinc-200">
+                      Повільні ковтки крижаної води
+                    </p>
+                    <p className="text-slate-600 dark:text-zinc-400 leading-relaxed text-[11px]">
+                      Повільно випийте склянку крижаної води дрібними свідомими ковтками, відчуваючи, як прохолода опускається по горлу та стравоходу, заспокоюючи нервові закінчення.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Note / Tip */}
+              <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-700 dark:text-amber-300 leading-relaxed font-medium">
+                💡 <strong>Важливо:</strong> Холод повинен впливати саме на обличчя (зона трійчастого нерва) або внутрішні рецептори стравоходу. Холодна вода на кистях рук чи стопах рефлекс нирця НЕ вмикає.
               </div>
 
               <button
                 type="button"
                 onClick={() => setMode('menu')}
-                className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 rounded-2xl font-bold text-xs cursor-pointer"
+                className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 rounded-2xl font-bold text-xs cursor-pointer transition-colors"
               >
-                Зрозуміло, виконаю
+                Зрозуміло, виконати
               </button>
             </div>
           )}
@@ -928,15 +961,19 @@ export const SosTab: React.FC<SosTabProps> = React.memo(({
             return (
               <div
                 key={p.id}
-                onClick={() => handleSelectMode(p.id as SosMode, p.title)}
-                className="w-full p-4 rounded-3xl bg-white hover:bg-slate-50/90 dark:bg-zinc-900/60 dark:hover:bg-zinc-900/90 border border-slate-200/90 dark:border-zinc-800 transition-all duration-300 cursor-pointer text-left relative overflow-hidden group active:scale-[0.99] shadow-2xs hover:shadow-xs"
+                onClick={() => {
+                  handleSelectMode(p.id as SosMode, p.title);
+                }}
+                className="w-full p-4 rounded-3xl bg-white hover:bg-slate-50/90 dark:bg-[#18181f]/90 dark:hover:bg-[#1f1f27] border border-slate-200/90 dark:border-zinc-800/80 transition-all duration-300 cursor-pointer text-left relative overflow-hidden group active:scale-[0.99] shadow-2xs hover:shadow-xs"
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between gap-2 mb-1">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <IconComponent className="w-4 h-4 text-rose-500 shrink-0" />
-                        <h3 className="text-sm font-semibold tracking-wide text-slate-800 dark:text-zinc-200 truncate">
+                    <div className="flex items-center justify-between gap-2 mb-1.5">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-8 h-8 rounded-xl bg-zinc-800/80 text-zinc-200 border border-zinc-700/50 flex items-center justify-center flex-none shadow-xs group-hover:border-zinc-600 transition-colors">
+                          <IconComponent className="w-4 h-4 text-zinc-200" />
+                        </div>
+                        <h3 className="text-sm font-bold tracking-wide text-slate-800 dark:text-zinc-100 truncate">
                           {p.title}
                         </h3>
                       </div>
@@ -946,7 +983,7 @@ export const SosTab: React.FC<SosTabProps> = React.memo(({
                         className={`p-1.5 rounded-xl transition-all cursor-pointer shrink-0 ${
                           isPinned
                             ? 'bg-amber-500/20 text-amber-500 dark:text-amber-400 border border-amber-500/40 shadow-xs'
-                            : 'text-slate-400 hover:text-slate-600 dark:text-zinc-500 dark:hover:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800'
+                            : 'text-slate-400 hover:text-slate-600 dark:text-zinc-400 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800'
                         }`}
                         title={isPinned ? "Прибрати зі Швидкого доступу" : "Закріпити у Швидкий доступ на Головній"}
                       >
@@ -956,13 +993,13 @@ export const SosTab: React.FC<SosTabProps> = React.memo(({
                     <p className="text-xs text-slate-500 dark:text-zinc-400 leading-relaxed mb-2 font-normal">
                       {p.desc}
                     </p>
-                    <div className="text-[11px] text-slate-400 dark:text-zinc-500 flex items-center gap-1 group-hover:text-slate-700 dark:group-hover:text-zinc-300 transition-colors">
+                    <div className="text-[11px] text-slate-400 dark:text-zinc-400 flex items-center gap-1 group-hover:text-slate-700 dark:group-hover:text-zinc-200 transition-colors">
                       <span className="font-medium">{p.action}</span>
                       <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
                     </div>
                   </div>
 
-                  <div className="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-zinc-800/60 flex items-center justify-center flex-none border border-slate-200 dark:border-zinc-700/40 group-hover:border-slate-300 transition-colors">
+                  <div className="w-14 h-14 rounded-2xl bg-zinc-800/80 text-zinc-200 flex items-center justify-center flex-none border border-zinc-700/50 group-hover:border-zinc-600 transition-colors shadow-xs">
                     {p.svg}
                   </div>
                 </div>

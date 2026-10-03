@@ -457,7 +457,7 @@ export const CozyForestModal: React.FC<CozyForestModalProps> = ({
                         <span className="text-xs text-stone-400 italic">({sp.botanicalName})</span>
                       </div>
                       <p className="text-xs text-stone-400 leading-tight mt-0.5">{sp.symbol}</p>
-                      <p className="text-[11px] text-emerald-400/80 mt-1">Час дозрівання: 20 днів</p>
+                      <p className="text-[11px] text-emerald-400/80 mt-1">Нейронний ріст дерева</p>
                     </div>
                   </div>
 

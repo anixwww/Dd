@@ -119,7 +119,7 @@ export const OrbitVoyageTab: React.FC<OrbitVoyageTabProps> = React.memo(({
   // Simulation controls
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(orbitState.soundEnabled ?? true);
-  const [activeCenterPreset, setActiveCenterPreset] = useState<'single' | 'binary' | 'triple' | 'yin_yang_blackhole' | 'black_hole'>('single');
+  const [activeCenterPreset, setActiveCenterPreset] = useState<'single' | 'binary' | 'triple'>('single');
   const [showInfo, setShowInfo] = useState<boolean>(false);
 
   // Zoom & Pan
@@ -190,8 +190,8 @@ export const OrbitVoyageTab: React.FC<OrbitVoyageTabProps> = React.memo(({
     bgStarsRef.current = stars;
   }, []);
 
-  // Apply Gravity Centers Presets (1, 2, 3 Stars or Black Holes)
-  const applyCentersPreset = useCallback((preset: 'single' | 'binary' | 'triple' | 'yin_yang_blackhole' | 'black_hole') => {
+  // Apply Gravity Centers Presets (1, 2, or 3 Stars)
+  const applyCentersPreset = useCallback((preset: 'single' | 'binary' | 'triple') => {
     setActiveCenterPreset(preset);
 
     if (preset === 'single') {
@@ -238,131 +238,6 @@ export const OrbitVoyageTab: React.FC<OrbitVoyageTabProps> = React.memo(({
           vy: 0,
           radius: 4.5,
           color: '#34D399',
-          trail: [],
-          laps: 0,
-          nearestCenterDist: 220,
-          prevDistToNearest: 220,
-          isMovingAway: false,
-          active: true,
-          lastChimeTime: 0
-        }
-      ];
-      setBodies(initialBodies);
-      bodiesRef.current = initialBodies;
-    } else if (preset === 'yin_yang_blackhole') {
-      const yinYangCenters: GravityCenter[] = [
-        {
-          id: 'yin-black-hole',
-          x: -110,
-          y: 0,
-          mass: 140,
-          radius: 17,
-          color: '#000000',
-          glow: 'rgba(56, 189, 248, 0.65)',
-          coreColor: '#000000',
-          name: 'Інь (Чорна діра)',
-          pulsePhase: 0,
-          type: 'black_hole'
-        },
-        {
-          id: 'yang-star',
-          x: 110,
-          y: 0,
-          mass: 100,
-          radius: 15,
-          color: '#F59E0B',
-          glow: 'rgba(251, 191, 36, 0.55)',
-          coreColor: '#FFFBEB',
-          name: 'Ян (Біла зоря)',
-          pulsePhase: Math.PI,
-          type: 'star'
-        }
-      ];
-      setCenters(yinYangCenters);
-      centersRef.current = yinYangCenters;
-
-      // Yin-Yang harmonic dual orbital bodies
-      const initialBodies: CelestialBody[] = [
-        {
-          id: 1,
-          x: 0,
-          y: -170,
-          vx: 1.48,
-          vy: 0,
-          radius: 4,
-          color: '#67E8F9',
-          trail: [],
-          laps: 0,
-          nearestCenterDist: 170,
-          prevDistToNearest: 170,
-          isMovingAway: false,
-          active: true,
-          lastChimeTime: 0
-        },
-        {
-          id: 2,
-          x: 0,
-          y: 170,
-          vx: -1.48,
-          vy: 0,
-          radius: 4,
-          color: '#FBBF24',
-          trail: [],
-          laps: 0,
-          nearestCenterDist: 170,
-          prevDistToNearest: 170,
-          isMovingAway: false,
-          active: true,
-          lastChimeTime: 0
-        }
-      ];
-      setBodies(initialBodies);
-      bodiesRef.current = initialBodies;
-    } else if (preset === 'black_hole') {
-      const bhCenters: GravityCenter[] = [
-        {
-          id: 'singularity',
-          x: 0,
-          y: 0,
-          mass: 220,
-          radius: 20,
-          color: '#000000',
-          glow: 'rgba(56, 189, 248, 0.75)',
-          coreColor: '#000000',
-          name: 'Чорна діра (Сингулярність)',
-          pulsePhase: 0,
-          type: 'black_hole'
-        }
-      ];
-      setCenters(bhCenters);
-      centersRef.current = bhCenters;
-
-      // Stable Keplerian relativistic orbit body + close accretion probe
-      const initialBodies: CelestialBody[] = [
-        {
-          id: 1,
-          x: 0,
-          y: -135,
-          vx: 1.82,
-          vy: 0,
-          radius: 4,
-          color: '#38BDF8',
-          trail: [],
-          laps: 0,
-          nearestCenterDist: 135,
-          prevDistToNearest: 135,
-          isMovingAway: false,
-          active: true,
-          lastChimeTime: 0
-        },
-        {
-          id: 2,
-          x: 0,
-          y: 220,
-          vx: -1.42,
-          vy: 0,
-          radius: 4.5,
-          color: '#A78BFA',
           trail: [],
           laps: 0,
           nearestCenterDist: 220,
@@ -835,118 +710,32 @@ export const OrbitVoyageTab: React.FC<OrbitVoyageTabProps> = React.memo(({
       const center = centersRef.current[cIdx];
       const pulseScale = 1.0 + Math.sin(timeSec * 2.5 + center.pulsePhase) * 0.08;
 
-      if (center.type === 'black_hole') {
-        // --- SCIENTIFICALLY ACCURATE RELATIVISTIC BLACK HOLE ---
-        ctx.save();
-        ctx.translate(center.x, center.y);
+      // --- STANDARD CELESTIAL STAR ---
+      // Outer shimmering celestial aura
+      const auraGrad = ctx.createRadialGradient(
+        center.x, center.y, center.radius * 0.4,
+        center.x, center.y, center.radius * 4.2 * pulseScale
+      );
+      auraGrad.addColorStop(0, center.glow);
+      auraGrad.addColorStop(0.5, `${center.color}18`);
+      auraGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
-        const rs = center.radius; // Schwarzschild Event Horizon Radius
-        const rPhoton = rs * 1.5; // Photon Sphere Orbit (1.5 rs)
-        const rAccretionInner = rs * 2.1;
-        const rAccretionOuter = rs * 4.6;
+      ctx.fillStyle = auraGrad;
+      ctx.beginPath();
+      ctx.arc(center.x, center.y, center.radius * 4.2 * pulseScale, 0, Math.PI * 2);
+      ctx.fill();
 
-        // 1. Relativistic Jets (Bipolar synchrotron energy beams)
-        const jetLen = rs * 5.8;
-        const jetGrad = ctx.createLinearGradient(0, -jetLen, 0, jetLen);
-        jetGrad.addColorStop(0, 'rgba(56, 189, 248, 0)');
-        jetGrad.addColorStop(0.35, 'rgba(56, 189, 248, 0.45)');
-        jetGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.85)');
-        jetGrad.addColorStop(0.65, 'rgba(56, 189, 248, 0.45)');
-        jetGrad.addColorStop(1, 'rgba(56, 189, 248, 0)');
-        ctx.fillStyle = jetGrad;
-        ctx.beginPath();
-        ctx.moveTo(-1.2 / zoom, -jetLen);
-        ctx.lineTo(1.2 / zoom, -jetLen);
-        ctx.lineTo(2.4 / zoom, jetLen);
-        ctx.lineTo(-2.4 / zoom, jetLen);
-        ctx.closePath();
-        ctx.fill();
+      // Main star body
+      ctx.fillStyle = center.color;
+      ctx.beginPath();
+      ctx.arc(center.x, center.y, center.radius, 0, Math.PI * 2);
+      ctx.fill();
 
-        // 2. Gravitationally Lensed Backside Accretion Halo (Einstein ring distortion arc over top)
-        ctx.save();
-        ctx.scale(1.0, 0.72);
-        const lensedGrad = ctx.createRadialGradient(0, 0, rs * 1.2, 0, 0, rAccretionOuter * 0.85);
-        lensedGrad.addColorStop(0, 'rgba(56, 189, 248, 0.75)');
-        lensedGrad.addColorStop(0.5, 'rgba(251, 191, 36, 0.45)');
-        lensedGrad.addColorStop(1, 'rgba(234, 88, 12, 0)');
-        ctx.fillStyle = lensedGrad;
-        ctx.beginPath();
-        ctx.arc(0, 0, rAccretionOuter * 0.85, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-
-        // 3. Relativistic Accretion Disk with Doppler Beaming (Left approaching = intense blue/cyan, Right receding = dim amber/red)
-        ctx.save();
-        ctx.rotate(-0.25);
-        ctx.scale(1.0, 0.38); // Tilted accretion plane
-
-        // Accretion disk outer glowing gradient
-        const diskGrad = ctx.createRadialGradient(0, 0, rAccretionInner, 0, 0, rAccretionOuter);
-        diskGrad.addColorStop(0, '#ffffff');
-        diskGrad.addColorStop(0.25, '#38bdf8');
-        diskGrad.addColorStop(0.65, '#f59e0b');
-        diskGrad.addColorStop(1, 'rgba(194, 65, 12, 0)');
-        ctx.fillStyle = diskGrad;
-        ctx.beginPath();
-        ctx.arc(0, 0, rAccretionOuter, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Doppler Beaming: Intense relativistic boost on approaching side
-        const dopplerGrad = ctx.createRadialGradient(-rAccretionInner * 1.2, 0, 0, -rAccretionInner * 1.2, 0, rAccretionOuter);
-        dopplerGrad.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
-        dopplerGrad.addColorStop(0.4, 'rgba(103, 232, 249, 0.65)');
-        dopplerGrad.addColorStop(1, 'rgba(56, 189, 248, 0)');
-        ctx.fillStyle = dopplerGrad;
-        ctx.beginPath();
-        ctx.arc(0, 0, rAccretionOuter, Math.PI * 0.5, Math.PI * 1.5);
-        ctx.fill();
-        ctx.restore();
-
-        // 4. Photon Sphere (Razor-thin Einstein photon orbit ring at 1.5 rs)
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = Math.max(0.8, 1.2 / zoom);
-        ctx.shadowColor = '#38bdf8';
-        ctx.shadowBlur = 12;
-        ctx.beginPath();
-        ctx.arc(0, 0, rPhoton, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.shadowBlur = 0;
-
-        // 5. Schwarzschild Event Horizon Shadow (Absolute pitch-black void sphere)
-        ctx.fillStyle = '#000000';
-        ctx.beginPath();
-        ctx.arc(0, 0, rs, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.restore();
-      } else {
-        // --- STANDARD CELESTIAL STAR ---
-        // Outer shimmering celestial aura
-        const auraGrad = ctx.createRadialGradient(
-          center.x, center.y, center.radius * 0.4,
-          center.x, center.y, center.radius * 4.2 * pulseScale
-        );
-        auraGrad.addColorStop(0, center.glow);
-        auraGrad.addColorStop(0.5, `${center.color}18`);
-        auraGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-
-        ctx.fillStyle = auraGrad;
-        ctx.beginPath();
-        ctx.arc(center.x, center.y, center.radius * 4.2 * pulseScale, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Main star body
-        ctx.fillStyle = center.color;
-        ctx.beginPath();
-        ctx.arc(center.x, center.y, center.radius, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Radiant white-hot core
-        ctx.fillStyle = center.coreColor;
-        ctx.beginPath();
-        ctx.arc(center.x, center.y, center.radius * 0.52, 0, Math.PI * 2);
-        ctx.fill();
-      }
+      // Radiant white-hot core
+      ctx.fillStyle = center.coreColor;
+      ctx.beginPath();
+      ctx.arc(center.x, center.y, center.radius * 0.52, 0, Math.PI * 2);
+      ctx.fill();
 
       // Center Name Badge
       if (center.name) {
@@ -1298,22 +1087,22 @@ export const OrbitVoyageTab: React.FC<OrbitVoyageTabProps> = React.memo(({
       className="fixed inset-0 z-50 bg-[#030712] text-slate-100 select-none overflow-hidden touch-none flex flex-col justify-between font-sans"
     >
       {/* 1. TOP HEADER: RETURN BUTTON, GRAVITY CENTERS SELECTOR, AND ESSENTIAL ACTIONS */}
-      <header className="absolute top-4 inset-x-4 z-30 flex items-center justify-between pointer-events-none">
+      <header className="absolute top-2 sm:top-4 inset-x-2 sm:inset-x-4 z-30 flex items-center justify-between gap-1.5 pointer-events-none">
         {/* RETURN BUTTON (LEFT) */}
-        <div className="flex items-center gap-2 pointer-events-auto">
+        <div className="flex items-center gap-1.5 pointer-events-auto flex-shrink-0">
           <button
             type="button"
             onClick={() => onSwitchTab?.('counter')}
-            className="w-11 h-11 rounded-full bg-slate-900/80 hover:bg-slate-800 active:scale-95 border border-slate-700/60 backdrop-blur-md flex items-center justify-center text-slate-200 hover:text-white transition-all cursor-pointer shadow-xl"
+            className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-slate-900/85 hover:bg-slate-800 active:scale-95 border border-slate-700/60 backdrop-blur-md flex items-center justify-center text-slate-200 hover:text-white transition-all cursor-pointer shadow-xl"
             title="Повернутися"
             aria-label="Повернутися"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
 
         {/* GRAVITY CENTER SELECTOR (CENTER - REDESIGNED SLEEK GLASS DOCK) */}
-        <div className="pointer-events-auto flex items-center p-1 rounded-full bg-slate-900/80 border border-slate-800/80 backdrop-blur-md shadow-xl">
+        <div className="pointer-events-auto flex items-center p-0.5 sm:p-1 rounded-full bg-slate-900/85 border border-slate-800/80 backdrop-blur-md shadow-xl flex-shrink-0">
           {GRAVITY_CENTER_PRESETS.map((preset) => {
             const isSelected = activeCenterPreset === preset.id;
             return (
@@ -1321,7 +1110,7 @@ export const OrbitVoyageTab: React.FC<OrbitVoyageTabProps> = React.memo(({
                 key={preset.id}
                 type="button"
                 onClick={() => applyCentersPreset(preset.id)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 ${
+                className={`px-2 py-1 sm:px-3.5 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-medium transition-all cursor-pointer flex items-center gap-1 ${
                   isSelected
                     ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm font-semibold'
                     : 'text-slate-400 hover:text-slate-200 hover:bg-white/5 border border-transparent'
@@ -1336,53 +1125,53 @@ export const OrbitVoyageTab: React.FC<OrbitVoyageTabProps> = React.memo(({
         </div>
 
         {/* TOP RIGHT ACTION CONTROLS */}
-        <div className="flex items-center gap-2 pointer-events-auto">
+        <div className="flex items-center gap-1 sm:gap-2 pointer-events-auto flex-shrink-0">
           {/* Info helper toggle */}
           <button
             type="button"
             onClick={() => setShowInfo((v) => !v)}
-            className={`w-10 h-10 rounded-full border backdrop-blur-md flex items-center justify-center transition-all cursor-pointer shadow-lg active:scale-95 ${
+            className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full border backdrop-blur-md flex items-center justify-center transition-all cursor-pointer shadow-lg active:scale-95 ${
               showInfo
                 ? 'bg-cyan-500/20 border-cyan-500/50 text-cyan-300'
-                : 'bg-slate-900/80 border-slate-800 text-slate-400 hover:text-slate-200'
+                : 'bg-slate-900/85 border-slate-800 text-slate-400 hover:text-slate-200'
             }`}
             title="Фізика орбіт та звук"
           >
-            <HelpCircle className="w-4 h-4" />
+            <HelpCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
 
           {/* Sound Mute/Unmute */}
           <button
             type="button"
             onClick={toggleSound}
-            className={`w-10 h-10 rounded-full border backdrop-blur-md flex items-center justify-center transition-all cursor-pointer shadow-lg active:scale-95 ${
+            className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full border backdrop-blur-md flex items-center justify-center transition-all cursor-pointer shadow-lg active:scale-95 ${
               soundEnabled
                 ? 'bg-cyan-500/20 border-cyan-500/50 text-cyan-300'
-                : 'bg-slate-900/80 border-slate-800 text-slate-500'
+                : 'bg-slate-900/85 border-slate-800 text-slate-500'
             }`}
             title={soundEnabled ? 'Звук увімкнено (дзвін біля зірок)' : 'Звук вимкнено'}
           >
-            {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+            {soundEnabled ? <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <VolumeX className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
           </button>
 
           {/* Pause / Play */}
           <button
             type="button"
             onClick={() => setIsPaused((v) => !v)}
-            className="w-10 h-10 rounded-full bg-slate-900/80 hover:bg-slate-800 border border-slate-800 text-slate-200 hover:text-white backdrop-blur-md flex items-center justify-center transition-all cursor-pointer shadow-lg active:scale-95"
+            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-900/85 hover:bg-slate-800 border border-slate-800 text-slate-200 hover:text-white backdrop-blur-md flex items-center justify-center transition-all cursor-pointer shadow-lg active:scale-95"
             title={isPaused ? 'Продовжити рух' : 'Зупинити час'}
           >
-            {isPaused ? <Play className="w-4 h-4 text-emerald-400" /> : <Pause className="w-4 h-4" />}
+            {isPaused ? <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400" /> : <Pause className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
           </button>
 
           {/* Clear all bodies */}
           <button
             type="button"
             onClick={clearAllBodies}
-            className="w-10 h-10 rounded-full bg-slate-900/80 hover:bg-rose-950/40 border border-slate-800 hover:border-rose-800/40 text-rose-300 backdrop-blur-md flex items-center justify-center transition-all cursor-pointer shadow-lg active:scale-95"
+            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-900/85 hover:bg-rose-950/40 border border-slate-800 hover:border-rose-800/40 text-rose-300 backdrop-blur-md flex items-center justify-center transition-all cursor-pointer shadow-lg active:scale-95"
             title="Очистити всі орбіти"
           >
-            <Trash2 className="w-4 h-4" />
+            <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
         </div>
       </header>
@@ -1399,7 +1188,7 @@ export const OrbitVoyageTab: React.FC<OrbitVoyageTabProps> = React.memo(({
 
       {/* 3. OPTIONAL INFO MODAL / TOAST */}
       {showInfo && (
-        <div className="absolute top-20 left-1/2 -translate-x-1/2 z-40 max-w-sm w-[90%] p-4 rounded-2xl bg-slate-900/90 backdrop-blur-xl border border-slate-700/60 shadow-2xl text-xs text-slate-300 leading-relaxed animate-fadeIn">
+        <div className="absolute top-16 sm:top-20 left-1/2 -translate-x-1/2 z-40 max-w-xs sm:max-w-sm w-[92%] p-3.5 sm:p-4 rounded-2xl bg-slate-900/90 backdrop-blur-xl border border-slate-700/60 shadow-2xl text-xs text-slate-300 leading-relaxed animate-fadeIn">
           <div className="flex items-center justify-between mb-2">
             <span className="font-semibold text-slate-100 flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
@@ -1426,9 +1215,9 @@ export const OrbitVoyageTab: React.FC<OrbitVoyageTabProps> = React.memo(({
       )}
 
       {/* 4. BOTTOM FLOATING CONTROLS: ZOOM CONTROLS (RIGHT) & STATUS (LEFT) */}
-      <footer className="absolute bottom-5 inset-x-5 z-30 flex items-center justify-between pointer-events-none">
+      <footer className="absolute bottom-3 sm:bottom-5 inset-x-3 sm:inset-x-5 z-30 flex items-center justify-between pointer-events-none">
         {/* Status Badge */}
-        <div className="pointer-events-auto px-3.5 py-2 rounded-full bg-slate-900/80 backdrop-blur-md border border-slate-800 text-xs text-slate-300 font-mono flex items-center gap-2 shadow-lg">
+        <div className="pointer-events-auto px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-full bg-slate-900/85 backdrop-blur-md border border-slate-800 text-[11px] sm:text-xs text-slate-300 font-mono flex items-center gap-1.5 sm:gap-2 shadow-lg">
           <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
           <span>Тіла: {bodies.length}</span>
           <span className="text-slate-600">•</span>
@@ -1436,32 +1225,32 @@ export const OrbitVoyageTab: React.FC<OrbitVoyageTabProps> = React.memo(({
         </div>
 
         {/* REDESIGNED ZOOM CONTROLS */}
-        <div className="pointer-events-auto flex items-center gap-1.5 p-1 rounded-full bg-slate-900/80 border border-slate-800/80 backdrop-blur-md shadow-xl">
+        <div className="pointer-events-auto flex items-center gap-1 p-1 rounded-full bg-slate-900/85 border border-slate-800/80 backdrop-blur-md shadow-xl">
           <button
             type="button"
             onClick={handleZoomIn}
-            className="w-9 h-9 rounded-full bg-slate-800/60 hover:bg-slate-700/80 active:scale-95 text-slate-200 hover:text-white flex items-center justify-center transition-all cursor-pointer"
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-800/60 hover:bg-slate-700/80 active:scale-95 text-slate-200 hover:text-white flex items-center justify-center transition-all cursor-pointer"
             title="Збільшити масштаб"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
 
           <button
             type="button"
             onClick={handleZoomOut}
-            className="w-9 h-9 rounded-full bg-slate-800/60 hover:bg-slate-700/80 active:scale-95 text-slate-200 hover:text-white flex items-center justify-center transition-all cursor-pointer"
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-800/60 hover:bg-slate-700/80 active:scale-95 text-slate-200 hover:text-white flex items-center justify-center transition-all cursor-pointer"
             title="Зменшити масштаб"
           >
-            <Minus className="w-4 h-4" />
+            <Minus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
 
           <button
             type="button"
             onClick={resetView}
-            className="w-9 h-9 rounded-full bg-slate-800/60 hover:bg-slate-700/80 active:scale-95 text-slate-200 hover:text-white flex items-center justify-center transition-all cursor-pointer"
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-800/60 hover:bg-slate-700/80 active:scale-95 text-slate-200 hover:text-white flex items-center justify-center transition-all cursor-pointer"
             title="Центрувати вигляд"
           >
-            <Maximize2 className="w-3.5 h-3.5" />
+            <Maximize2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
           </button>
         </div>
       </footer>
@@ -1469,9 +1258,9 @@ export const OrbitVoyageTab: React.FC<OrbitVoyageTabProps> = React.memo(({
       {/* 5. GENTLE ONBOARDING HINT IF NO BODIES */}
       {bodies.length === 0 && !dragState && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="px-5 py-3 rounded-2xl bg-slate-900/60 backdrop-blur-sm border border-slate-700/40 text-center shadow-2xl">
-            <p className="text-sm text-slate-200 font-medium mb-0.5">Потягніть у просторі</p>
-            <p className="text-xs text-slate-400">запустіть орбіту та відчуйте звуковий резонанс біля зорі</p>
+          <div className="px-4 py-2.5 sm:px-5 sm:py-3 rounded-2xl bg-slate-900/60 backdrop-blur-sm border border-slate-700/40 text-center shadow-2xl">
+            <p className="text-xs sm:text-sm text-slate-200 font-medium mb-0.5">Потягніть у просторі</p>
+            <p className="text-[11px] sm:text-xs text-slate-400">запустіть орбіту та відчуйте звуковий резонанс біля зорі</p>
           </div>
         </div>
       )}

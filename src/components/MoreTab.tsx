@@ -3685,7 +3685,7 @@ export const MoreTab: React.FC<MoreTabProps> = ({
               </div>
               <div className="min-w-0">
                 <h3 className="text-sm font-bold text-zinc-100 truncate">
-                  Про розробника та підтримка
+                  Підтримка розробника
                 </h3>
                 <p className="text-[11px] text-zinc-400 truncate">
                   Автор проекту та банка Monobank
@@ -3710,20 +3710,7 @@ export const MoreTab: React.FC<MoreTabProps> = ({
                 <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500/30 inline-block align-baseline shrink-0" />
               </p>
 
-              <div className="pt-1 space-y-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    replayIntro();
-                    showFeedback('Відтворення заставки першого запуску... ');
-                    if (onCloseOverlay) onCloseOverlay();
-                  }}
-                  className="w-full py-2.5 px-3 bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-700 dark:text-indigo-300 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer transition-all shadow-xs active:scale-[0.98]"
-                >
-                  <Sparkles className="w-4 h-4 text-indigo-500 animate-pulse" />
-                  <span>Відтворити заставку першого запуску </span>
-                </button>
-
+              <div className="pt-1">
                 <a
                   href="https://send.monobank.ua/jar/7HQL5m91BK"
                   target="_blank"

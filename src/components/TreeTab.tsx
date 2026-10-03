@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { TreeState, TreeSpeciesId, CurrentTree, ForestTree } from '../types';
-import { TREE_SPECIES } from '../data/treeSpecies';
+import { TREE_SPECIES, getTreeStageInfo } from '../data/treeSpecies';
 import { CozyForestModal } from './CozyForestModal';
 import {
   ArrowLeft,
@@ -16,7 +16,10 @@ import {
   Compass,
   Clock,
   SlidersHorizontal,
-  RotateCcw
+  RotateCcw,
+  Sprout,
+  Check,
+  Info
 } from 'lucide-react';
 
 export interface TreeTabProps {
@@ -29,7 +32,7 @@ export interface TreeTabProps {
 }
 
 const CIGS_PER_SEED = 300;
-const MATURATION_DAYS = 20;
+const MATURATION_DAYS = 21;
 const MATURATION_MS = MATURATION_DAYS * 24 * 3600 * 1000;
 
 // ========================================================
@@ -294,6 +297,10 @@ export const getRealMoonPhase = (date: Date = new Date()): MoonPhaseData => {
 // TRANSCENDENT SANCTUARY AUDIO
 // Pure procedural ASMR wind breeze & gentle flame crackle
 // ========================================================
+// ========================================================
+// TRANSCENDENT SANCTUARY AUDIO (HIGH EFFICIENCY & LOW BATTERY DRAIN)
+// Pure procedural ASMR wind breeze & crackle with zero-allocation audio buffers
+// ========================================================
 class SanctuaryAudio {
   private ctx: AudioContext | null = null;
   private isEnabled: boolean = true;
@@ -303,6 +310,7 @@ class SanctuaryAudio {
   private isNeuralActive: boolean = false;
   private neuralCrackleGain: GainNode | null = null;
   private neuralSparkTimer: any = null;
+  private sharedNoiseBuffer: AudioBuffer | null = null;
 
   constructor() {
     try {
@@ -322,34 +330,64 @@ class SanctuaryAudio {
     try {
       localStorage.setItem('quit-smoking:tree-audio', String(val));
     } catch {}
-    if (this.breezeGain && this.ctx) {
-      this.breezeGain.gain.setTargetAtTime(val ? 0.016 : 0.00001, this.ctx.currentTime, 0.4);
+
+    if (!val) {
+      this.silence();
+      return;
     }
-    if (this.neuralCrackleGain && this.ctx) {
-      this.neuralCrackleGain.gain.setTargetAtTime(val && this.isNeuralActive ? 0.026 : 0.00001, this.ctx.currentTime, 0.35);
+
+    if (this.ctx) {
+      if (this.ctx.state === 'suspended') {
+        this.ctx.resume().catch(() => {});
+      }
+      if (this.breezeGain) {
+        this.breezeGain.gain.setTargetAtTime(0.016, this.ctx.currentTime, 0.4);
+      }
+      if (this.neuralCrackleGain && this.isNeuralActive) {
+        this.neuralCrackleGain.gain.setTargetAtTime(0.026, this.ctx.currentTime, 0.35);
+      }
     }
-    if (val && !this.isStarted) {
+    if (!this.isStarted) {
       this.init();
     }
   }
 
   public silence() {
+    if (this.neuralSparkTimer) {
+      clearTimeout(this.neuralSparkTimer);
+      this.neuralSparkTimer = null;
+    }
     if (this.breezeGain && this.ctx) {
       try {
         this.breezeGain.gain.cancelScheduledValues(this.ctx.currentTime);
         this.breezeGain.gain.setValueAtTime(0.00001, this.ctx.currentTime);
-        if (this.ctx.state === 'running') {
-          this.ctx.suspend().catch(() => {});
-        }
       } catch {}
     }
-    this.setNeuralCrackle(false);
+    if (this.neuralCrackleGain && this.ctx) {
+      try {
+        this.neuralCrackleGain.gain.cancelScheduledValues(this.ctx.currentTime);
+        this.neuralCrackleGain.gain.setValueAtTime(0.00001, this.ctx.currentTime);
+      } catch {}
+    }
+    if (this.ctx && this.ctx.state === 'running') {
+      try {
+        this.ctx.suspend().catch(() => {});
+      } catch {}
+    }
+  }
+
+  public resume() {
+    if (this.isEnabled && this.ctx && this.ctx.state === 'suspended') {
+      try {
+        this.ctx.resume().catch(() => {});
+      } catch {}
+    }
   }
 
   public init() {
     if (this.ctx && this.isStarted) {
-      if (this.ctx.state === 'suspended') {
-        this.ctx.resume();
+      if (this.isEnabled && this.ctx.state === 'suspended') {
+        this.ctx.resume().catch(() => {});
       }
       return;
     }
@@ -360,7 +398,8 @@ class SanctuaryAudio {
       this.ctx = new AudioCtx();
       const now = this.ctx.currentTime;
 
-      const bufferSize = this.ctx.sampleRate * 3.0;
+      // Single pre-allocated 1.5-second loopable noise buffer
+      const bufferSize = Math.floor(this.ctx.sampleRate * 1.5);
       const noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
       const data = noiseBuffer.getChannelData(0);
       let last = 0;
@@ -369,6 +408,7 @@ class SanctuaryAudio {
         data[i] = (last + 0.015 * white) / 1.015;
         last = data[i];
       }
+      this.sharedNoiseBuffer = noiseBuffer;
 
       const noiseSource = this.ctx.createBufferSource();
       noiseSource.buffer = noiseBuffer;
@@ -392,7 +432,7 @@ class SanctuaryAudio {
   }
 
   public updateWindIntensity(intensity: number) {
-    if (!this.ctx || !this.breezeGain || !this.breezeFilter || !this.isEnabled) return;
+    if (!this.ctx || !this.breezeGain || !this.breezeFilter || !this.isEnabled || this.ctx.state === 'suspended') return;
     const now = this.ctx.currentTime;
     const targetGain = 0.002 + intensity * 0.022;
     const targetCutoff = 180 + intensity * 340;
@@ -402,7 +442,7 @@ class SanctuaryAudio {
 
   setNeuralCrackle(active: boolean) {
     this.isNeuralActive = active;
-    if (active) {
+    if (active && this.isEnabled) {
       this.init();
       this.startCrackleLoop();
     } else {
@@ -411,9 +451,9 @@ class SanctuaryAudio {
   }
 
   private startCrackleLoop() {
-    if (!this.ctx) return;
+    if (!this.ctx || !this.isEnabled) return;
     if (this.neuralCrackleGain) {
-      this.neuralCrackleGain.gain.setTargetAtTime(this.isEnabled ? 0.05 : 0.00001, this.ctx.currentTime, 0.2);
+      this.neuralCrackleGain.gain.setTargetAtTime(0.045, this.ctx.currentTime, 0.2);
       return;
     }
 
@@ -421,48 +461,38 @@ class SanctuaryAudio {
       const now = this.ctx.currentTime;
       const masterGain = this.ctx.createGain();
       masterGain.gain.setValueAtTime(0.00001, now);
-      masterGain.gain.exponentialRampToValueAtTime(this.isEnabled ? 0.05 : 0.00001, now + 0.2);
+      masterGain.gain.exponentialRampToValueAtTime(0.045, now + 0.2);
       masterGain.connect(this.ctx.destination);
       this.neuralCrackleGain = masterGain;
 
       const scheduleCrackle = () => {
-        if (!this.isNeuralActive || !this.ctx || !this.neuralCrackleGain) return;
+        if (!this.isNeuralActive || !this.ctx || !this.neuralCrackleGain || !this.isEnabled || this.ctx.state === 'suspended') {
+          return;
+        }
 
-        const burstCount = Math.random() > 0.6 ? (Math.random() > 0.85 ? 3 : 2) : 1;
-        for (let c = 0; c < burstCount; c++) {
-          const sparkOffset = c * (0.007 + Math.random() * 0.018);
-          const sparkTime = this.ctx.currentTime + sparkOffset;
-
-          const sparkLen = Math.floor(this.ctx.sampleRate * (0.0012 + Math.random() * 0.0026));
-          const sBuf = this.ctx.createBuffer(1, sparkLen, this.ctx.sampleRate);
-          const sData = sBuf.getChannelData(0);
-          for (let j = 0; j < sparkLen; j++) {
-            const decay = Math.exp(-j / (sparkLen * 0.2));
-            sData[j] = (Math.random() * 2 - 1) * decay;
-          }
-
+        if (this.sharedNoiseBuffer) {
+          const sparkTime = this.ctx.currentTime;
           const sSource = this.ctx.createBufferSource();
-          sSource.buffer = sBuf;
+          sSource.buffer = this.sharedNoiseBuffer;
 
           const sFilter = this.ctx.createBiquadFilter();
           sFilter.type = 'bandpass';
-          sFilter.frequency.setValueAtTime(1200 + Math.random() * 2400, sparkTime);
-          sFilter.Q.setValueAtTime(2.4 + Math.random() * 1.6, sparkTime);
+          sFilter.frequency.setValueAtTime(1400 + Math.random() * 2200, sparkTime);
+          sFilter.Q.setValueAtTime(2.8, sparkTime);
 
           const sGain = this.ctx.createGain();
-          const vol = (0.015 + Math.random() * 0.035) * (Math.random() > 0.88 ? 1.6 : 0.85);
+          const vol = 0.02 + Math.random() * 0.03;
           sGain.gain.setValueAtTime(vol, sparkTime);
-          sGain.gain.exponentialRampToValueAtTime(0.00001, sparkTime + 0.014);
+          sGain.gain.exponentialRampToValueAtTime(0.00001, sparkTime + 0.012);
 
           sSource.connect(sFilter);
           sFilter.connect(sGain);
           sGain.connect(this.neuralCrackleGain);
 
-          sSource.start(sparkTime);
-          sSource.stop(sparkTime + 0.018);
+          sSource.start(sparkTime, Math.random() * 0.5, 0.015);
         }
 
-        const nextDelay = 28 + Math.random() * 75;
+        const nextDelay = 45 + Math.random() * 85;
         this.neuralSparkTimer = setTimeout(scheduleCrackle, nextDelay);
       };
 
@@ -477,16 +507,15 @@ class SanctuaryAudio {
     }
 
     if (this.neuralCrackleGain && this.ctx) {
-      const now = this.ctx.currentTime;
-      this.neuralCrackleGain.gain.setTargetAtTime(0.00001, now, 0.18);
-      const gainToClean = this.neuralCrackleGain;
-      this.neuralCrackleGain = null;
-
-      setTimeout(() => {
-        try {
-          gainToClean.disconnect();
-        } catch {}
-      }, 300);
+      try {
+        const now = this.ctx.currentTime;
+        this.neuralCrackleGain.gain.setTargetAtTime(0.00001, now, 0.15);
+        const gainToClean = this.neuralCrackleGain;
+        this.neuralCrackleGain = null;
+        setTimeout(() => {
+          try { gainToClean.disconnect(); } catch {}
+        }, 200);
+      } catch {}
     }
   }
 
@@ -497,6 +526,9 @@ class SanctuaryAudio {
     }
 
     try {
+      if (this.ctx.state === 'suspended') {
+        this.ctx.resume().catch(() => {});
+      }
       const now = this.ctx.currentTime;
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
@@ -506,16 +538,14 @@ class SanctuaryAudio {
       const freq = notes[Math.floor(Math.random() * notes.length)];
 
       osc.frequency.setValueAtTime(freq, now);
-      osc.frequency.exponentialRampToValueAtTime(freq * 0.98, now + 0.25);
+      osc.frequency.exponentialRampToValueAtTime(freq * 0.98, now + 0.22);
 
       gain.gain.setValueAtTime(0.012, now);
-      gain.gain.exponentialRampToValueAtTime(0.00001, now + 0.9);
+      gain.gain.exponentialRampToValueAtTime(0.00001, now + 0.85);
 
       osc.connect(gain);
-      gain.connect(this.ctx.destination);
-
       osc.start(now);
-      osc.stop(now + 1.0);
+      osc.stop(now + 0.9);
     } catch {}
   }
 }
@@ -628,12 +658,12 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
     return () => clearInterval(timer);
   }, []);
 
-  // Silver Neural Tree mode
-  const [isNeuralMode, setIsNeuralMode] = useState<boolean>(false);
-  const isNeuralModeRef = useRef<boolean>(false);
+  // Silver Neural Tree mode (Default true for rich neural model)
+  const [isNeuralMode, setIsNeuralMode] = useState<boolean>(true);
+  const isNeuralModeRef = useRef<boolean>(true);
   isNeuralModeRef.current = isNeuralMode;
 
-  const neuralProgressRef = useRef<number>(0);
+  const neuralProgressRef = useRef<number>(1.0);
   const [hasClickedSeed, setHasClickedSeed] = useState<boolean>(false);
   const hasClickedSeedRef = useRef<boolean>(false);
   hasClickedSeedRef.current = hasClickedSeed;
@@ -681,8 +711,14 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
   const forest = useMemo(() => treeState?.forest || [], [treeState?.forest]);
 
   const totalTreesPlanted = forest.length + (currentTree ? 1 : 0);
-  const earnedSeedsTotal = Math.max(1, 1 + Math.floor(cigsAvoided / CIGS_PER_SEED));
+  const earnedSeedsTotal = Math.floor(cigsAvoided / CIGS_PER_SEED);
   const availableSeeds = Math.max(0, earnedSeedsTotal - totalTreesPlanted);
+  const progressToNextSeed = cigsAvoided % CIGS_PER_SEED;
+  const cigsRemaining = CIGS_PER_SEED - progressToNextSeed;
+
+  // Selected seed when choosing
+  const [selectedSeedSpecies, setSelectedSeedSpecies] = useState<TreeSpeciesId>('oak');
+  const [showSeedPicker, setShowSeedPicker] = useState<boolean>(false);
 
   const activeSpeciesId = currentTree?.speciesId || 'oak';
   const activeSpeciesIdRef = useRef<TreeSpeciesId>(activeSpeciesId);
@@ -692,17 +728,24 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
   const activeSpeciesRef = useRef(activeSpecies);
   activeSpeciesRef.current = activeSpecies;
 
-  // 20-DAY REALISTIC GROWTH CALCULATION
-  const { growthProgress, isMature } = useMemo(() => {
+  // 21-DAY REALISTIC GROWTH CALCULATION
+  const { growthProgress, isMature, currentDay, daysRemaining, hoursRemaining } = useMemo(() => {
     if (!currentTree) {
-      return { growthProgress: 0, isMature: false };
+      return { growthProgress: 0, isMature: false, currentDay: 0, daysRemaining: 21, hoursRemaining: 0 };
     }
     const now = Date.now();
     const elapsedMs = Math.max(0, now - (currentTree.plantedAt || now));
     const rawProgress = Math.min(1.0, elapsedMs / MATURATION_MS);
+    const day = Math.min(21, Math.floor(elapsedMs / (24 * 3600 * 1000)) + 1);
+    const msLeft = Math.max(0, MATURATION_MS - elapsedMs);
+    const daysLeft = Math.floor(msLeft / (24 * 3600 * 1000));
+    const hoursLeft = Math.floor((msLeft % (24 * 3600 * 1000)) / (3600 * 1000));
     return {
       growthProgress: rawProgress,
-      isMature: rawProgress >= 1.0
+      isMature: rawProgress >= 1.0,
+      currentDay: day,
+      daysRemaining: daysLeft,
+      hoursRemaining: hoursLeft
     };
   }, [currentTree]);
 
@@ -755,12 +798,12 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
 
     branchSkeletonRef.current = null;
     rootSkeletonsRef.current = [];
-    setIsNeuralMode(false);
-    isNeuralModeRef.current = false;
+    setIsNeuralMode(true);
+    isNeuralModeRef.current = true;
     setPreviewAdult(false);
     previewAdultRef.current = false;
     previewProgressRef.current = 0;
-    neuralProgressRef.current = 0;
+    neuralProgressRef.current = 1.0;
     setHasClickedSeed(false);
     hasClickedSeedRef.current = false;
     audio.playDropNote();
@@ -791,22 +834,24 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
   }, [currentTree, activeSpecies.name, onUpdateTreeState, treeState?.forest]);
 
   // Build tree structure skeleton
+  // Build deeply elaborated neural tree structure skeleton
   const buildSkeleton = (species: TreeSpeciesId) => {
+    // Multi-depth subterranean sensory nerve plexus
     const makeRootBranch = (depth: number, length: number, angle: number, idPrefix: string): RootNode => {
       const node: RootNode = {
         id: idPrefix,
         length,
         angle,
         depth,
-        thickness: Math.max(0.45, 1.8 - depth * 0.45),
+        thickness: Math.max(0.4, 2.2 - depth * 0.42),
         children: []
       };
 
-      if (depth < 3) {
-        const count = 2;
+      if (depth < 4) {
+        const count = depth === 0 ? 3 : 2;
         for (let i = 0; i < count; i++) {
-          const spread = (i === 0 ? -1 : 1) * (0.35 + Math.random() * 0.2);
-          const lenScale = 0.65 + Math.random() * 0.12;
+          const spread = (i === 0 ? -1 : (i === 2 ? 0.9 : 0.15)) * (0.32 + Math.random() * 0.18);
+          const lenScale = 0.68 + Math.random() * 0.14;
           node.children.push(
             makeRootBranch(depth + 1, length * lenScale, angle + spread, `${idPrefix}_${i}`)
           );
@@ -816,16 +861,20 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
     };
 
     const roots: RootNode[] = [
-      makeRootBranch(0, 38, Math.PI / 2 + 0.08, 'root_tap1'),
-      makeRootBranch(0, 34, Math.PI / 2 - 0.12, 'root_tap2'),
-      makeRootBranch(0, 32, Math.PI / 2 - 0.55, 'root_left'),
-      makeRootBranch(0, 32, Math.PI / 2 + 0.55, 'root_right'),
-      makeRootBranch(0, 26, Math.PI / 2 - 0.95, 'root_far_l'),
-      makeRootBranch(0, 26, Math.PI / 2 + 0.95, 'root_far_r')
+      makeRootBranch(0, 44, Math.PI / 2 + 0.05, 'root_tap1'),
+      makeRootBranch(0, 40, Math.PI / 2 - 0.15, 'root_tap2'),
+      makeRootBranch(0, 36, Math.PI / 2 - 0.52, 'root_left'),
+      makeRootBranch(0, 36, Math.PI / 2 + 0.52, 'root_right'),
+      makeRootBranch(0, 30, Math.PI / 2 - 0.88, 'root_far_l'),
+      makeRootBranch(0, 30, Math.PI / 2 + 0.88, 'root_far_r'),
+      makeRootBranch(0, 24, Math.PI / 2 - 1.15, 'root_lat_l'),
+      makeRootBranch(0, 24, Math.PI / 2 + 1.15, 'root_lat_r')
     ];
     rootSkeletonsRef.current = roots;
 
+    // Elaborated species neural arborization
     if (species === 'oak') {
+      // Giant Neocortical Dendritic Arbor
       const makeOakBranch = (depth: number, length: number, angle: number, thick: number, idPrefix: string): BranchNode => {
         const node: BranchNode = {
           id: idPrefix,
@@ -834,16 +883,16 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
           depth,
           thickness: thick,
           swayOffset: Math.random() * Math.PI * 2,
-          curvature: (Math.random() - 0.5) * 0.16,
+          curvature: (Math.random() - 0.5) * 0.22,
           children: [],
-          leafCount: depth >= 2 ? 6 : 0
+          leafCount: depth >= 2 ? 7 : 0
         };
-        if (depth < 5) {
-          const count = depth === 0 ? 3 : 2;
-          const spreads = depth === 0 ? [-0.64, 0.04, 0.60] : [-0.54, 0.50];
+        if (depth < 6) {
+          const count = depth === 0 ? 3 : (depth <= 2 ? 2 : (Math.random() > 0.25 ? 2 : 1));
+          const spreads = depth === 0 ? [-0.68, 0.04, 0.64] : [-0.56, 0.52];
           for (let i = 0; i < count; i++) {
-            const a = spreads[i] * (0.86 + Math.random() * 0.28);
-            const lenScale = depth === 0 ? 0.82 : 0.72;
+            const a = spreads[i % spreads.length] * (0.84 + Math.random() * 0.32);
+            const lenScale = depth === 0 ? 0.84 : (depth === 1 ? 0.76 : 0.7);
             node.children.push(
               makeOakBranch(depth + 1, length * lenScale, a, thick * 0.64, `${idPrefix}_${i}`)
             );
@@ -851,9 +900,10 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
         }
         return node;
       };
-      branchSkeletonRef.current = makeOakBranch(0, 78, -Math.PI / 2, 13, 'oak_trunk');
+      branchSkeletonRef.current = makeOakBranch(0, 82, -Math.PI / 2, 14, 'oak_trunk');
 
     } else if (species === 'sakura') {
+      // Elegant Cascading Pyramidal Dendrite Arbor
       const makeSakuraBranch = (depth: number, length: number, angle: number, thick: number, idPrefix: string): BranchNode => {
         const isLeft = idPrefix.includes('_0');
         const node: BranchNode = {
@@ -863,42 +913,44 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
           depth,
           thickness: thick,
           swayOffset: Math.random() * Math.PI * 2,
-          curvature: isLeft ? -0.16 : 0.16,
+          curvature: isLeft ? -0.2 : 0.2,
           children: [],
-          leafCount: depth >= 1 ? 5 : 0
+          leafCount: depth >= 1 ? 6 : 0
         };
-        if (depth < 5) {
-          const count = 2;
-          const spreads = [-0.60, 0.54];
+        if (depth < 6) {
+          const count = depth === 0 ? 3 : 2;
+          const spreads = depth === 0 ? [-0.62, 0.02, 0.58] : [-0.62, 0.56];
           for (let i = 0; i < count; i++) {
-            const a = spreads[i] * (0.88 + Math.random() * 0.24);
+            const a = spreads[i] * (0.86 + Math.random() * 0.28);
             node.children.push(
-              makeSakuraBranch(depth + 1, length * 0.78, a, thick * 0.62, `${idPrefix}_${i}`)
+              makeSakuraBranch(depth + 1, length * (depth <= 1 ? 0.8 : 0.74), a, thick * 0.62, `${idPrefix}_${i}`)
             );
           }
         }
         return node;
       };
-      branchSkeletonRef.current = makeSakuraBranch(0, 88, -Math.PI / 2 + 0.06, 9.5, 'sakura_trunk');
+      branchSkeletonRef.current = makeSakuraBranch(0, 92, -Math.PI / 2 + 0.04, 10.5, 'sakura_trunk');
 
     } else if (species === 'pine') {
+      // Cerebellar Purkinje Multitier Axon System
       const makePineSkeleton = (): BranchNode => {
         const trunk: BranchNode = {
           id: 'pine_trunk',
-          length: 126,
+          length: 132,
           angle: -Math.PI / 2,
           depth: 0,
-          thickness: 11,
+          thickness: 12,
           swayOffset: 0,
           children: [],
           leafCount: 0
         };
 
         const tiers = [
-          { tierLen: 64, spread: 1.38 },
-          { tierLen: 52, spread: 1.36 },
-          { tierLen: 40, spread: 1.34 },
-          { tierLen: 26, spread: 1.30 }
+          { tierLen: 72, spread: 1.42 },
+          { tierLen: 60, spread: 1.39 },
+          { tierLen: 48, spread: 1.36 },
+          { tierLen: 36, spread: 1.32 },
+          { tierLen: 24, spread: 1.28 }
         ];
 
         tiers.forEach((tier, tIdx) => {
@@ -908,16 +960,16 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
               length: len,
               angle,
               depth,
-              thickness: Math.max(0.9, 5.2 - depth * 1.3),
+              thickness: Math.max(0.85, 5.6 - depth * 1.2),
               swayOffset: Math.random() * Math.PI * 2,
-              curvature: 0.09,
+              curvature: 0.1,
               children: [],
-              leafCount: 6
+              leafCount: 7
             };
-            if (depth < 2) {
+            if (depth < 3) {
               b.children.push(
-                makeTierBranch(len * 0.64, -0.28, depth + 1, `${id}_subL`),
-                makeTierBranch(len * 0.64, 0.28, depth + 1, `${id}_subR`)
+                makeTierBranch(len * 0.66, -0.32, depth + 1, `${id}_subL`),
+                makeTierBranch(len * 0.66, 0.32, depth + 1, `${id}_subR`)
               );
             }
             return b;
@@ -930,13 +982,13 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
 
         trunk.children.push({
           id: 'pine_apex',
-          length: 28,
+          length: 32,
           angle: 0,
           depth: 1,
-          thickness: 4.5,
+          thickness: 4.8,
           swayOffset: 0,
           children: [],
-          leafCount: 8
+          leafCount: 9
         });
 
         return trunk;
@@ -944,6 +996,7 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
       branchSkeletonRef.current = makePineSkeleton();
 
     } else if (species === 'apple') {
+      // Radiant Multipolar Neural Arbor
       const makeAppleBranch = (depth: number, length: number, angle: number, thick: number, idPrefix: string): BranchNode => {
         const node: BranchNode = {
           id: idPrefix,
@@ -952,24 +1005,26 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
           depth,
           thickness: thick,
           swayOffset: Math.random() * Math.PI * 2,
+          curvature: (Math.random() - 0.5) * 0.18,
           children: [],
-          leafCount: depth >= 1 ? 5 : 0
+          leafCount: depth >= 1 ? 6 : 0
         };
-        if (depth < 5) {
+        if (depth < 6) {
           const count = depth === 0 ? 3 : 2;
-          const spreads = depth === 0 ? [-0.68, 0.02, 0.65] : [-0.48, 0.46];
+          const spreads = depth === 0 ? [-0.72, 0.02, 0.68] : [-0.52, 0.48];
           for (let i = 0; i < count; i++) {
-            const a = spreads[i] * (0.86 + Math.random() * 0.26);
+            const a = spreads[i] * (0.86 + Math.random() * 0.28);
             node.children.push(
-              makeAppleBranch(depth + 1, length * 0.74, a, thick * 0.62, `${idPrefix}_${i}`)
+              makeAppleBranch(depth + 1, length * 0.75, a, thick * 0.62, `${idPrefix}_${i}`)
             );
           }
         }
         return node;
       };
-      branchSkeletonRef.current = makeAppleBranch(0, 64, -Math.PI / 2, 10.5, 'apple_trunk');
+      branchSkeletonRef.current = makeAppleBranch(0, 68, -Math.PI / 2, 11, 'apple_trunk');
 
     } else {
+      // Starburst Radial Cortical Arbor
       const makeMapleBranch = (depth: number, length: number, angle: number, thick: number, idPrefix: string): BranchNode => {
         const node: BranchNode = {
           id: idPrefix,
@@ -978,60 +1033,119 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
           depth,
           thickness: thick,
           swayOffset: Math.random() * Math.PI * 2,
+          curvature: (Math.random() - 0.5) * 0.16,
           children: [],
-          leafCount: depth >= 1 ? 5 : 0
+          leafCount: depth >= 1 ? 6 : 0
         };
-        if (depth < 5) {
+        if (depth < 6) {
           const count = depth === 0 ? 3 : 2;
-          const spreads = depth === 0 ? [-0.42, 0.0, 0.42] : [-0.54, 0.52];
+          const spreads = depth === 0 ? [-0.46, 0.0, 0.46] : [-0.56, 0.54];
           for (let i = 0; i < count; i++) {
             const a = spreads[i] * (0.88 + Math.random() * 0.24);
             node.children.push(
-              makeMapleBranch(depth + 1, length * 0.75, a, thick * 0.63, `${idPrefix}_${i}`)
+              makeMapleBranch(depth + 1, length * 0.76, a, thick * 0.63, `${idPrefix}_${i}`)
             );
           }
         }
         return node;
       };
-      branchSkeletonRef.current = makeMapleBranch(0, 84, -Math.PI / 2, 10.5, 'maple_trunk');
+      branchSkeletonRef.current = makeMapleBranch(0, 88, -Math.PI / 2, 11.5, 'maple_trunk');
     }
 
+    // High-Energy Light Bundles & Quantum Photons
     const bundles: LightBundle[] = [];
-    for (let i = 0; i < 32; i++) {
+    for (let i = 0; i < 48; i++) {
       bundles.push({
         id: i,
         domain: i % 3 === 0 ? 'root' : i % 3 === 1 ? 'web' : 'canopy',
         segIndex: i,
         progress: Math.random(),
-        speed: 0.18 + Math.random() * 0.32,
+        speed: 0.16 + Math.random() * 0.36,
         direction: Math.random() > 0.3 ? 1 : -1,
-        radius: 2.8 + Math.random() * 1.8,
-        alpha: 0.7 + Math.random() * 0.3,
+        radius: 2.6 + Math.random() * 2.2,
+        alpha: 0.75 + Math.random() * 0.25,
         subPhotons: [
-          { angle: 0, dist: 1.5, speed: 3.5, size: 1.2 },
-          { angle: 2.1, dist: 2.8, speed: -4.2, size: 1.0 },
-          { angle: 4.2, dist: 2.2, speed: 5.0, size: 0.9 },
-          { angle: 1.2, dist: 3.4, speed: -2.8, size: 0.8 }
+          { angle: 0, dist: 1.6, speed: 3.8, size: 1.3 },
+          { angle: 2.0, dist: 3.0, speed: -4.4, size: 1.1 },
+          { angle: 4.1, dist: 2.4, speed: 5.2, size: 1.0 },
+          { angle: 1.3, dist: 3.6, speed: -3.0, size: 0.9 },
+          { angle: 5.2, dist: 1.8, speed: 4.0, size: 0.8 }
         ]
       });
     }
     lightBundlesRef.current = bundles;
   };
 
-  // PERSISTENT CONTINUOUS CANVAS SIMULATION & RENDERING LOOP
+  // ========================================================
+  // HIGH-PERFORMANCE ZERO-ALLOCATION RENDER ENGINE & OFFSCREEN SPRITES
+  // ========================================================
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d', { alpha: false });
     if (!ctx) return;
 
-    let width = (canvas.width = window.innerWidth);
-    let height = (canvas.height = window.innerHeight);
+    // 1. Offscreen Sprite Cache (Pre-rendered radial gradients to eliminate runtime gradient allocation)
+    const createOffscreenGlow = (r1: number, r2: number, g1: number, g2: number, b1: number, b2: number, size = 64): HTMLCanvasElement => {
+      const off = document.createElement('canvas');
+      off.width = size;
+      off.height = size;
+      const octx = off.getContext('2d');
+      if (octx) {
+        const half = size / 2;
+        const grad = octx.createRadialGradient(half, half, 0, half, half, half);
+        grad.addColorStop(0, `rgba(255, 255, 255, 1)`);
+        grad.addColorStop(0.3, `rgba(${r1}, ${g1}, ${b1}, 0.85)`);
+        grad.addColorStop(0.65, `rgba(${r2}, ${g2}, ${b2}, 0.3)`);
+        grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        octx.fillStyle = grad;
+        octx.beginPath();
+        octx.arc(half, half, half, 0, Math.PI * 2);
+        octx.fill();
+      }
+      return off;
+    };
+
+    const spriteCyan = createOffscreenGlow(56, 192, 189, 132, 248, 252);
+    const spriteViolet = createOffscreenGlow(192, 132, 132, 200, 252, 255);
+    const spriteGold = createOffscreenGlow(253, 251, 224, 191, 71, 36);
+    const spriteTeal = createOffscreenGlow(45, 56, 212, 189, 191, 248);
+    const spritePink = createOffscreenGlow(244, 251, 114, 191, 182, 36);
+    const spriteWhite = createOffscreenGlow(255, 224, 255, 242, 255, 254, 48);
+
+    // 2. Offscreen Background Scenery Cache (Sky, Hills, Ground, Stars)
+    const bgCanvas = document.createElement('canvas');
+    const bgCtx = bgCanvas.getContext('2d', { alpha: false });
+    let bgNeedsUpdate = true;
+
+    // 3. Clamped DPR and Layout Dimensions
+    let dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+
+    const syncCanvasSize = () => {
+      dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      width = window.innerWidth;
+      height = window.innerHeight;
+
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      bgCanvas.width = Math.floor(width * dpr);
+      bgCanvas.height = Math.floor(height * dpr);
+      if (bgCtx) {
+        bgCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      bgNeedsUpdate = true;
+    };
+
+    syncCanvasSize();
 
     const handleResize = () => {
-      if (!canvas) return;
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
+      syncCanvasSize();
     };
     window.addEventListener('resize', handleResize);
 
@@ -1045,7 +1159,7 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
 
     if (grassBladesRef.current.length === 0) {
       const blades: GrassBlade[] = [];
-      const count = 75;
+      const count = 70;
       for (let i = 0; i < count; i++) {
         blades.push({
           xPercent: (i + Math.random() * 0.6) / count,
@@ -1061,7 +1175,7 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
 
     if (motesRef.current.length === 0) {
       const motes: AtmosphericMote[] = [];
-      for (let i = 0; i < 32; i++) {
+      for (let i = 0; i < 28; i++) {
         motes.push({
           x: Math.random() * width,
           y: height * 0.15 + Math.random() * (groundY * 0.8),
@@ -1075,6 +1189,45 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
       motesRef.current = motes;
     }
 
+    // 4. Zero-Allocation Object Pools for Tree Filaments & Node Points
+    const registeredSegments: FilamentSegment[] = [];
+    let segmentPoolIndex = 0;
+    const segmentPool: FilamentSegment[] = [];
+
+    const allocSegment = (
+      startX: number,
+      startY: number,
+      endX: number,
+      endY: number,
+      domain: 'canopy' | 'root' | 'web',
+      depth: number,
+      isCurved = false,
+      ctrlX?: number,
+      ctrlY?: number
+    ) => {
+      let seg: FilamentSegment;
+      if (segmentPoolIndex < segmentPool.length) {
+        seg = segmentPool[segmentPoolIndex++];
+        seg.startX = startX;
+        seg.startY = startY;
+        seg.endX = endX;
+        seg.endY = endY;
+        seg.domain = domain;
+        seg.depth = depth;
+        seg.isCurved = isCurved;
+        seg.ctrlX = ctrlX;
+        seg.ctrlY = ctrlY;
+      } else {
+        seg = { startX, startY, endX, endY, domain, depth, isCurved, ctrlX, ctrlY };
+        segmentPool.push(seg);
+        segmentPoolIndex++;
+      }
+      registeredSegments.push(seg);
+    };
+
+    const canopyNodePoints: { x: number; y: number; depth: number }[] = [];
+    const rootNodePoints: { x: number; y: number; depth: number }[] = [];
+
     // Pointer events: Click on seed OR Click on Moon
     const handlePointerDown = (e: PointerEvent) => {
       audio.init();
@@ -1082,7 +1235,6 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
       const clickX = e.clientX - rect.left;
       const clickY = e.clientY - rect.top;
 
-      // 1. Check Moon click (top-right at 82% width, 16% height) - only when moon is in the sky
       if (currentAtmosphereRef.current.showMoon) {
         const moonX = width * 0.82;
         const moonY = height * 0.16;
@@ -1094,7 +1246,6 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
         }
       }
 
-      // 1b. Check Sun click (if sun is currently in the sky)
       const curAtm = currentAtmosphereRef.current;
       if (curAtm.showSun && curAtm.sunX !== undefined && curAtm.sunY !== undefined) {
         const sunX = width * curAtm.sunX;
@@ -1106,7 +1257,6 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
         }
       }
 
-      // 2. Check Seed click strictly at (treeX, groundY)
       const distToSeed = Math.hypot(clickX - treeX, clickY - groundY);
       if (distToSeed < 65) {
         setHasClickedSeed(true);
@@ -1120,12 +1270,154 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
 
     canvas.addEventListener('pointerdown', handlePointerDown);
 
+    // 5. Render Static Scenery into Offscreen Canvas
+    let lastRenderedAtmosphere: string = '';
+    const renderStaticBackground = (curAtm: AtmosphereSettings, periodKey: TimeOfDay) => {
+      if (!bgCtx) return;
+
+      const skyGrad = bgCtx.createLinearGradient(0, 0, 0, height);
+      skyGrad.addColorStop(0, curAtm.skyTop);
+      skyGrad.addColorStop(0.38, curAtm.skyMid1);
+      skyGrad.addColorStop(0.64, curAtm.skyMid2);
+      skyGrad.addColorStop(0.68, curAtm.skyHorizon);
+      skyGrad.addColorStop(1, curAtm.groundBase);
+      bgCtx.fillStyle = skyGrad;
+      bgCtx.fillRect(0, 0, width, height);
+
+      // Starfield
+      if (periodKey === 'night' || periodKey === 'predawn' || periodKey === 'evening' || periodKey === 'dawn' || periodKey === 'twilight') {
+        bgCtx.save();
+        const starCount = periodKey === 'night' ? 42 : (periodKey === 'predawn' ? 32 : (periodKey === 'evening' ? 20 : 10));
+        for (let i = 0; i < starCount; i++) {
+          const sx = (treeX * 0.35 + i * 47) % width;
+          const sy = (height * 0.03 + (i * 29) % (groundY * 0.62));
+          const starSize = (i % 5 === 0) ? 1.2 : 0.8;
+          bgCtx.fillStyle = `rgba(230, 242, 255, ${periodKey === 'night' ? 0.6 : 0.35})`;
+          bgCtx.beginPath();
+          bgCtx.arc(sx, sy, starSize, 0, Math.PI * 2);
+          bgCtx.fill();
+        }
+        bgCtx.restore();
+      }
+
+      // Soft ambient haze
+      const haze = bgCtx.createRadialGradient(treeX, groundY - 30, 20, treeX, groundY - 30, width * 0.55);
+      haze.addColorStop(0, curAtm.hazeColor);
+      haze.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      bgCtx.fillStyle = haze;
+      bgCtx.fillRect(0, 0, width, height);
+
+      // Rolling Ground Ridges & Mound
+      const ridgeY = groundY + 14;
+      bgCtx.fillStyle = periodKey === 'night' ? '#040906' : (periodKey === 'predawn' ? '#0A140F' : (periodKey === 'day' || periodKey === 'morning' ? '#172C1C' : (periodKey === 'dawn' ? '#1C2414' : '#141E15')));
+      bgCtx.beginPath();
+      bgCtx.moveTo(0, height);
+      bgCtx.lineTo(0, ridgeY + 12);
+      bgCtx.bezierCurveTo(width * 0.35, ridgeY - 8, width * 0.75, ridgeY + 22, width, ridgeY);
+      bgCtx.lineTo(width, height);
+      bgCtx.closePath();
+      bgCtx.fill();
+
+      const midHillY = groundY + 6;
+      bgCtx.fillStyle = periodKey === 'night' ? '#061009' : (periodKey === 'predawn' ? '#0D1C14' : (periodKey === 'day' || periodKey === 'morning' ? '#1D3B23' : (periodKey === 'dawn' ? '#26341B' : '#1A281B')));
+      bgCtx.beginPath();
+      bgCtx.moveTo(0, height);
+      bgCtx.lineTo(0, midHillY + 6);
+      bgCtx.bezierCurveTo(width * 0.25, midHillY + 14, width * 0.65, midHillY - 12, width, midHillY + 8);
+      bgCtx.lineTo(width, height);
+      bgCtx.closePath();
+      bgCtx.fill();
+
+      const moundGrad = bgCtx.createLinearGradient(0, groundY - 15, 0, height);
+      moundGrad.addColorStop(0, curAtm.groundTop);
+      moundGrad.addColorStop(0.12, curAtm.groundBase);
+      moundGrad.addColorStop(0.45, '#0a1209');
+      moundGrad.addColorStop(1, '#020402');
+      bgCtx.fillStyle = moundGrad;
+
+      bgCtx.beginPath();
+      bgCtx.moveTo(0, height);
+      bgCtx.lineTo(0, groundY + 8);
+      bgCtx.bezierCurveTo(
+        width * 0.25, groundY + 3,
+        treeX - width * 0.15, groundY - 2,
+        treeX, groundY
+      );
+      bgCtx.bezierCurveTo(
+        treeX + width * 0.15, groundY - 2,
+        width * 0.75, groundY + 5,
+        width, groundY + 10
+      );
+      bgCtx.lineTo(width, height);
+      bgCtx.closePath();
+      bgCtx.fill();
+
+      // Subterranean mineral flecks
+      bgCtx.save();
+      for (let m = 0; m < 16; m++) {
+        const sx = (treeX * 0.4 + m * 73) % width;
+        const sy = groundY + 25 + (m * 19) % (height - groundY - 40);
+        bgCtx.fillStyle = 'rgba(186, 230, 253, 0.12)';
+        bgCtx.beginPath();
+        bgCtx.arc(sx, sy, 1.2, 0, Math.PI * 2);
+        bgCtx.fill();
+      }
+      bgCtx.restore();
+
+      // Moss Cushion & Fog
+      bgCtx.save();
+      const mossGrad = bgCtx.createRadialGradient(treeX, groundY + 4, 2, treeX, groundY + 4, 38);
+      mossGrad.addColorStop(0, periodKey === 'day' || periodKey === 'morning' ? '#3B6B3E' : (periodKey === 'dawn' ? '#486634' : '#1E3E26'));
+      mossGrad.addColorStop(0.5, periodKey === 'day' || periodKey === 'morning' ? '#274B2A' : '#132818');
+      mossGrad.addColorStop(1, 'rgba(0,0,0,0)');
+      bgCtx.fillStyle = mossGrad;
+      bgCtx.beginPath();
+      bgCtx.ellipse(treeX, groundY + 3, 34, 9, 0, 0, Math.PI * 2);
+      bgCtx.fill();
+
+      const fogGrad = bgCtx.createLinearGradient(0, groundY - 12, 0, groundY + 28);
+      fogGrad.addColorStop(0, 'rgba(0,0,0,0)');
+      fogGrad.addColorStop(0.5, periodKey === 'night' || periodKey === 'predawn' ? 'rgba(30, 55, 45, 0.12)' : (periodKey === 'dawn' ? 'rgba(215, 140, 90, 0.15)' : 'rgba(100, 160, 130, 0.1)'));
+      fogGrad.addColorStop(1, 'rgba(0,0,0,0)');
+      bgCtx.fillStyle = fogGrad;
+      bgCtx.fillRect(0, groundY - 12, width, 40);
+      bgCtx.restore();
+
+      lastRenderedAtmosphere = `${periodKey}_${width}x${height}`;
+    };
+
     let animId: number;
     let lastTime = performance.now();
+    let lastFrameTime = 0;
+    const targetFrameInterval = 1000 / 60; // 60 FPS Cap to preserve battery & avoid thermal throttle
     let windSmoothed = 0.01;
 
-    // Continuous 60fps render loop
+    // Visibility & Lifecycle Handlers
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        audio.silence();
+        if (animId) cancelAnimationFrame(animId);
+      } else {
+        lastTime = performance.now();
+        lastFrameTime = performance.now();
+        audio.resume();
+        animId = requestAnimationFrame(render);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Continuous 60fps Energy-Efficient Render Loop
     const render = (timeMs: number) => {
+      if (document.hidden) return;
+
+      // Frame pacing: Cap at 60 FPS to preserve mobile battery
+      const elapsedSinceLast = timeMs - lastFrameTime;
+      if (elapsedSinceLast < targetFrameInterval - 1.2) {
+        animId = requestAnimationFrame(render);
+        return;
+      }
+      lastFrameTime = timeMs;
+
       const dt = Math.min(0.04, (timeMs - lastTime) / 1000);
       lastTime = timeMs;
       const t = timeMs * 0.001;
@@ -1135,7 +1427,7 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
         buildSkeleton(activeSpeciesIdRef.current);
       }
 
-      // 1. DYNAMIC WIND PHYSICS
+      // 1. Dynamic Wind Physics
       const slowMacro1 = Math.sin(t * 0.14);
       const slowMacro2 = Math.sin(t * 0.067 + 1.2);
       const windGate = Math.max(0, (slowMacro1 * 0.6 + slowMacro2 * 0.6 - 0.05));
@@ -1147,12 +1439,11 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
       const windAudioIntensity = Math.max(0, Math.min(1.0, windSmoothed / 0.026));
       audio.updateWindIntensity(windAudioIntensity);
 
-      // Smooth organic growth easing for Silver Neural Tree (0 to 1)
+      // Smooth neural & preview easing
       const targetNeuralProgress = isNeuralModeRef.current ? 1.0 : 0.0;
       neuralProgressRef.current += (targetNeuralProgress - neuralProgressRef.current) * (dt * 2.5);
       const neuralAmount = neuralProgressRef.current;
 
-      // Smooth organic transition for Adult Tree Preview (0 to 1)
       const targetPreview = previewAdultRef.current ? 1.0 : 0.0;
       previewProgressRef.current += (targetPreview - previewProgressRef.current) * (dt * 2.8);
       const previewAmount = previewProgressRef.current;
@@ -1164,38 +1455,15 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
       const curMoon = moonDataRef.current;
       const curSpecies = activeSpeciesRef.current;
 
-      // ========================================================
-      // 2. ASTRONOMICAL SKY & ATMOSPHERE FOR THE 7 PERIODS
-      // ========================================================
-      const skyGrad = ctx.createLinearGradient(0, 0, 0, height);
-      skyGrad.addColorStop(0, curAtmosphere.skyTop);
-      skyGrad.addColorStop(0.38, curAtmosphere.skyMid1);
-      skyGrad.addColorStop(0.64, curAtmosphere.skyMid2);
-      skyGrad.addColorStop(0.68, curAtmosphere.skyHorizon);
-      skyGrad.addColorStop(1, curAtmosphere.groundBase);
-      ctx.fillStyle = skyGrad;
-      ctx.fillRect(0, 0, width, height);
-
-      // Night / Twilight / Dawn Stars
-      if (curRealPeriod === 'night' || curRealPeriod === 'predawn' || curRealPeriod === 'evening' || curRealPeriod === 'dawn' || curRealPeriod === 'twilight') {
-        ctx.save();
-        const starCount = curRealPeriod === 'night' ? 45 : (curRealPeriod === 'predawn' ? 35 : (curRealPeriod === 'evening' ? 22 : 12));
-        for (let i = 0; i < starCount; i++) {
-          const sx = (treeX * 0.35 + i * 47) % width;
-          const sy = (height * 0.03 + (i * 29) % (groundY * 0.62));
-          const starPulse = 0.3 + 0.7 * Math.sin(t * 1.6 + i * 1.7);
-          const starSize = (i % 5 === 0) ? 1.2 : 0.8;
-          ctx.fillStyle = `rgba(230, 242, 255, ${starPulse * (curRealPeriod === 'night' ? 0.65 : 0.35)})`;
-          ctx.beginPath();
-          ctx.arc(sx, sy, starSize, 0, Math.PI * 2);
-          ctx.fill();
-        }
-        ctx.restore();
+      // 2. Blit Pre-rendered Scenery from Offscreen Canvas (Ultra-Fast Blit)
+      const currentAtmKey = `${curRealPeriod}_${width}x${height}`;
+      if (bgNeedsUpdate || lastRenderedAtmosphere !== currentAtmKey) {
+        renderStaticBackground(curAtmosphere, curRealPeriod);
+        bgNeedsUpdate = false;
       }
+      ctx.drawImage(bgCanvas, 0, 0, width, height);
 
-      // ========================================================
-      // 3. RADIANT SUN (DAYTIME PERIODS: DAWN, MORNING, DAY, TWILIGHT)
-      // ========================================================
+      // 3. Radiant Sun (Dawn, Morning, Day, Twilight)
       if (curAtmosphere.showSun && curAtmosphere.sunX !== undefined && curAtmosphere.sunY !== undefined) {
         ctx.save();
         const sx = width * curAtmosphere.sunX;
@@ -1204,49 +1472,30 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
 
         ctx.translate(sx, sy);
 
-        // 3a. Massive Atmospheric Solar Corona & Chromatic Flare
-        const sunCorona = ctx.createRadialGradient(0, 0, sr * 0.5, 0, 0, sr * 4.5);
-        sunCorona.addColorStop(0, curAtmosphere.sunCoronaColor || 'rgba(255, 240, 180, 0.6)');
-        sunCorona.addColorStop(0.3, 'rgba(255, 210, 120, 0.25)');
-        sunCorona.addColorStop(0.65, 'rgba(255, 180, 80, 0.08)');
-        sunCorona.addColorStop(1, 'rgba(255, 150, 50, 0)');
-        ctx.fillStyle = sunCorona;
-        ctx.beginPath();
-        ctx.arc(0, 0, sr * 4.5, 0, Math.PI * 2);
-        ctx.fill();
-
-        // 3b. Rotating Golden Sunlight Rays / Diffraction Beams
-        ctx.save();
+        // Rotating Sunlight Rays
         ctx.rotate(t * 0.08);
         ctx.strokeStyle = curAtmosphere.sunCoronaColor || 'rgba(255, 230, 160, 0.35)';
         ctx.lineWidth = 1.2;
-        for (let r = 0; r < 12; r++) {
-          const rAngle = (r * Math.PI * 2) / 12;
+        for (let r = 0; r < 10; r++) {
+          const rAngle = (r * Math.PI * 2) / 10;
           const rayLen = sr * (1.8 + 0.35 * Math.sin(t * 2.0 + r));
           ctx.beginPath();
           ctx.moveTo(Math.cos(rAngle) * (sr * 0.8), Math.sin(rAngle) * (sr * 0.8));
           ctx.lineTo(Math.cos(rAngle) * rayLen, Math.sin(rAngle) * rayLen);
           ctx.stroke();
         }
-        ctx.restore();
 
-        // 3c. Blinding Diamond Core
-        const coreGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, sr);
-        coreGrad.addColorStop(0, '#FFFFFF');
-        coreGrad.addColorStop(0.4, curAtmosphere.sunCoreColor || '#FFF4CC');
-        coreGrad.addColorStop(0.85, curAtmosphere.sunCoreColor || '#FFAE42');
-        coreGrad.addColorStop(1, 'rgba(255, 180, 50, 0.7)');
-        ctx.fillStyle = coreGrad;
+        // Diamond Sun Core
+        ctx.drawImage(spriteGold, -sr * 2.2, -sr * 2.2, sr * 4.4, sr * 4.4);
+        ctx.fillStyle = '#FFFFFF';
         ctx.beginPath();
-        ctx.arc(0, 0, sr, 0, Math.PI * 2);
+        ctx.arc(0, 0, sr * 0.75, 0, Math.PI * 2);
         ctx.fill();
 
         ctx.restore();
       }
 
-      // ========================================================
-      // 4. RADIANT LUMINOUS MOON (ALWAYS GLOWING & VIBRANT)
-      // ========================================================
+      // 4. Radiant Luminous Moon
       if (curAtmosphere.showMoon) {
         ctx.save();
         const mx = width * 0.82;
@@ -1256,56 +1505,27 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
         ctx.globalAlpha = curAtmosphere.moonOpacity;
         ctx.translate(mx, my);
 
-        // 4a. Radiant Atmospheric Corona ("Живе світіння")
+        // Radiant Atmospheric Corona using Sprite Blitting
         const glowPulse = 0.95 + 0.05 * Math.sin(t * 1.2);
-        const glowIntensity = 0.16 + curMoon.illumination * 0.34;
-        const outerHalo = ctx.createRadialGradient(0, 0, mr * 0.5, 0, 0, mr * 3.4 * glowPulse);
-        outerHalo.addColorStop(0, `rgba(241, 245, 249, ${glowIntensity * 0.95})`);
-        outerHalo.addColorStop(0.35, `rgba(186, 230, 253, ${glowIntensity * 0.45})`);
-        outerHalo.addColorStop(0.7, `rgba(147, 197, 253, ${glowIntensity * 0.12})`);
-        outerHalo.addColorStop(1, 'rgba(0, 0, 0, 0)');
-        ctx.fillStyle = outerHalo;
-        ctx.beginPath();
-        ctx.arc(0, 0, mr * 3.4 * glowPulse, 0, Math.PI * 2);
-        ctx.fill();
+        const moonAuraR = mr * 3.4 * glowPulse;
+        ctx.drawImage(spriteWhite, -moonAuraR, -moonAuraR, moonAuraR * 2, moonAuraR * 2);
 
-        // 4b. Base Disc (Soft silver-pearl night glow, never pitch black!)
-        const baseMoonGrad = ctx.createRadialGradient(-mr * 0.2, -mr * 0.2, 0, 0, 0, mr);
-        baseMoonGrad.addColorStop(0, 'rgba(226, 232, 240, 0.42)');
-        baseMoonGrad.addColorStop(0.65, 'rgba(148, 163, 184, 0.32)');
-        baseMoonGrad.addColorStop(1, 'rgba(71, 85, 105, 0.25)');
-        ctx.fillStyle = baseMoonGrad;
+        // Base Disc
+        ctx.fillStyle = 'rgba(226, 232, 240, 0.35)';
         ctx.beginPath();
         ctx.arc(0, 0, mr, 0, Math.PI * 2);
         ctx.fill();
 
-        // 4c. Maria Texture on base disc
-        ctx.fillStyle = 'rgba(71, 85, 105, 0.22)';
-        ctx.beginPath();
-        ctx.arc(-mr * 0.35, -mr * 0.22, mr * 0.28, 0, Math.PI * 2);
-        ctx.arc(mr * 0.15, mr * 0.32, mr * 0.34, 0, Math.PI * 2);
-        ctx.arc(mr * 0.25, -mr * 0.28, mr * 0.22, 0, Math.PI * 2);
-        ctx.arc(-mr * 0.1, mr * 0.1, mr * 0.2, 0, Math.PI * 2);
-        ctx.fill();
-
-        // 4d. REAL ASTRONOMICAL ILLUMINATED SURFACE (Luminous white-silver pearl)
+        // Real Astronomical Phase Disc
         const phase = curMoon.phase;
         ctx.save();
         ctx.beginPath();
 
-        // If near full moon or any phase, render accurate geometry
         if (phase < 0.02 || phase > 0.98) {
-          // New Moon (Молодик): Delicate ethereal ashen glow
           ctx.arc(0, 0, mr, 0, Math.PI * 2);
-          ctx.closePath();
-          ctx.clip();
-          const ashenGrad = ctx.createRadialGradient(-mr * 0.2, -mr * 0.2, 0, 0, 0, mr);
-          ashenGrad.addColorStop(0, 'rgba(241, 245, 249, 0.22)');
-          ashenGrad.addColorStop(1, 'rgba(148, 163, 184, 0.12)');
-          ctx.fillStyle = ashenGrad;
+          ctx.fillStyle = 'rgba(241, 245, 249, 0.18)';
           ctx.fill();
         } else {
-          // Crescent, Quarters, Gibbous, Full Moon
           const isWaxing = phase < 0.5;
           const k = Math.cos(2 * Math.PI * phase);
           const rx = Math.max(0.1, Math.abs(k) * mr);
@@ -1320,52 +1540,28 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
           ctx.closePath();
           ctx.clip();
 
-          // Luminous Diamond-Pearl Lit Body
-          const litGrad = ctx.createRadialGradient(-mr * 0.25, -mr * 0.25, 0, 0, 0, mr * 1.15);
-          litGrad.addColorStop(0, '#FFFFFF');
-          litGrad.addColorStop(0.35, '#F8FAFC');
-          litGrad.addColorStop(0.75, '#E2E8F0');
-          litGrad.addColorStop(1, '#CBD5E1');
-          ctx.fillStyle = litGrad;
-          ctx.fill();
-
-          // Lunar Maria (Seas) inside lit surface
-          ctx.fillStyle = 'rgba(71, 85, 105, 0.28)';
+          // Luminous lit pearl body
+          ctx.fillStyle = '#F8FAFC';
           ctx.beginPath();
-          ctx.ellipse(-mr * 0.38, -mr * 0.1, mr * 0.32, mr * 0.44, -0.2, 0, Math.PI * 2);
-          ctx.arc(-mr * 0.18, -mr * 0.38, mr * 0.24, 0, Math.PI * 2);
-          ctx.arc(mr * 0.22, -mr * 0.2, mr * 0.21, 0, Math.PI * 2);
-          ctx.arc(mr * 0.26, mr * 0.08, mr * 0.23, 0, Math.PI * 2);
-          ctx.ellipse(mr * 0.55, -mr * 0.18, mr * 0.14, mr * 0.18, 0.3, 0, Math.PI * 2);
-          ctx.arc(mr * 0.32, mr * 0.34, mr * 0.22, 0, Math.PI * 2);
-          ctx.arc(mr * 0.08, mr * 0.42, mr * 0.18, 0, Math.PI * 2);
+          ctx.arc(0, 0, mr, 0, Math.PI * 2);
           ctx.fill();
 
-          // Tycho Crater Rays (Radiating silver beams)
+          // Tycho Crater Rays
           ctx.strokeStyle = 'rgba(255, 255, 255, 0.38)';
           ctx.lineWidth = 0.8;
           const tychoX = mr * 0.05;
           const tychoY = mr * 0.58;
           ctx.beginPath();
-          for (let r = 0; r < 8; r++) {
-            const rayAngle = -Math.PI * 0.5 + (r - 3.5) * 0.28;
+          for (let r = 0; r < 6; r++) {
+            const rayAngle = -Math.PI * 0.5 + (r - 2.5) * 0.35;
             ctx.moveTo(tychoX, tychoY);
             ctx.lineTo(tychoX + Math.cos(rayAngle) * mr * 0.9, tychoY + Math.sin(rayAngle) * mr * 0.9);
           }
           ctx.stroke();
-
-          // Bright crater centers
-          ctx.fillStyle = '#FFFFFF';
-          ctx.beginPath();
-          ctx.arc(tychoX, tychoY, 1.8, 0, Math.PI * 2);
-          ctx.arc(-mr * 0.2, -mr * 0.08, 1.5, 0, Math.PI * 2);
-          ctx.arc(-mr * 0.42, -mr * 0.05, 1.2, 0, Math.PI * 2);
-          ctx.fill();
         }
-
         ctx.restore();
 
-        // Luminous glowing rim border
+        // Luminous glowing rim
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.65)';
         ctx.lineWidth = 1.0;
         ctx.beginPath();
@@ -1375,73 +1571,7 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
         ctx.restore();
       }
 
-      // Soft ambient haze
-      const haze = ctx.createRadialGradient(treeX, groundY - 30, 20, treeX, groundY - 30, width * 0.55);
-      haze.addColorStop(0, curAtmosphere.hazeColor);
-      haze.addColorStop(1, 'rgba(0, 0, 0, 0)');
-      ctx.fillStyle = haze;
-      ctx.fillRect(0, 0, width, height);
-
-      // ========================================================
-      // 5. ROLLING GROUND & HILLS DYNAMICALLY TINTED
-      // ========================================================
-      const ridgeY = groundY + 14;
-      ctx.fillStyle = curRealPeriod === 'night' ? '#040906' : (curRealPeriod === 'predawn' ? '#0A140F' : (curRealPeriod === 'day' || curRealPeriod === 'morning' ? '#172C1C' : (curRealPeriod === 'dawn' ? '#1C2414' : '#141E15')));
-      ctx.beginPath();
-      ctx.moveTo(0, height);
-      ctx.lineTo(0, ridgeY + 12);
-      ctx.bezierCurveTo(width * 0.35, ridgeY - 8, width * 0.75, ridgeY + 22, width, ridgeY);
-      ctx.lineTo(width, height);
-      ctx.closePath();
-      ctx.fill();
-
-      const midHillY = groundY + 6;
-      ctx.fillStyle = curRealPeriod === 'night' ? '#061009' : (curRealPeriod === 'predawn' ? '#0D1C14' : (curRealPeriod === 'day' || curRealPeriod === 'morning' ? '#1D3B23' : (curRealPeriod === 'dawn' ? '#26341B' : '#1A281B')));
-      ctx.beginPath();
-      ctx.moveTo(0, height);
-      ctx.lineTo(0, midHillY + 6);
-      ctx.bezierCurveTo(width * 0.25, midHillY + 14, width * 0.65, midHillY - 12, width, midHillY + 8);
-      ctx.lineTo(width, height);
-      ctx.closePath();
-      ctx.fill();
-
-      const moundGrad = ctx.createLinearGradient(0, groundY - 15, 0, height);
-      moundGrad.addColorStop(0, curAtmosphere.groundTop);
-      moundGrad.addColorStop(0.12, curAtmosphere.groundBase);
-      moundGrad.addColorStop(0.45, '#0a1209');
-      moundGrad.addColorStop(1, '#020402');
-      ctx.fillStyle = moundGrad;
-
-      ctx.beginPath();
-      ctx.moveTo(0, height);
-      ctx.lineTo(0, groundY + 8);
-      ctx.bezierCurveTo(
-        width * 0.25, groundY + 3,
-        treeX - width * 0.15, groundY - 2,
-        treeX, groundY
-      );
-      ctx.bezierCurveTo(
-        treeX + width * 0.15, groundY - 2,
-        width * 0.75, groundY + 5,
-        width, groundY + 10
-      );
-      ctx.lineTo(width, height);
-      ctx.closePath();
-      ctx.fill();
-
-      // Subterranean mineral flecks
-      ctx.save();
-      for (let m = 0; m < 18; m++) {
-        const sx = (treeX * 0.4 + m * 73) % width;
-        const sy = groundY + 25 + (m * 19) % (height - groundY - 40);
-        ctx.fillStyle = neuralAmount > 0.3 ? 'rgba(186, 230, 253, 0.15)' : 'rgba(180, 160, 120, 0.08)';
-        ctx.beginPath();
-        ctx.arc(sx, sy, 1.2, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      ctx.restore();
-
-      // Living Grass Blades
+      // 5. Living Grass Blades
       const blades = grassBladesRef.current;
       ctx.save();
       blades.forEach((b) => {
@@ -1467,32 +1597,13 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
       });
       ctx.restore();
 
-      // Moss Cushion & Ground Mist
-      ctx.save();
-      const mossGrad = ctx.createRadialGradient(treeX, groundY + 4, 2, treeX, groundY + 4, 38);
-      mossGrad.addColorStop(0, curRealPeriod === 'day' || curRealPeriod === 'morning' ? '#3B6B3E' : (curRealPeriod === 'dawn' ? '#486634' : '#1E3E26'));
-      mossGrad.addColorStop(0.5, curRealPeriod === 'day' || curRealPeriod === 'morning' ? '#274B2A' : '#132818');
-      mossGrad.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = mossGrad;
-      ctx.beginPath();
-      ctx.ellipse(treeX, groundY + 3, 34, 9, 0, 0, Math.PI * 2);
-      ctx.fill();
+      // Reset Pools
+      registeredSegments.length = 0;
+      segmentPoolIndex = 0;
+      canopyNodePoints.length = 0;
+      rootNodePoints.length = 0;
 
-      const fogGrad = ctx.createLinearGradient(0, groundY - 12, 0, groundY + 28);
-      fogGrad.addColorStop(0, 'rgba(0,0,0,0)');
-      fogGrad.addColorStop(0.5, curRealPeriod === 'night' || curRealPeriod === 'predawn' ? 'rgba(30, 55, 45, 0.12)' : (curRealPeriod === 'dawn' ? 'rgba(215, 140, 90, 0.15)' : 'rgba(100, 160, 130, 0.1)'));
-      fogGrad.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = fogGrad;
-      ctx.fillRect(0, groundY - 12, width, 40);
-      ctx.restore();
-
-      const registeredSegments: FilamentSegment[] = [];
-      const canopyNodePoints: { x: number; y: number; depth: number }[] = [];
-      const rootNodePoints: { x: number; y: number; depth: number }[] = [];
-
-      // ========================================================
-      // 6. ROOT NETWORK (PHYSICAL WOOD VS NEURAL MYCELIUM)
-      // ========================================================
+      // 6. Subterranean Root Network & Neural Axons
       const renderRootNode = (node: RootNode, startX: number, startY: number, parentAngle: number) => {
         const physicalRootGrowth = Math.min(1.0, physicalGrowth * 1.3);
         const neuralRootGrowth = Math.min(1.0, neuralAmount * 1.3);
@@ -1504,15 +1615,9 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
         const endY = startY + Math.sin(parentAngle) * (node.length * effectiveRootGrowth);
 
         rootNodePoints.push({ x: endX, y: endY, depth: node.depth });
-        registeredSegments.push({
-          startX,
-          startY,
-          endX,
-          endY,
-          domain: 'root',
-          depth: node.depth
-        });
+        allocSegment(startX, startY, endX, endY, 'root', node.depth);
 
+        // Botanical Root
         if (physicalGrowth > 0.01 && physicalRootGrowth > 0.01) {
           ctx.save();
           ctx.strokeStyle = curRealPeriod === 'day' || curRealPeriod === 'morning' ? '#4A3728' : '#33271D';
@@ -1525,22 +1630,45 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
           ctx.restore();
         }
 
-        if (neuralAmount > 0.05 && neuralRootGrowth > 0.01) {
+        // Bioluminescent Neural Root Axons
+        if (neuralAmount > 0.04 && neuralRootGrowth > 0.01) {
           ctx.save();
-          ctx.strokeStyle = `rgba(203, 213, 225, ${0.22 + 0.45 * neuralAmount})`;
-          ctx.lineWidth = Math.max(0.45, node.thickness * neuralRootGrowth * (0.65 + 0.25 * Math.sin(t * 2 + node.depth)));
+          ctx.strokeStyle = `rgba(56, 189, 248, ${0.2 + 0.35 * neuralAmount})`;
+          ctx.lineWidth = Math.max(1.2, node.thickness * neuralRootGrowth * 0.85);
           ctx.lineCap = 'round';
           ctx.beginPath();
           ctx.moveTo(startX, startY);
           ctx.lineTo(endX, endY);
           ctx.stroke();
 
-          if (neuralAmount > 0.25 && node.children.length === 0) {
+          ctx.strokeStyle = `rgba(224, 242, 254, ${0.65 + 0.35 * neuralAmount})`;
+          ctx.lineWidth = Math.max(0.5, node.thickness * neuralRootGrowth * 0.32);
+          ctx.beginPath();
+          ctx.moveTo(startX, startY);
+          ctx.lineTo(endX, endY);
+          ctx.stroke();
+
+          if (node.children.length === 0) {
+            const tipPulse = 0.8 + 0.3 * Math.sin(t * 3.2 + node.depth);
+            const rR = 1.6 * tipPulse * neuralAmount;
             ctx.fillStyle = '#67E8F9';
             ctx.beginPath();
-            ctx.arc(endX, endY, 1.1 * neuralAmount, 0, Math.PI * 2);
+            ctx.arc(endX, endY, rR, 0, Math.PI * 2);
             ctx.fill();
+
+            const auraSize = rR * 5.0;
+            ctx.drawImage(spriteCyan, endX - auraSize * 0.5, endY - auraSize * 0.5, auraSize, auraSize);
           }
+
+          // Upward Traveling Root Action Potentials
+          const rootPulseU = ((1.0 - (t * 1.4 + node.depth * 0.28) % 1.0) + 1.0) % 1.0;
+          const rpx = startX + (endX - startX) * rootPulseU;
+          const rpy = startY + (endY - startY) * rootPulseU;
+          ctx.fillStyle = '#FFFFFF';
+          ctx.beginPath();
+          ctx.arc(rpx, rpy, 1.1, 0, Math.PI * 2);
+          ctx.fill();
+
           ctx.restore();
         }
 
@@ -1554,17 +1682,17 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
           renderRootNode(trunk, treeX, groundY, trunk.angle);
         });
 
-        if (neuralAmount > 0.15 && rootNodePoints.length > 3) {
+        if (neuralAmount > 0.12 && rootNodePoints.length > 3) {
           ctx.save();
-          ctx.strokeStyle = `rgba(186, 230, 253, ${0.14 * neuralAmount})`;
-          ctx.lineWidth = 0.45;
+          ctx.strokeStyle = `rgba(186, 230, 253, ${0.16 * neuralAmount})`;
+          ctx.lineWidth = 0.55;
 
           for (let i = 0; i < rootNodePoints.length; i += 2) {
             for (let j = i + 1; j < rootNodePoints.length; j += 2) {
               const p1 = rootNodePoints[i];
               const p2 = rootNodePoints[j];
               const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
-              if (dist > 15 && dist < 55 && Math.abs(p1.depth - p2.depth) <= 1) {
+              if (dist > 14 && dist < 65 && Math.abs(p1.depth - p2.depth) <= 1) {
                 const midX = (p1.x + p2.x) * 0.5;
                 const midY = (p1.y + p2.y) * 0.5 + 4;
                 ctx.beginPath();
@@ -1572,17 +1700,7 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
                 ctx.quadraticCurveTo(midX, midY, p2.x, p2.y);
                 ctx.stroke();
 
-                registeredSegments.push({
-                  startX: p1.x,
-                  startY: p1.y,
-                  endX: p2.x,
-                  endY: p2.y,
-                  ctrlX: midX,
-                  ctrlY: midY,
-                  isCurved: true,
-                  domain: 'root',
-                  depth: p1.depth
-                });
+                allocSegment(p1.x, p1.y, p2.x, p2.y, 'root', p1.depth, true, midX, midY);
               }
             }
           }
@@ -1590,76 +1708,68 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
         }
       }
 
-      // ========================================================
-      // 7. SACRED SEED
-      // ========================================================
-      const seedScale = Math.max(0.65, 1 - physicalGrowth * 1.4);
-      const seedR = Math.max(5, 7.5 * seedScale);
+      // 7. Sacred Soma (Perikaryon / Nucleus)
+      const seedScale = Math.max(0.7, 1 - physicalGrowth * 1.3);
+      const seedR = Math.max(6.5, 9.5 * seedScale);
       ctx.save();
 
-      const haloR = seedR * (1.8 + 0.35 * Math.sin(t * 2.8));
-      const sHalo = ctx.createRadialGradient(treeX, groundY, 1, treeX, groundY, haloR);
-      if (neuralAmount > 0.05) {
-        sHalo.addColorStop(0, `rgba(186, 230, 253, ${0.5 * neuralAmount})`);
-        sHalo.addColorStop(1, 'rgba(56, 189, 248, 0)');
-      } else {
-        sHalo.addColorStop(0, 'rgba(234, 179, 8, 0.35)');
-        sHalo.addColorStop(1, 'rgba(234, 179, 8, 0)');
+      // Expanding ripples
+      for (let w = 1; w <= 3; w++) {
+        const waveProgress = ((t * 0.75 + w * 0.33) % 1.0);
+        const waveRadius = seedR + waveProgress * 36;
+        const waveAlpha = (1 - waveProgress) * 0.55 * neuralAmount;
+        ctx.strokeStyle = `rgba(56, 189, 248, ${waveAlpha})`;
+        ctx.lineWidth = 0.9;
+        ctx.beginPath();
+        ctx.arc(treeX, groundY, waveRadius, 0, Math.PI * 2);
+        ctx.stroke();
       }
-      ctx.fillStyle = sHalo;
+
+      // Soma Corona using Sprite Blit
+      const haloR = seedR * (2.4 + 0.45 * Math.sin(t * 2.6));
+      ctx.drawImage(spriteCyan, treeX - haloR, groundY - haloR, haloR * 2, haloR * 2);
+
+      // Soma Cytoplasm
+      ctx.fillStyle = '#0284C7';
       ctx.beginPath();
-      ctx.arc(treeX, groundY, haloR, 0, Math.PI * 2);
+      ctx.ellipse(treeX, groundY, seedR * 1.18, seedR * 0.92, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      // Seed Core
-      const seedGrad = ctx.createRadialGradient(treeX - 1.5, groundY - 1.5, 0, treeX, groundY, seedR);
-      if (neuralAmount > 0.3) {
-        seedGrad.addColorStop(0, '#FFFFFF');
-        seedGrad.addColorStop(0.4, '#CBD5E1');
-        seedGrad.addColorStop(1, '#475569');
-      } else {
-        seedGrad.addColorStop(0, '#FACC15');
-        seedGrad.addColorStop(0.7, '#A16207');
-        seedGrad.addColorStop(1, '#5C381E');
+      // Chromatin matrix
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+      ctx.lineWidth = 0.8;
+      for (let c = 0; c < 5; c++) {
+        const cAngle = (c * Math.PI) / 2.5 + t * 0.4;
+        ctx.beginPath();
+        ctx.moveTo(treeX, groundY);
+        ctx.lineTo(treeX + Math.cos(cAngle) * (seedR * 0.75), groundY + Math.sin(cAngle) * (seedR * 0.65));
+        ctx.stroke();
       }
-      ctx.fillStyle = seedGrad;
+
+      // Nucleolus core
+      ctx.fillStyle = '#FFFFFF';
       ctx.beginPath();
-      ctx.ellipse(treeX, groundY, seedR * 1.15, seedR * 0.9, 0, 0, Math.PI * 2);
+      ctx.arc(treeX, groundY, seedR * 0.35, 0, Math.PI * 2);
       ctx.fill();
-
-      // Breathing ring
-      const pulseRingR = seedR + 3.5 + Math.sin(t * 2.2) * 2;
-      ctx.strokeStyle = neuralAmount > 0.3 ? 'rgba(56, 189, 248, 0.65)' : 'rgba(234, 179, 8, 0.55)';
-      ctx.lineWidth = 1.2;
-      ctx.beginPath();
-      ctx.arc(treeX, groundY, pulseRingR, 0, Math.PI * 2);
-      ctx.stroke();
-
-      if (!hasClickedSeedRef.current && neuralAmount < 0.1 && physicalGrowth < 0.05) {
-        ctx.fillStyle = 'rgba(203, 213, 225, 0.75)';
-        ctx.font = '11px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('Доторкніться до зернини', treeX, groundY + 28);
-      }
 
       ctx.restore();
 
-      // ========================================================
-      // 8. CANOPY: SEPARATED PHYSICAL TREE & NEURAL GOSSAMER
-      // ========================================================
+      // 8. Canopy: Deep Multi-Level Neural Arborization
+      const chosenSprite = activeSpeciesIdRef.current === 'sakura' ? spritePink : (activeSpeciesIdRef.current === 'pine' ? spriteTeal : (activeSpeciesIdRef.current === 'apple' ? spriteGold : spriteCyan));
+
       const renderBranch = (
         node: BranchNode,
         startX: number,
         startY: number,
         accumAngle: number
       ) => {
-        const depthThreshold = node.depth * 0.12;
+        const depthThreshold = node.depth * 0.1;
 
-        const physicalBranchGrowth = Math.max(0, Math.min(1.0, (physicalGrowth - depthThreshold) * 2.4));
-        const neuralBranchGrowth = Math.max(0, Math.min(1.0, (neuralAmount - depthThreshold) * 2.4));
+        const physicalBranchGrowth = Math.max(0, Math.min(1.0, (physicalGrowth - depthThreshold) * 2.5));
+        const neuralBranchGrowth = Math.max(0, Math.min(1.0, (neuralAmount - depthThreshold) * 2.5));
         const effectiveBranchGrowth = Math.max(physicalBranchGrowth, neuralBranchGrowth);
 
-        if (effectiveBranchGrowth <= 0.005) return;
+        if (effectiveBranchGrowth <= 0.004) return;
 
         const depthFactor = (node.depth + 1);
         const windDeflection = windSmoothed * 1.5 * depthFactor;
@@ -1677,19 +1787,9 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
         const midY = (startY + endY) * 0.5 + Math.cos(currentAngle) * curveOffset;
 
         canopyNodePoints.push({ x: endX, y: endY, depth: node.depth });
-        registeredSegments.push({
-          startX,
-          startY,
-          endX,
-          endY,
-          ctrlX: node.curvature ? midX : undefined,
-          ctrlY: node.curvature ? midY : undefined,
-          isCurved: !!node.curvature,
-          domain: 'canopy',
-          depth: node.depth
-        });
+        allocSegment(startX, startY, endX, endY, 'canopy', node.depth, !!node.curvature, node.curvature ? midX : undefined, node.curvature ? midY : undefined);
 
-        // 8a. PHYSICAL BOTANICAL WOOD (ONLY IF REAL PHYSICAL GROWTH EXISTS)
+        // Botanical Wood
         if (physicalGrowth > 0.02 && physicalBranchGrowth > 0.01) {
           ctx.save();
           const pLen = node.length * physicalBranchGrowth;
@@ -1705,11 +1805,8 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
           ctx.lineCap = 'round';
           ctx.beginPath();
           ctx.moveTo(startX, startY);
-          if (node.curvature) {
-            ctx.quadraticCurveTo(pMidX, pMidY, pEndX, pEndY);
-          } else {
-            ctx.lineTo(pEndX, pEndY);
-          }
+          if (node.curvature) ctx.quadraticCurveTo(pMidX, pMidY, pEndX, pEndY);
+          else ctx.lineTo(pEndX, pEndY);
           ctx.stroke();
 
           if (node.depth <= 1 && woodThick > 3.5) {
@@ -1717,18 +1814,15 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
             ctx.lineWidth = woodThick * 0.35;
             ctx.beginPath();
             ctx.moveTo(startX, startY);
-            if (node.curvature) {
-              ctx.quadraticCurveTo(pMidX, pMidY, pEndX, pEndY);
-            } else {
-              ctx.lineTo(pEndX, pEndY);
-            }
+            if (node.curvature) ctx.quadraticCurveTo(pMidX, pMidY, pEndX, pEndY);
+            else ctx.lineTo(pEndX, pEndY);
             ctx.stroke();
           }
           ctx.restore();
         }
 
-        // 8b. SILVER GOSSAMER FILAMENTS
-        if (neuralAmount > 0.05 && neuralBranchGrowth > 0.01) {
+        // Bioluminescent Neural Arborization
+        if (neuralAmount > 0.04 && neuralBranchGrowth > 0.01) {
           ctx.save();
           const nLen = node.length * neuralBranchGrowth;
           const nEndX = startX + Math.cos(currentAngle) * nLen;
@@ -1737,29 +1831,98 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
           const nMidX = (startX + nEndX) * 0.5 - Math.sin(currentAngle) * nCurveOffset;
           const nMidY = (startY + nEndY) * 0.5 + Math.cos(currentAngle) * nCurveOffset;
 
-          const silverGrad = ctx.createLinearGradient(startX, startY, nEndX, nEndY);
-          silverGrad.addColorStop(0, '#CBD5E1');
-          silverGrad.addColorStop(0.5, '#FFFFFF');
-          silverGrad.addColorStop(1, '#94A3B8');
-          ctx.strokeStyle = silverGrad;
-          ctx.lineWidth = Math.max(
-            0.65,
-            node.thickness * neuralBranchGrowth * 0.28 * (0.85 + 0.15 * Math.sin(t * 2.5 + node.depth))
-          );
+          // Halo
+          const haloPulse = 0.82 + 0.22 * Math.sin(t * 2.8 + node.depth * 0.65);
+          ctx.strokeStyle = `rgba(56, 189, 248, ${0.32 * neuralAmount * haloPulse})`;
+          ctx.lineWidth = Math.max(2.0, node.thickness * neuralBranchGrowth * 0.72);
           ctx.lineCap = 'round';
           ctx.beginPath();
           ctx.moveTo(startX, startY);
-          if (node.curvature) {
-            ctx.quadraticCurveTo(nMidX, nMidY, nEndX, nEndY);
-          } else {
-            ctx.lineTo(nEndX, nEndY);
-          }
+          if (node.curvature) ctx.quadraticCurveTo(nMidX, nMidY, nEndX, nEndY);
+          else ctx.lineTo(nEndX, nEndY);
           ctx.stroke();
+
+          // Myelinated Axon Trunk
+          ctx.strokeStyle = '#38BDF8';
+          ctx.lineWidth = Math.max(0.95, node.thickness * neuralBranchGrowth * 0.32);
+          ctx.beginPath();
+          ctx.moveTo(startX, startY);
+          if (node.curvature) ctx.quadraticCurveTo(nMidX, nMidY, nEndX, nEndY);
+          else ctx.lineTo(nEndX, nEndY);
+          ctx.stroke();
+
+          // High-Frequency Core
+          ctx.strokeStyle = '#FFFFFF';
+          ctx.lineWidth = Math.max(0.55, node.thickness * neuralBranchGrowth * 0.12);
+          ctx.beginPath();
+          ctx.moveTo(startX, startY);
+          if (node.curvature) ctx.quadraticCurveTo(nMidX, nMidY, nEndX, nEndY);
+          else ctx.lineTo(nEndX, nEndY);
+          ctx.stroke();
+
+          // Nodes of Ranvier
+          if (node.depth <= 2 && nLen > 24) {
+            const numNodes = Math.floor(nLen / 22);
+            for (let rIdx = 1; rIdx <= numNodes; rIdx++) {
+              const rU = rIdx / (numNodes + 1);
+              const invRU = 1 - rU;
+              const rx = node.curvature ? (invRU * invRU * startX + 2 * invRU * rU * nMidX + rU * rU * nEndX) : (startX + (nEndX - startX) * rU);
+              const ry = node.curvature ? (invRU * invRU * startY + 2 * invRU * rU * nMidY + rU * rU * nEndY) : (startY + (nEndY - startY) * rU);
+
+              ctx.strokeStyle = '#FDE047';
+              ctx.lineWidth = 1.1;
+              ctx.beginPath();
+              ctx.arc(rx, ry, (2.0 + node.thickness * 0.12) * neuralAmount, 0, Math.PI * 2);
+              ctx.stroke();
+            }
+          }
+
+          // Dendritic Spines
+          if (node.depth >= 1 && nLen > 11) {
+            const numSpines = Math.min(5, Math.floor(nLen / 7));
+            for (let s = 1; s <= numSpines; s++) {
+              const u = s / (numSpines + 1);
+              const invU = 1 - u;
+              const bx = node.curvature ? (invU * invU * startX + 2 * invU * u * nMidX + u * u * nEndX) : (startX + (nEndX - startX) * u);
+              const by = node.curvature ? (invU * invU * startY + 2 * invU * u * nMidY + u * u * nEndY) : (startY + (nEndY - startY) * u);
+              const side = s % 2 === 0 ? 1 : -1;
+              const spineAngle = currentAngle + side * (Math.PI * 0.42);
+              const spineLen = (2.6 + (s % 3) * 1.2) * neuralAmount;
+              const spineTipX = bx + Math.cos(spineAngle) * spineLen;
+              const spineTipY = by + Math.sin(spineAngle) * spineLen;
+
+              ctx.strokeStyle = 'rgba(186, 230, 253, 0.7)';
+              ctx.lineWidth = 0.6;
+              ctx.beginPath();
+              ctx.moveTo(bx, by);
+              ctx.lineTo(spineTipX, spineTipY);
+              ctx.stroke();
+
+              ctx.fillStyle = s % 2 === 0 ? '#67E8F9' : '#A7F3D0';
+              ctx.beginPath();
+              ctx.arc(spineTipX, spineTipY, 1.0 * neuralAmount, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
+
+          // Traveling Action Potential
+          const waveU = ((t * 1.75 - node.depth * 0.32) % 1.0 + 1.0) % 1.0;
+          const invW = 1 - waveU;
+          const px = node.curvature ? (invW * invW * startX + 2 * invW * waveU * nMidX + waveU * waveU * nEndX) : (startX + (nEndX - startX) * waveU);
+          const py = node.curvature ? (invW * invW * startY + 2 * invW * waveU * nMidY + waveU * waveU * nEndY) : (startY + (nEndY - startY) * waveU);
+
+          const spikeSize = 8 * neuralAmount;
+          ctx.drawImage(chosenSprite, px - spikeSize * 0.5, py - spikeSize * 0.5, spikeSize, spikeSize);
+          ctx.fillStyle = '#FFFFFF';
+          ctx.beginPath();
+          ctx.arc(px, py, 1.2, 0, Math.PI * 2);
+          ctx.fill();
+
           ctx.restore();
         }
 
-        // 8c. SYNAPTIC DEWDROPS ON SILVER WEB
-        if (neuralAmount > 0.12 && neuralBranchGrowth > 0.01) {
+        // Terminal Synaptic Boutons
+        if (neuralAmount > 0.06 && neuralBranchGrowth > 0.01) {
           ctx.save();
           const nLen = node.length * neuralBranchGrowth;
           const nEndX = startX + Math.cos(currentAngle) * nLen;
@@ -1767,29 +1930,48 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
 
           ctx.translate(nEndX, nEndY);
 
-          const pearlPulse = 0.85 + 0.25 * Math.sin(t * 3.2 + node.depth);
-          const pearlR = (node.children.length === 0 ? 2.8 : 1.8) * pearlPulse * neuralAmount;
+          const isTerminal = node.children.length === 0;
+          const pearlPulse = 0.85 + 0.28 * Math.sin(t * 3.6 + node.depth * 1.1);
+          const boutonRadius = (isTerminal ? 3.2 : 2.0) * pearlPulse * neuralAmount;
 
-          ctx.fillStyle = '#E0F2FE';
+          const boutonAuraSize = boutonRadius * 4.5;
+          ctx.drawImage(chosenSprite, -boutonAuraSize * 0.5, -boutonAuraSize * 0.5, boutonAuraSize, boutonAuraSize);
+
+          ctx.fillStyle = '#FFFFFF';
           ctx.beginPath();
-          ctx.arc(0, 0, pearlR, 0, Math.PI * 2);
+          ctx.arc(0, 0, boutonRadius, 0, Math.PI * 2);
           ctx.fill();
 
-          if (node.children.length === 0) {
-            ctx.strokeStyle = `rgba(186, 230, 253, ${0.45 * neuralAmount})`;
-            ctx.lineWidth = 0.65;
+          if (isTerminal) {
+            ctx.strokeStyle = `rgba(186, 230, 253, ${0.75 * neuralAmount})`;
+            ctx.lineWidth = 0.75;
             for (let d = -2; d <= 2; d++) {
-              const dAngle = currentAngle + d * 0.32 + Math.sin(t * 2 + d) * 0.15;
+              const dAngle = currentAngle + d * 0.38 + Math.sin(t * 2.4 + d) * 0.12;
+              const fibrilLen = (6.0 + Math.abs(d) * 1.5) * neuralAmount;
               ctx.beginPath();
               ctx.moveTo(0, 0);
-              ctx.lineTo(Math.cos(dAngle) * 7.5 * neuralAmount, Math.sin(dAngle) * 7.5 * neuralAmount);
+              const fx = Math.cos(dAngle) * fibrilLen;
+              const fy = Math.sin(dAngle) * fibrilLen;
+              ctx.lineTo(fx, fy);
               ctx.stroke();
+
+              ctx.fillStyle = '#E0F2FE';
+              ctx.beginPath();
+              ctx.arc(fx, fy, 0.95 * neuralAmount, 0, Math.PI * 2);
+              ctx.fill();
             }
+
+            const orbitAngle = t * 3.2 + node.depth;
+            const orbitDist = 5.5 * neuralAmount;
+            ctx.fillStyle = '#FDE047';
+            ctx.beginPath();
+            ctx.arc(Math.cos(orbitAngle) * orbitDist, Math.sin(orbitAngle) * orbitDist, 0.95 * neuralAmount, 0, Math.PI * 2);
+            ctx.fill();
           }
           ctx.restore();
         }
 
-        // 8d. PHYSICAL FOLIAGE & FRUITS (ONLY IF REAL BOTANICAL GROWTH)
+        // Physical Foliage
         const leafGrowth = Math.max(0, Math.min(1.0, (physicalGrowth - 0.15 - node.depth * 0.08) * 2.2));
         if (leafGrowth > 0.05 && node.leafCount > 0 && (previewAmount > 0.08 || growthProgressRef.current > 0.12)) {
           ctx.save();
@@ -1806,112 +1988,56 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
             ctx.lineWidth = 1.1;
             for (let n = -3; n <= 3; n++) {
               const nFlutter = Math.sin(t * flutterSpeed + n) * flutterAmp;
+              const nAngle = currentAngle + n * 0.24 + nFlutter;
               ctx.beginPath();
               ctx.moveTo(0, 0);
-              const nAngle = currentAngle + n * 0.24 + nFlutter;
               ctx.lineTo(Math.cos(nAngle) * 12 * leafGrowth, Math.sin(nAngle) * 12 * leafGrowth);
               ctx.stroke();
             }
-            if (node.depth >= 1 && leafGrowth > 0.55 && node.id.includes('tier')) {
-              ctx.fillStyle = '#6E4426';
-              ctx.beginPath();
-              ctx.ellipse(0, 6 * leafGrowth, 2.5 * leafGrowth, 4.5 * leafGrowth, 0, 0, Math.PI * 2);
-              ctx.fill();
-            }
-
           } else if (activeSpeciesIdRef.current === 'sakura') {
             ctx.fillStyle = curSpecies.leafColor2 || '#F4A3C2';
             ctx.globalAlpha = 0.85;
             for (let pIdx = 0; pIdx < 5; pIdx++) {
               const pFlutter = Math.sin(t * flutterSpeed + pIdx) * flutterAmp;
               const pAngle = (pIdx * Math.PI * 2) / 5 + pFlutter;
-              const px = Math.cos(pAngle) * 5.5 * leafGrowth;
-              const py = Math.sin(pAngle) * 5.5 * leafGrowth;
               ctx.beginPath();
-              ctx.arc(px, py, 3.8 * leafGrowth, 0, Math.PI * 2);
+              ctx.arc(Math.cos(pAngle) * 5.5 * leafGrowth, Math.sin(pAngle) * 5.5 * leafGrowth, 3.8 * leafGrowth, 0, Math.PI * 2);
               ctx.fill();
             }
-            ctx.fillStyle = '#E11D48';
-            ctx.beginPath();
-            ctx.arc(0, 0, 1.2 * leafGrowth, 0, Math.PI * 2);
-            ctx.fill();
-
           } else if (activeSpeciesIdRef.current === 'oak') {
             ctx.fillStyle = curSpecies.leafColor || '#2D8055';
             for (let lIdx = -2; lIdx <= 2; lIdx++) {
               const lFlutter = Math.sin(t * flutterSpeed + lIdx * 1.5) * flutterAmp;
               const lAngle = currentAngle + lIdx * 0.35 + lFlutter;
               ctx.beginPath();
-              ctx.ellipse(
-                Math.cos(lAngle) * 6 * leafGrowth,
-                Math.sin(lAngle) * 6 * leafGrowth,
-                8.5 * leafGrowth,
-                4.8 * leafGrowth,
-                lAngle,
-                0,
-                Math.PI * 2
-              );
+              ctx.ellipse(Math.cos(lAngle) * 6 * leafGrowth, Math.sin(lAngle) * 6 * leafGrowth, 8.5 * leafGrowth, 4.8 * leafGrowth, lAngle, 0, Math.PI * 2);
               ctx.fill();
             }
-            if (node.depth >= 2 && leafGrowth > 0.6) {
-              ctx.fillStyle = '#926033';
-              ctx.beginPath();
-              ctx.ellipse(2, 5 * leafGrowth, 2.2 * leafGrowth, 3.5 * leafGrowth, 0, 0, Math.PI * 2);
-              ctx.fill();
-              ctx.fillStyle = '#5C381E';
-              ctx.beginPath();
-              ctx.arc(2, 3.5 * leafGrowth, 2.6 * leafGrowth, Math.PI, 0);
-              ctx.fill();
-            }
-
           } else if (activeSpeciesIdRef.current === 'apple') {
             ctx.fillStyle = curSpecies.leafColor || '#369A5D';
             for (let aIdx = -1; aIdx <= 1; aIdx++) {
               const aFlutter = Math.sin(t * flutterSpeed + aIdx * 2) * flutterAmp;
               const aAngle = currentAngle + aIdx * 0.45 + aFlutter;
               ctx.beginPath();
-              ctx.ellipse(
-                Math.cos(aAngle) * 5 * leafGrowth,
-                Math.sin(aAngle) * 5 * leafGrowth,
-                7.5 * leafGrowth,
-                4.2 * leafGrowth,
-                aAngle,
-                0,
-                Math.PI * 2
-              );
+              ctx.ellipse(Math.cos(aAngle) * 5 * leafGrowth, Math.sin(aAngle) * 5 * leafGrowth, 7.5 * leafGrowth, 4.2 * leafGrowth, aAngle, 0, Math.PI * 2);
               ctx.fill();
             }
             if (node.depth >= 2 && leafGrowth > 0.55 && node.children.length === 0) {
-              const appleR = 4.2 * leafGrowth;
               ctx.fillStyle = '#DC2626';
               ctx.beginPath();
-              ctx.arc(0, 6 * leafGrowth, appleR, 0, Math.PI * 2);
-              ctx.fill();
-              ctx.fillStyle = '#FEF08A';
-              ctx.beginPath();
-              ctx.arc(-1.2 * leafGrowth, (6 - 1.2) * leafGrowth, 1.1 * leafGrowth, 0, Math.PI * 2);
+              ctx.arc(0, 6 * leafGrowth, 4.2 * leafGrowth, 0, Math.PI * 2);
               ctx.fill();
             }
-
           } else {
             ctx.fillStyle = curSpecies.leafColor || '#E68A2E';
             for (let mIdx = -2; mIdx <= 2; mIdx++) {
               const mFlutter = Math.sin(t * flutterSpeed + mIdx * 1.6) * flutterAmp;
               const mAngle = currentAngle + mIdx * 0.32 + mFlutter;
               ctx.beginPath();
-              ctx.ellipse(
-                Math.cos(mAngle) * 5.5 * leafGrowth,
-                Math.sin(mAngle) * 5.5 * leafGrowth,
-                8 * leafGrowth,
-                3.8 * leafGrowth,
-                mAngle,
-                0,
-                Math.PI * 2
-              );
+              ctx.ellipse(Math.cos(mAngle) * 5.5 * leafGrowth, Math.sin(mAngle) * 5.5 * leafGrowth, 8 * leafGrowth, 3.8 * leafGrowth, mAngle, 0, Math.PI * 2);
               ctx.fill();
             }
           }
-
           ctx.restore();
         }
 
@@ -1924,13 +2050,11 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
         renderBranch(branchSkeletonRef.current, treeX, groundY, 0);
       }
 
-      // ========================================================
-      // 9. SPIDERWEB CROSS-THREADS IN CANOPY
-      // ========================================================
-      if (neuralAmount > 0.12 && canopyNodePoints.length > 6) {
+      // 9. Astrocytic Glia Matrix
+      if (neuralAmount > 0.1 && canopyNodePoints.length > 6) {
         ctx.save();
-        ctx.strokeStyle = `rgba(241, 245, 249, ${0.32 * neuralAmount})`;
-        ctx.lineWidth = 0.65;
+        ctx.strokeStyle = `rgba(241, 245, 249, ${0.35 * neuralAmount})`;
+        ctx.lineWidth = 0.7;
 
         for (let i = 0; i < canopyNodePoints.length; i += 2) {
           for (let j = i + 1; j < canopyNodePoints.length; j += 2) {
@@ -1938,7 +2062,7 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
             const p2 = canopyNodePoints[j];
             const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
 
-            if (dist > 35 && dist < 135 && Math.abs(p1.depth - p2.depth) <= 1) {
+            if (dist > 30 && dist < 140 && Math.abs(p1.depth - p2.depth) <= 1) {
               const midX = (p1.x + p2.x) * 0.5;
               const midY = (p1.y + p2.y) * 0.5 + (dist * 0.08);
 
@@ -1947,33 +2071,22 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
               ctx.quadraticCurveTo(midX, midY, p2.x, p2.y);
               ctx.stroke();
 
-              const pearlR = 1.1 * neuralAmount;
-              ctx.fillStyle = 'rgba(224, 242, 254, 0.7)';
+              const astroPulse = 0.8 + 0.3 * Math.sin(t * 2.8 + p1.depth + i);
+              const pearlR = 1.35 * astroPulse * neuralAmount;
+              ctx.fillStyle = 'rgba(224, 242, 254, 0.9)';
               ctx.beginPath();
               ctx.arc(midX, midY, pearlR, 0, Math.PI * 2);
               ctx.fill();
 
-              registeredSegments.push({
-                startX: p1.x,
-                startY: p1.y,
-                endX: p2.x,
-                endY: p2.y,
-                ctrlX: midX,
-                ctrlY: midY,
-                isCurved: true,
-                domain: 'web',
-                depth: p1.depth
-              });
+              allocSegment(p1.x, p1.y, p2.x, p2.y, 'web', p1.depth, true, midX, midY);
             }
           }
         }
         ctx.restore();
       }
 
-      // ========================================================
-      // 10. LIGHT BUNDLES ("ПУЧКИ СВІТЛА")
-      // ========================================================
-      if (neuralAmount > 0.1 && registeredSegments.length > 0) {
+      // 10. Light Bundles & Action Potential Photons (Sprite-Accelerated)
+      if (neuralAmount > 0.08 && registeredSegments.length > 0) {
         const segCount = registeredSegments.length;
         const bundles = lightBundlesRef.current;
 
@@ -2007,62 +2120,29 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
           }
 
           ctx.save();
-
-          const auraR = (bundle.radius * 3.2) * neuralAmount;
-          const auraGrad = ctx.createRadialGradient(px, py, 0.5, px, py, auraR);
-          auraGrad.addColorStop(0, `rgba(255, 255, 255, ${0.9 * bundle.alpha * neuralAmount})`);
-          auraGrad.addColorStop(0.35, `rgba(103, 232, 249, ${0.65 * bundle.alpha * neuralAmount})`);
-          auraGrad.addColorStop(0.7, `rgba(56, 189, 248, ${0.25 * bundle.alpha * neuralAmount})`);
-          auraGrad.addColorStop(1, 'rgba(56, 189, 248, 0)');
-
-          ctx.fillStyle = auraGrad;
-          ctx.beginPath();
-          ctx.arc(px, py, auraR, 0, Math.PI * 2);
-          ctx.fill();
+          const auraR = (bundle.radius * 3.4) * neuralAmount;
+          ctx.drawImage(chosenSprite, px - auraR, py - auraR, auraR * 2, auraR * 2);
 
           ctx.fillStyle = '#FFFFFF';
           ctx.beginPath();
-          ctx.arc(px, py, bundle.radius * 0.7 * neuralAmount, 0, Math.PI * 2);
+          ctx.arc(px, py, bundle.radius * 0.75 * neuralAmount, 0, Math.PI * 2);
           ctx.fill();
 
           bundle.subPhotons.forEach((sp) => {
             const currentSubAngle = sp.angle + t * sp.speed;
             const spX = px + Math.cos(currentSubAngle) * sp.dist;
             const spY = py + Math.sin(currentSubAngle) * sp.dist;
-
-            ctx.fillStyle = 'rgba(224, 242, 254, 0.85)';
+            ctx.fillStyle = 'rgba(224, 242, 254, 0.9)';
             ctx.beginPath();
             ctx.arc(spX, spY, sp.size * neuralAmount, 0, Math.PI * 2);
             ctx.fill();
           });
 
-          const tailU = Math.max(0, Math.min(1, u - bundle.direction * 0.12));
-          let tailX: number;
-          let tailY: number;
-          if (seg.isCurved && seg.ctrlX !== undefined && seg.ctrlY !== undefined) {
-            const invT = 1 - tailU;
-            tailX = invT * invT * seg.startX + 2 * invT * tailU * seg.ctrlX + tailU * tailU * seg.endX;
-            tailY = invT * invT * seg.startY + 2 * invT * tailU * seg.ctrlY + tailU * tailU * seg.endY;
-          } else {
-            tailX = seg.startX + (seg.endX - seg.startX) * tailU;
-            tailY = seg.startY + (seg.endY - seg.startY) * tailU;
-          }
-
-          const tailGrad = ctx.createLinearGradient(px, py, tailX, tailY);
-          tailGrad.addColorStop(0, `rgba(186, 230, 253, ${0.75 * neuralAmount})`);
-          tailGrad.addColorStop(1, 'rgba(56, 189, 248, 0)');
-          ctx.strokeStyle = tailGrad;
-          ctx.lineWidth = 1.6 * neuralAmount;
-          ctx.beginPath();
-          ctx.moveTo(px, py);
-          ctx.lineTo(tailX, tailY);
-          ctx.stroke();
-
           ctx.restore();
         });
       }
 
-      // 11. ATMOSPHERIC MOTES
+      // 11. Atmospheric Motes
       const motes = motesRef.current;
       motes.forEach((m) => {
         const windDriftX = windSmoothed * 38;
@@ -2081,10 +2161,6 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
         } else if (curRealPeriod === 'night' || curRealPeriod === 'predawn') {
           const pulse = 0.3 + 0.7 * Math.sin(t * 2.2 + m.phase);
           ctx.fillStyle = 'rgba(210, 255, 140, ' + (pulse * 0.55) + ')';
-        } else if (curRealPeriod === 'evening' || curRealPeriod === 'twilight') {
-          ctx.fillStyle = 'rgba(255, 200, 140, 0.28)';
-        } else if (curRealPeriod === 'dawn') {
-          ctx.fillStyle = 'rgba(230, 245, 220, 0.28)';
         } else {
           ctx.fillStyle = 'rgba(200, 235, 180, 0.32)';
         }
@@ -2102,7 +2178,9 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
     return () => {
       cancelAnimationFrame(animId);
       window.removeEventListener('resize', handleResize);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       canvas.removeEventListener('pointerdown', handlePointerDown);
+      audio.silence();
     };
   }, []);
 
@@ -2397,12 +2475,179 @@ export const TreeTab: React.FC<TreeTabProps> = React.memo(({
         </div>
       )}
 
-      {/* MATURE TREE: TRANSITION TO COZY FOREST PROMPT */}
+      {/* МІНІМАЛІСТИЧНИЙ ІНДИКАТОР: ПРИБРАНО НИЖНЮ ПАНЕЛЬ, ЗАЛИШЕНО ДЕНЬ 1 */}
+      {currentTree && !isMature && (
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 pointer-events-none animate-fade-in select-none">
+          <div className="px-5 py-2 rounded-full bg-stone-950/80 border border-emerald-500/40 backdrop-blur-xl shadow-2xl flex items-center gap-2.5">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_10px_#34d399]" />
+            <span className="text-xs sm:text-sm font-mono font-bold tracking-widest text-emerald-300 uppercase">
+              День {currentDay || 1}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* 2. NO CURRENT TREE: SEED PICKER MODAL (OPEN ON DEMAND OR WHEN SEED READY) */}
+      {!currentTree && (showSeedPicker || availableSeeds > 0) && (
+        <div className="absolute inset-0 z-40 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fade-in pointer-events-auto">
+          <div className="w-full max-w-md rounded-3xl bg-stone-950/95 border border-emerald-500/40 shadow-2xl p-5 text-stone-100 relative max-h-[90vh] flex flex-col">
+            <div className="flex items-center justify-between pb-3 border-b border-stone-800">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-emerald-950/80 border border-emerald-500/40 flex items-center justify-center text-lg">
+                  🌱
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-emerald-200">
+                    {availableSeeds > 0 ? 'Вам відкрилася насінина дерева!' : 'Вибір насінини дерева'}
+                  </h3>
+                  <p className="text-[11px] text-stone-400">
+                    Розвиток живої нейронної моделі дерева
+                  </p>
+                </div>
+              </div>
+              {availableSeeds === 0 && (
+                <button
+                  type="button"
+                  onClick={() => setShowSeedPicker(false)}
+                  className="w-7 h-7 rounded-full bg-stone-900 hover:bg-stone-800 text-stone-400 hover:text-white flex items-center justify-center cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+
+            {/* SEED SELECTION LIST */}
+            <div className="my-3 space-y-2 overflow-y-auto flex-1 pr-1">
+              {(Object.keys(TREE_SPECIES) as TreeSpeciesId[]).map((spId) => {
+                const sp = TREE_SPECIES[spId];
+                const isSelected = selectedSeedSpecies === spId;
+                return (
+                  <div
+                    key={spId}
+                    onClick={() => {
+                      setSelectedSeedSpecies(spId);
+                      audio.init();
+                      audio.playDropNote();
+                    }}
+                    className={`p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
+                      isSelected
+                        ? 'bg-emerald-500/20 border-emerald-400/70 shadow-lg scale-[1.01]'
+                        : 'bg-stone-900/60 border-stone-800/80 hover:bg-stone-800/70'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-stone-800 border border-stone-700 flex items-center justify-center text-2xl shrink-0">
+                        {sp.icon}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-stone-100">{sp.name}</span>
+                          <span className="text-[10px] text-stone-400 italic">({sp.botanicalName})</span>
+                        </div>
+                        <p className="text-[11px] text-stone-400 line-clamp-1">{sp.symbol}</p>
+                        <p className="text-[10px] text-emerald-400/90 font-mono mt-0.5">Нейронний ріст</p>
+                      </div>
+                    </div>
+                    {isSelected && (
+                      <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-black shrink-0">
+                        <Check className="w-4 h-4 stroke-[3]" />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* ACTION BUTTON */}
+            <div className="pt-2 border-t border-stone-800/80 flex flex-col gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  handlePlantChosenSeed(selectedSeedSpecies);
+                  setShowSeedPicker(false);
+                }}
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs transition active:scale-98 shadow-lg cursor-pointer flex items-center justify-center gap-2"
+              >
+                <Sprout className="w-4 h-4" />
+                <span>Посадити насінину ({TREE_SPECIES[selectedSeedSpecies].name})</span>
+              </button>
+              {availableSeeds === 0 && (
+                <p className="text-[10px] text-center text-stone-400">
+                  (Тестовий режим: доступний для миттєвого ознайомлення)
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 3. NO TREE & NO SEED AVAILABLE: PROGRESSION CARD TOWARDS 300 CIGARETTES */}
+      {!currentTree && availableSeeds === 0 && !showSeedPicker && (
+        <div className="absolute bottom-6 left-4 right-4 z-30 pointer-events-none flex justify-center">
+          <div className="pointer-events-auto max-w-md w-full p-4 rounded-3xl bg-stone-950/90 border border-amber-500/35 backdrop-blur-2xl shadow-2xl flex flex-col gap-2.5 text-stone-100">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-amber-950/80 border border-amber-500/40 flex items-center justify-center text-xl shrink-0">
+                🌰
+              </div>
+              <div className="min-w-0">
+                <h4 className="text-xs sm:text-sm font-bold text-amber-200">
+                  Насінина відкривається за 300 сигарет
+                </h4>
+                <p className="text-[11px] text-stone-400">
+                  Не викурюйте 300 сигарет, щоб обрати насінину та посадити дерево
+                </p>
+              </div>
+            </div>
+
+            {/* Progress to 300 cigarettes avoided */}
+            <div className="space-y-1">
+              <div className="flex items-center justify-between text-xs font-mono">
+                <span className="text-stone-300">Прогрес:</span>
+                <span className="text-amber-400 font-bold">
+                  {progressToNextSeed} / 300 ({Math.round((progressToNextSeed / 300) * 100)}%)
+                </span>
+              </div>
+              <div className="w-full bg-stone-800/80 rounded-full h-2 overflow-hidden border border-stone-700/50">
+                <div
+                  className="h-full bg-gradient-to-r from-amber-500 to-emerald-400 transition-all duration-700 rounded-full"
+                  style={{ width: `${Math.max(2, Math.round((progressToNextSeed / 300) * 100))}%` }}
+                />
+              </div>
+              <p className="text-[10px] text-stone-400 text-right">
+                Залишилося: <span className="text-stone-200 font-semibold">{cigsRemaining} сигарет</span>
+              </p>
+            </div>
+
+            <div className="flex gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => setShowSeedPicker(true)}
+                className="flex-1 py-2 px-3 rounded-xl bg-stone-800 hover:bg-stone-700 border border-stone-600/50 text-stone-200 text-xs font-medium transition cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <span>Ознайомитися з породами</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  handlePlantChosenSeed('oak');
+                }}
+                className="py-2 px-3 rounded-xl bg-emerald-600/80 hover:bg-emerald-500 text-white text-xs font-medium transition cursor-pointer flex items-center justify-center gap-1.5"
+                title="Посадити насінину в демо-режимі"
+              >
+                <Sprout className="w-3.5 h-3.5" />
+                <span>Посадити зараз (Демо)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 4. MATURE TREE: TRANSITION TO COZY FOREST PROMPT (21 DAYS REACHED) */}
       {isMature && currentTree && (
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 pointer-events-auto">
           <div className="px-5 py-3 rounded-2xl bg-stone-950/85 border border-emerald-500/40 backdrop-blur-xl shadow-2xl flex items-center gap-4 animate-fade-in">
             <div>
-              <p className="text-xs font-semibold text-emerald-300">Дерево виросло за 20 днів!</p>
+              <p className="text-xs font-semibold text-emerald-300">Дерево повністю дозріло!</p>
               <p className="text-[11px] text-stone-400">Час перенести саджанець у Затишний Ліс</p>
             </div>
             <button

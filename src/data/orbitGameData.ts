@@ -2,7 +2,7 @@
 // Pure Ethereal 432 Hz Pythagorean / Pentatonic meditation tuning
 
 export interface GravityConfigPreset {
-  id: 'single' | 'binary' | 'triple' | 'yin_yang_blackhole' | 'black_hole';
+  id: 'single' | 'binary' | 'triple';
   name: string;
   centersCount: number;
   description: string;
@@ -16,20 +16,6 @@ export const GRAVITY_CENTER_PRESETS: GravityConfigPreset[] = [
     centersCount: 1,
     description: 'Класична гравітація Кеплера. Стабільні еліптичні та колові орбіти.',
     icon: '☀️'
-  },
-  {
-    id: 'yin_yang_blackhole',
-    name: 'Інь-Ян (Чорна діра & Зоря)',
-    centersCount: 2,
-    description: 'Космічний баланс Інь-Ян: релятивістська Чорна діра з акреційним диском та сяюча золота Зоря.',
-    icon: '☯️'
-  },
-  {
-    id: 'black_hole',
-    name: 'Чорна діра (Сингулярність)',
-    centersCount: 1,
-    description: 'Науково точна Чорна діра: релятивістський акреційний диск, горизонт подій та фотонна сфера.',
-    icon: '🕳️'
   },
   {
     id: 'binary',

@@ -1554,10 +1554,10 @@ export const AnalyzerTip: React.FC<AnalyzerTipProps> = ({
       const saved = localStorage.getItem('quit-smoking:analyzer-ring-stars-count');
       if (saved !== null) {
         const p = parseInt(saved, 10);
-        if (!isNaN(p)) return Math.max(1, Math.min(80, p));
+        if (!isNaN(p)) return Math.max(1, Math.min(200, p));
       }
     } catch {}
-    return 40;
+    return 80;
   });
 
   useEffect(() => {
@@ -5216,35 +5216,38 @@ export const AnalyzerTip: React.FC<AnalyzerTipProps> = ({
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-zinc-300 font-medium flex items-center gap-1.5">
                         <CircleDot className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
-                        <span>Кількість зірок у кільці (Оптимізація)</span>
+                        <span>Кількість зірок у кільці</span>
                       </span>
                       <span className="text-zinc-200 font-bold font-mono text-[11px] bg-zinc-800/80 border border-zinc-700/60 px-2 py-0.5 rounded-lg">
-                        {ringStarsCount} / 80
+                        {ringStarsCount} шт
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-3">
-                      <button
-                        type="button"
-                        disabled={ringStarsCount <= 1}
-                        onClick={() => {
-                          const next = Math.max(1, ringStarsCount - 1);
-                          setRingStarsCount(next);
-                          try {
-                            localStorage.setItem('quit-smoking:analyzer-ring-stars-count', String(next));
-                            window.dispatchEvent(new Event('analyzer-ring-stars-changed'));
-                          } catch {}
-                        }}
-                        className="flex-1 py-2.5 px-4 rounded-xl bg-zinc-800/80 hover:bg-zinc-750 disabled:opacity-40 text-zinc-200 border border-zinc-700/60 flex items-center justify-center gap-2 font-semibold text-xs select-none cursor-pointer active:scale-95 transition-all"
-                        title="Зменшити на 1 зірку"
-                      >
-                        <Minus className="w-4 h-4 shrink-0 text-zinc-400" />
-                        <span>Зменшити кількість зірок на 1</span>
-                      </button>
+                    <input
+                      type="range"
+                      min={1}
+                      max={200}
+                      step={1}
+                      value={ringStarsCount}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value, 10);
+                        setRingStarsCount(val);
+                        try {
+                          localStorage.setItem('quit-smoking:analyzer-ring-stars-count', String(val));
+                          window.dispatchEvent(new Event('analyzer-ring-stars-changed'));
+                        } catch {}
+                      }}
+                      className="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-zinc-200"
+                    />
+
+                    <div className="flex justify-between text-[10px] text-zinc-500 font-mono pt-0.5">
+                      <span>1</span>
+                      <span>80 (Стандарт)</span>
+                      <span>200</span>
                     </div>
 
                     <p className="text-[10px] text-zinc-500 font-medium leading-normal">
-                      Для оптимізації продуктивності: кількість зірок у кільці може тільки зменшуватись по одній одиниці (не менше 1 зірки) для економії заряду та зниження навантаження.
+                      Повзунком можна регулювати кількість зірок у кільці по 1 шт (від 1 до 200).
                     </p>
                   </div>
                 )}

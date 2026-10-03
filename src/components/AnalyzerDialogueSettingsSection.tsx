@@ -236,6 +236,30 @@ export const AnalyzerDialogueSettingsSection: React.FC<AnalyzerDialogueSettingsS
   const [customActions, setCustomActions] = useState<AnalyzerActionDefinition[]>(loadCustomAnalyzerActions);
   const [savedToast, setSavedToast] = useState<string | null>(null);
 
+  // Cosmic Ring Stars Count (Initial 80 stars, slider step = 1)
+  const [ringStarCount, setRingStarCount] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem('quit-smoking:analyzer-ring-stars-count');
+      if (saved !== null) {
+        const val = parseInt(saved, 10);
+        if (!isNaN(val)) return Math.max(1, Math.min(200, val));
+      }
+    } catch {}
+    return 80;
+  });
+
+  const handleUpdateStarCount = (count: number) => {
+    const clamped = Math.max(1, Math.min(200, count));
+    setRingStarCount(clamped);
+    try {
+      localStorage.setItem('quit-smoking:analyzer-ring-stars-count', String(clamped));
+      window.dispatchEvent(new CustomEvent('analyzer-ring-stars-count-changed', { detail: clamped }));
+      window.dispatchEvent(new Event('analyzer-ring-stars-changed'));
+      window.dispatchEvent(new Event('storage'));
+      triggerToast(`Кількість зірок у кільці: ${clamped} шт.`);
+    } catch {}
+  };
+
   // Local tab switcher
   const [currentTab, setCurrentTab] = useState<string>(activeSubTab || 'dialogues');
 
@@ -624,6 +648,57 @@ export const AnalyzerDialogueSettingsSection: React.FC<AnalyzerDialogueSettingsS
       {/* ================= TAB 1: DIALOGUES & TIMERS LIST (INCLUDING INTEGRATED DIARY DIALOGUES) ================= */}
       {(currentTab === 'dialogues' || currentTab === 'schedule' || currentTab === 'phrases' || currentTab === 'tasks_gratitude') && (
         <div className="flex flex-col gap-3.5">
+          {/* BLOCK 0: Зірки Космічного Кільця Аналізатора */}
+          <div className="p-4 rounded-2xl bg-[#18181f]/90 border border-purple-500/30 flex flex-col gap-3 shadow-xs">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/30 flex items-center justify-center shrink-0">
+                  <Sparkles className="w-4.5 h-4.5 text-purple-300" />
+                </div>
+                <div>
+                  <div className="text-sm font-bold text-zinc-100 flex items-center gap-1.5">
+                    <span>Зірки Космічного Кільця</span>
+                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                      {ringStarCount} шт.
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-zinc-400">
+                    Початково 80 шт. Регулювання повзунком по 1 шт.
+                  </div>
+                </div>
+              </div>
+
+              {ringStarCount !== 80 && (
+                <button
+                  type="button"
+                  onClick={() => handleUpdateStarCount(80)}
+                  className="px-2.5 py-1 rounded-xl bg-purple-950/80 hover:bg-purple-900 text-purple-200 text-[10px] font-bold border border-purple-500/40 transition-colors cursor-pointer shrink-0"
+                  title="Скинути до початкових 80 шт"
+                >
+                  Скинути 80
+                </button>
+              )}
+            </div>
+
+            {/* Slider with step=1 */}
+            <div className="space-y-1 pt-1">
+              <div className="flex items-center justify-between text-[10px] font-mono text-zinc-400">
+                <span>1 шт</span>
+                <span className="text-purple-300 font-bold text-xs">{ringStarCount} зірок у кільці</span>
+                <span>150 шт</span>
+              </div>
+              <input
+                type="range"
+                min={1}
+                max={150}
+                step={1}
+                value={ringStarCount}
+                onChange={(e) => handleUpdateStarCount(Number(e.target.value))}
+                className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-purple-500"
+              />
+            </div>
+          </div>
+
           {/* BLOCK 1: Щоденник вдячності */}
           <div className="p-4 rounded-2xl bg-[#18181f]/90 border border-zinc-800/80 hover:border-zinc-700/80 flex flex-col gap-3 shadow-xs transition-all">
             <div className="flex items-center justify-between gap-2 pb-2 border-b border-zinc-800/60">

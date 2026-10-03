@@ -18,13 +18,7 @@ const RelapseModal = React.lazy(() => import('./components/Modals').then(m => ({
 const OnboardingModal = React.lazy(() => import('./components/OnboardingModal').then(m => ({ default: m.OnboardingModal })));
 const GuidedTourModal = React.lazy(() => import('./components/GuidedTourModal').then(m => ({ default: m.GuidedTourModal })));
 const AnalyzerNamingModal = React.lazy(() => import('./components/AnalyzerNamingModal').then(m => ({ default: m.AnalyzerNamingModal })));
-const SosCravingTimerModal: React.FC<{
-  isOpen: boolean;
-  onClose: () => void;
-  onVictory?: () => void;
-  onGoToHome?: () => void;
-  onOpenFullSos?: () => void;
-}> = () => null;
+const SosCravingTimerModal = React.lazy(() => import('./components/SosCravingTimerModal').then(m => ({ default: m.SosCravingTimerModal })));
 import { calculateCigsAvoided, calculateTotalSaved } from './utils/moneyCalculator';
 import { checkAndApplyAutoEco } from './utils/autoEcoManager';
 const SosOverlayModal = React.lazy(() => import('./components/SosOverlayModal').then(m => ({ default: m.SosOverlayModal })));
@@ -567,6 +561,25 @@ function AppContent() {
       window.removeEventListener('analyzer-name-changed', handleNameChange);
       window.removeEventListener('open-analyzer-naming-modal', handleOpenNaming);
       window.removeEventListener('storage', handleNameChange);
+    };
+  }, []);
+
+  React.useEffect(() => {
+    const handleTabChange = (e: any) => {
+      const target = e?.detail;
+      if (typeof target === 'string') {
+        setActiveTab(target as TabType);
+        setIsSosTimerModalOpen(false);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
+    const handleOpenSosTimer = () => setIsSosTimerModalOpen(true);
+
+    window.addEventListener('change-tab', handleTabChange);
+    window.addEventListener('open-sos-timer-modal', handleOpenSosTimer);
+    return () => {
+      window.removeEventListener('change-tab', handleTabChange);
+      window.removeEventListener('open-sos-timer-modal', handleOpenSosTimer);
     };
   }, []);
 
@@ -1745,16 +1758,19 @@ function AppContent() {
             <button
               type="button"
               id="nav-btn-sos"
-              onClick={() => setIsSosTimerModalOpen(true)}
+              onClick={() => {
+                setActiveTab('sos');
+                setIsSosTimerModalOpen(false);
+              }}
               className={`flex flex-col items-center rounded-lg cursor-pointer transition-all duration-300 py-1 px-1.5 gap-0.5 ${
-                activeTab === 'sos' || isSosTimerModalOpen
+                activeTab === 'sos'
                   ? `${getAccentTextClass(accent)} font-bold`
                   : 'text-slate-500 dark:text-slate-400 font-medium hover:text-slate-700 dark:hover:text-slate-200'
               }`}
               aria-label="SOS"
             >
               <div className="p-0.5 rounded-lg">
-                <NavSosIcon active={activeTab === 'sos' || isSosTimerModalOpen} className="w-5 h-5" />
+                <NavSosIcon active={activeTab === 'sos'} className="w-5 h-5" />
               </div>
               <span className="leading-tight tracking-tight font-bold text-[10px] sm:text-[11px]">
                 SOS

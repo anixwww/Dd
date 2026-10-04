@@ -307,14 +307,6 @@ export const BUILTIN_ANALYZER_ACTIONS: AnalyzerActionDefinition[] = [
     category: 'appearance'
   },
   {
-    id: 'style_cosmic_ring',
-    label: 'Оболонка: Космічне кільце',
-    description: 'Орбітальне кільце спектральних зірок теми Стандартна космос',
-    defaultReply: 'Оболонку переключено на Космічне кільце.',
-    behavior: 'style_cosmic_ring',
-    category: 'appearance'
-  },
-  {
     id: 'style_snowflake',
     label: 'Оболонка: Сніжинка',
     description: 'Кристалічний морозяний візерунок розслаблення',

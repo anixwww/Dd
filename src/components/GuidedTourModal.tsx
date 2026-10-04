@@ -184,7 +184,7 @@ export const GuidedTourModal: React.FC<GuidedTourModalProps> = ({
   // ---------------------------------------------------------------------------
   // STEP 3: Analyzer Shell State
   // ---------------------------------------------------------------------------
-  const [selectedShell, setSelectedShell] = useState<typeof analyzerStyle>(analyzerStyle || 'cosmic_ring');
+  const [selectedShell, setSelectedShell] = useState<typeof analyzerStyle>(analyzerStyle || 'standard');
 
   const SHELLS_LIST: Array<{
     id: typeof analyzerStyle;
@@ -194,14 +194,6 @@ export const GuidedTourModal: React.FC<GuidedTourModalProps> = ({
     bgGlow: string;
     borderGlow: string;
   }> = [
-    {
-      id: 'cosmic_ring',
-      name: 'Кільце',
-      desc: 'Гіпер-плавне кільце живої зоряної енергії',
-      badgeColor: 'border-purple-500/40 text-purple-300',
-      bgGlow: 'bg-purple-950/40',
-      borderGlow: 'border-purple-500/40',
-    },
     {
       id: 'standard',
       name: 'Глітер',

@@ -1010,7 +1010,7 @@ export const StardustBackground: React.FC = () => {
     let shellY = 160;
     let shellRadius = 65;
     let isShellPresent = false;
-    let shellStyle = 'cosmic_ring';
+    let shellStyle = 'standard';
 
     const updateShellPos = () => {
       const el = document.getElementById('analyzer-shell-anchor');
@@ -1021,7 +1021,7 @@ export const StardustBackground: React.FC = () => {
           shellY = rect.top + rect.height / 2;
           shellRadius = 65; // Radius of the visual analyzer shell orb
           isShellPresent = true;
-          shellStyle = el.getAttribute('data-shell-style') || localStorage.getItem('quit-smoking:analyzer-visual-style') || 'cosmic_ring';
+          shellStyle = el.getAttribute('data-shell-style') || localStorage.getItem('quit-smoking:analyzer-visual-style') || 'standard';
           return;
         }
       }

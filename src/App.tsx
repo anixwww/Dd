@@ -24,7 +24,7 @@ import { calculateCigsAvoided, calculateTotalSaved } from './utils/moneyCalculat
 import { checkAndApplyAutoEco } from './utils/autoEcoManager';
 const SosOverlayModal = React.lazy(() => import('./components/SosOverlayModal').then(m => ({ default: m.SosOverlayModal })));
 import { MiniResourceBar } from './components/MiniResourceBar';
-import { LivingCosmicRingVisual } from './components/LivingCosmicRingVisual';
+import { LivingGlitterVisual } from './components/LivingGlitterVisual';
 import { HourlyAchievementModal } from './components/HourlyAchievementModal';
 
 // Heavy Background Animations Lazy Imports
@@ -937,9 +937,9 @@ function AppContent() {
           localStorage.setItem('quit-smoking:analyzer-thought-font-size', '12');
         }
 
-        // Оболонка Аналізатора — Кільце
+        // Оболонка Аналізатора — Стандартний Глітер
         if (localStorage.getItem('quit-smoking:analyzer-style') === null) {
-          localStorage.setItem('quit-smoking:analyzer-style', 'cosmic_ring');
+          localStorage.setItem('quit-smoking:analyzer-style', 'standard');
         }
 
         // Відкладений старт Аналізатора на 5хв при першому запуску
@@ -2209,10 +2209,11 @@ function AppContent() {
         <div className="fixed inset-0 z-[100] bg-[#0b0c10] flex flex-col items-center justify-center pointer-events-auto select-none transition-opacity duration-700 ease-out">
           <div className="flex flex-col items-center justify-center gap-6 px-4 text-center">
             <div className="relative w-52 h-52 sm:w-64 sm:h-64 flex items-center justify-center">
-              <LivingCosmicRingVisual
+              <LivingGlitterVisual
                 mode="purple-glow"
                 isThinking={false}
                 isDialogueActive={false}
+                onClick={() => {}}
               />
             </div>
             <div className="flex flex-col items-center gap-1.5">

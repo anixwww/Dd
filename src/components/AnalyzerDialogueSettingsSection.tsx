@@ -1661,7 +1661,6 @@ export const AnalyzerDialogueSettingsSection: React.FC<AnalyzerDialogueSettingsS
                       </optgroup>
                       <optgroup label="Оболонка & Вигляд">
                         <option value="style_cat">Переключити на Чорного кота</option>
-                        <option value="style_cosmic_ring">Переключити на Космічне кільце</option>
                         <option value="style_glitter">Переключити на Глітер</option>
                         <option value="style_wave">Переключити на Хвилю</option>
                         <option value="style_snowflake">Переключити на Сніжинку</option>
@@ -1771,7 +1770,6 @@ export const AnalyzerDialogueSettingsSection: React.FC<AnalyzerDialogueSettingsS
                           <option value="mint_tea">М'ятний чай</option>
                           <option value="cold_compress">Охолодження скронь</option>
                           <option value="style_cat">Оболонка Чорний кіт</option>
-                          <option value="style_cosmic_ring">Оболонка Космічне кільце</option>
                           <option value="style_wave">Оболонка Хвиля</option>
                           <option value="style_glitter">Оболонка Глітер</option>
                           <option value="style_snowflake">Оболонка Сніжинка</option>

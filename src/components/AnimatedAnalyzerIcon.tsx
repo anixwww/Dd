@@ -15,7 +15,7 @@ export const AnimatedAnalyzerIcon: React.FC<AnimatedAnalyzerIconProps> = ({
   hue,
   hasAdvice: propHasAdvice
 }) => {
-  const [currentStyle, setCurrentStyle] = useState<'autumn' | 'fire' | 'snowflake' | 'flower' | 'standard' | 'sun' | 'wave' | 'cat' | 'cosmic_ring'>('cosmic_ring');
+  const [currentStyle, setCurrentStyle] = useState<'autumn' | 'fire' | 'snowflake' | 'flower' | 'standard' | 'sun' | 'wave' | 'cat' | 'cosmic_ring'>('standard');
   const [currentHue, setCurrentHue] = useState<number>(190);
   const [storedHasAdvice, setStoredHasAdvice] = useState<boolean>(() => {
     try {
@@ -61,7 +61,7 @@ export const AnimatedAnalyzerIcon: React.FC<AnimatedAnalyzerIconProps> = ({
           else if (s === 'wave') setCurrentStyle('wave');
           else if (s === 'cat') setCurrentStyle('cat');
           else if (s === 'standard') setCurrentStyle('standard');
-          else setCurrentStyle('cosmic_ring');
+          else setCurrentStyle('standard');
         } else {
           setCurrentStyle(styleMode);
         }

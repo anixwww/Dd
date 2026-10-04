@@ -8,7 +8,6 @@ import { LivingSnowflakeVisual } from './LivingSnowflakeVisual';
 import { LivingFlowerVisual } from './LivingFlowerVisual';
 import { LivingWaveVisual } from './LivingWaveVisual';
 import { LivingBlackCatVisual } from './LivingBlackCatVisual';
-import { LivingCosmicRingVisual } from './LivingCosmicRingVisual';
 import { RealConstellation } from './RealConstellations';
 import { 
   X, Sliders, Palette, Sparkles, Edit3, Telescope, Lightbulb, Snowflake, Flower, Flower2, Sun, Moon, Waves,
@@ -1395,12 +1394,12 @@ export const AnalyzerTip: React.FC<AnalyzerTipProps> = ({
     try {
       const saved = localStorage.getItem('quit-smoking:analyzer-style');
       if (saved === 'autumn' || saved === 'fire') return 'autumn';
-      if (saved === 'snowflake' || saved === 'flower' || saved === 'wave' || saved === 'cat' || saved === 'cosmic_ring' || saved === 'standard') {
+      if (saved === 'snowflake' || saved === 'flower' || saved === 'wave' || saved === 'cat' || saved === 'standard') {
         return saved as any;
       }
-      return 'cosmic_ring';
+      return 'standard';
     } catch {
-      return 'cosmic_ring';
+      return 'standard';
     }
   });
 
@@ -2382,10 +2381,10 @@ export const AnalyzerTip: React.FC<AnalyzerTipProps> = ({
         const saved = localStorage.getItem('quit-smoking:analyzer-style');
         if (saved === 'autumn' || saved === 'fire') {
           setVisualStyle('autumn');
-        } else if (saved === 'snowflake' || saved === 'flower' || saved === 'wave' || saved === 'cat' || saved === 'cosmic_ring' || saved === 'standard') {
+        } else if (saved === 'snowflake' || saved === 'flower' || saved === 'wave' || saved === 'cat' || saved === 'standard') {
           setVisualStyle(saved as any);
         } else {
-          setVisualStyle('cosmic_ring');
+          setVisualStyle('standard');
         }
       } catch {}
     };
@@ -3059,10 +3058,10 @@ export const AnalyzerTip: React.FC<AnalyzerTipProps> = ({
         break;
 
       case 'style_cosmic_ring':
-        setVisualStyle('cosmic_ring');
-        try { localStorage.setItem('quit-smoking:analyzer-style', 'cosmic_ring'); } catch {}
+        setVisualStyle('standard');
+        try { localStorage.setItem('quit-smoking:analyzer-style', 'standard'); } catch {}
         window.dispatchEvent(new Event('analyzer-style-change'));
-        transitionToPhrase(reply || "Оболонку переключено на Космічне кільце ✨", [{ label: "Чудово 🌌", action: closeDialogue }], 4000);
+        transitionToPhrase(reply || "Оболонку переключено на Глітер ✨", [{ label: "Добре", action: closeDialogue }], 4000);
         break;
 
       case 'style_glitter':
@@ -3238,8 +3237,8 @@ export const AnalyzerTip: React.FC<AnalyzerTipProps> = ({
             } else if (beh === 'style_cat') {
               setVisualStyle('cat');
             } else if (beh === 'style_cosmic_ring') {
-              setVisualStyle('cosmic_ring');
-              try { localStorage.setItem('quit-smoking:analyzer-style', 'cosmic_ring'); } catch {}
+              setVisualStyle('standard');
+              try { localStorage.setItem('quit-smoking:analyzer-style', 'standard'); } catch {}
             } else if (beh === 'style_glitter') {
               setVisualStyle('standard');
             } else if (beh === 'style_snowflake') {
@@ -4534,13 +4533,12 @@ export const AnalyzerTip: React.FC<AnalyzerTipProps> = ({
               }}
             >
               {visualStyle === 'cosmic_ring' ? (
-                <LivingCosmicRingVisual
+                <LivingGlitterVisual
                   mode={activeMode}
                   hasUnreadAdvice={hasNewData && !isAdviceDelivered}
                   hasAdvice={isRedGlowActive}
                   isThinking={isThinking}
                   isDialogueActive={isRevealed}
-                  isFirstDialogue={isIntroChattering}
                   isAllGood={organismDiagnosis.isAllGood}
                   onClick={handleCloudClick}
                   onSwipeAny={() => {}}
@@ -4552,20 +4550,16 @@ export const AnalyzerTip: React.FC<AnalyzerTipProps> = ({
                   blurAmount={cloudBlur}
                   calmHue={cloudRestHue}
                   calmLightness={cloudRestLightness}
-                  onConstellationActiveChange={setActiveConstellation}
                 />
               ) : visualStyle === 'cat' ? (
-                <LivingCosmicRingVisual
+                <LivingBlackCatVisual
                   mode={activeMode}
                   hasUnreadAdvice={hasNewData && !isAdviceDelivered}
                   hasAdvice={isRedGlowActive}
                   isThinking={isThinking}
                   isDialogueActive={isRevealed}
-                  isFirstDialogue={isIntroChattering}
                   isAllGood={organismDiagnosis.isAllGood}
-                  isCatMode={true}
                   onClick={handleCloudClick}
-                  onSwipeAny={() => {}}
                   onSwipeRight={() => {}}
                   onLongPress={() => {
                     setShellSettingsTab('appearance');
@@ -4573,8 +4567,6 @@ export const AnalyzerTip: React.FC<AnalyzerTipProps> = ({
                   }}
                   blurAmount={cloudBlur}
                   calmHue={cloudRestHue}
-                  calmLightness={cloudRestLightness}
-                  onConstellationActiveChange={setActiveConstellation}
                 />
               ) : visualStyle === 'wave' ? (
                 <LivingWaveVisual
@@ -5011,9 +5003,8 @@ export const AnalyzerTip: React.FC<AnalyzerTipProps> = ({
                   </div>
 
                   {/* Style Switcher with Clean Lucide Icons and NO emojis */}
-                  <div className="grid grid-cols-4 sm:grid-cols-7 gap-1 p-1 bg-zinc-900/60 rounded-2xl border border-zinc-800/80">
+                  <div className="grid grid-cols-3 sm:grid-cols-6 gap-1 p-1 bg-zinc-900/60 rounded-2xl border border-zinc-800/80">
                     {[
-                      { id: 'cosmic_ring', label: 'Кільце', icon: CircleDot },
                       { id: 'cat', label: 'Чорний кіт', icon: Cat },
                       { id: 'standard', label: 'Глітер', icon: Sparkles },
                       { id: 'autumn', label: 'Осінь', icon: Leaf },
@@ -5063,7 +5054,7 @@ export const AnalyzerTip: React.FC<AnalyzerTipProps> = ({
                     }}
                   >
                     {visualStyle === 'cosmic_ring' ? (
-                      <LivingCosmicRingVisual
+                      <LivingGlitterVisual
                         mode={activeMode}
                         hasUnreadAdvice={hasNewData && !isAdviceDelivered}
                         hasAdvice={isRedGlowActive}
@@ -5079,21 +5070,18 @@ export const AnalyzerTip: React.FC<AnalyzerTipProps> = ({
                         calmLightness={cloudRestLightness}
                       />
                     ) : visualStyle === 'cat' ? (
-                      <LivingCosmicRingVisual
+                      <LivingBlackCatVisual
                         mode={activeMode}
                         hasUnreadAdvice={hasNewData && !isAdviceDelivered}
                         hasAdvice={isRedGlowActive}
                         isThinking={false}
                         isDialogueActive={false}
                         isAllGood={organismDiagnosis.isAllGood}
-                        isCatMode={true}
                         onClick={() => {}}
-                        onSwipeAny={() => {}}
                         onSwipeRight={() => {}}
                         onLongPress={() => {}}
                         blurAmount={cloudBlur}
                         calmHue={cloudRestHue}
-                        calmLightness={cloudRestLightness}
                       />
                     ) : visualStyle === 'wave' ? (
                       <LivingWaveVisual

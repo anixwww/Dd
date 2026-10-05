@@ -1,0 +1,8 @@
+{
+  "name": "NoSmo — Без сигарет",
+  "description": "Енергоефективний трекер відмови від куріння з науковими шкалами регенерації та трекером стану.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

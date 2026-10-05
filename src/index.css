@@ -1,0 +1,2662 @@
+@import "tailwindcss";
+
+/* Global viewport boundary protection to prevent horizontal panning/misalignment */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Smooth Blur Sweep Animation for Timer Left-to-Right and Back */
+@keyframes blurSweep {
+  0% {
+    transform: translateX(-120%);
+    filter: blur(4px);
+    opacity: 0.2;
+  }
+  50% {
+    transform: translateX(180%);
+    filter: blur(2px);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateX(-120%);
+    filter: blur(4px);
+    opacity: 0.2;
+  }
+}
+
+.animate-blur-sweep {
+  animation: blurSweep 3.5s ease-in-out infinite;
+  will-change: transform, filter, opacity;
+}
+
+/* Seamless Marquee Ticker Animation */
+@keyframes marquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-100%, 0, 0);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 35s linear infinite;
+  will-change: transform;
+}
+
+/* Sequential Grey Blur Dissolve Animation for Sentient Dialogue Text */
+@keyframes blurSeepIn {
+  0% {
+    filter: blur(8px);
+    opacity: 0.2;
+    color: #64748b;
+  }
+  45% {
+    filter: blur(4px);
+    opacity: 0.65;
+    color: #94a3b8;
+  }
+  100% {
+    filter: blur(0px);
+    opacity: 1;
+    color: #94a3b8;
+  }
+}
+
+/* Smooth Hardware-Accelerated Ripple Animation for Section Headers & Chevrons */
+@keyframes sectionChevronBlurRipple {
+  0%, 100% {
+    transform: translateX(0px) translateZ(0);
+    opacity: 0.60;
+  }
+  50% {
+    transform: translateX(2px) translateZ(0);
+    opacity: 1;
+  }
+}
+
+@keyframes sectionHeaderTextBlurRipple {
+  0%, 100% {
+    opacity: 0.60;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.animate-section-chevron {
+  animation: sectionChevronBlurRipple 5.4s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.animate-section-header-text {
+  animation: sectionHeaderTextBlurRipple 5.4s ease-in-out infinite;
+  will-change: opacity;
+}
+
+.section-delay-0 { animation-delay: 0s; }
+.section-delay-1 { animation-delay: 1.05s; }
+.section-delay-2 { animation-delay: 2.1s; }
+.section-delay-3 { animation-delay: 3.15s; }
+.section-delay-4 { animation-delay: 4.2s; }
+
+/* Hide native scrollbars utility */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 180px;
+}
+
+.gpu-layer {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes breathing {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 4px rgba(30, 138, 105, 0.4));
+  }
+  50% {
+    transform: scale(1.02);
+    filter: drop-shadow(0 0 8px rgba(76, 201, 160, 0.6));
+  }
+}
+
+.animate-breathing {
+  animation: breathing 4s ease-in-out infinite;
+}
+
+@keyframes thoughtAmbientBreathe {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-1.2px) scale(1.004);
+  }
+}
+
+.animate-thought-breathe {
+  animation: thoughtAmbientBreathe 5.5s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  will-change: transform;
+}
+
+@keyframes thoughtDotWave {
+  0%, 100% {
+    transform: translateY(0px) scale(0.8);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translateY(-3.5px) scale(1.2);
+    opacity: 1;
+  }
+}
+
+.animate-thought-dot-1 {
+  animation: thoughtDotWave 1.0s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  animation-delay: 0s;
+}
+
+.animate-thought-dot-2 {
+  animation: thoughtDotWave 1.0s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  animation-delay: 0.2s;
+}
+
+.animate-thought-dot-3 {
+  animation: thoughtDotWave 1.0s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  animation-delay: 0.4s;
+}
+
+@keyframes pineCrownSway {
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(2.5deg);
+  }
+  75% {
+    transform: rotate(-2.5deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes pineMidSway {
+  0% {
+    transform: rotate(0deg);
+  }
+  30% {
+    transform: rotate(1.2deg);
+  }
+  70% {
+    transform: rotate(-1.2deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes breezeDrift {
+  0% {
+    transform: translateX(-10px);
+    opacity: 0;
+  }
+  40% {
+    opacity: 0.6;
+  }
+  80% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateX(30px);
+    opacity: 0;
+  }
+}
+
+.animate-pine-crown {
+  transform-origin: 60px 100px;
+  animation: pineCrownSway 4s ease-in-out infinite;
+}
+
+.animate-pine-mid {
+  transform-origin: 60px 100px;
+  animation: pineMidSway 5.5s ease-in-out infinite;
+}
+
+.animate-breeze {
+  animation: breezeDrift 3.5s ease-in-out infinite;
+}
+
+@keyframes wingFlapLeft {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-10deg) scaleY(0.92);
+  }
+}
+
+@keyframes wingFlapRight {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(10deg) scaleY(0.92);
+  }
+}
+
+@keyframes dragonFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-5px) rotate(0.8deg);
+  }
+}
+
+@keyframes starTwinkle {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+.animate-dragon-float {
+  animation: dragonFloat 4s ease-in-out infinite;
+}
+
+.animate-wing-left {
+  transform-origin: 50px 70px;
+  animation: wingFlapLeft 3.2s ease-in-out infinite;
+}
+
+.animate-wing-right {
+  transform-origin: 70px 70px;
+  animation: wingFlapRight 3.2s ease-in-out infinite;
+}
+
+.animate-star-twinkle {
+  animation: starTwinkle 2.5s ease-in-out infinite;
+}
+
+/* Feline Cat Eye Living Animation Keyframes */
+@keyframes catPupilBreathe {
+  0%, 100% {
+    transform: scaleX(1) scaleY(1);
+    opacity: 0.95;
+  }
+  35% {
+    transform: scaleX(2.6) scaleY(1.04);
+    opacity: 1;
+  }
+  70% {
+    transform: scaleX(0.7) scaleY(0.96);
+    opacity: 0.9;
+  }
+}
+
+@keyframes catIrisRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-cat-pupil-breathe {
+  transform-origin: center;
+  animation: catPupilBreathe 4.8s ease-in-out infinite;
+}
+
+.animate-cat-iris-rotate {
+  transform-origin: center;
+  animation: catIrisRotate 28s linear infinite;
+}
+
+/* Central Timer Bespoke Animation Keyframes */
+@keyframes timerColonPulse {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(0.92);
+    filter: drop-shadow(0 0 2px rgba(255, 253, 208, 0.4));
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.18);
+    filter: drop-shadow(0 0 8px rgba(255, 253, 208, 0.95)) drop-shadow(0 0 14px rgba(56, 189, 248, 0.7));
+  }
+}
+
+@keyframes timerOrbitRing {
+  0% {
+    transform: rotate(0deg) scale(1);
+    opacity: 0.4;
+  }
+  50% {
+    transform: rotate(180deg) scale(1.03);
+    opacity: 0.85;
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+    opacity: 0.4;
+  }
+}
+
+@keyframes timerDigitShimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.animate-timer-colon-pulse {
+  display: inline-block;
+  animation: timerColonPulse 1.4s ease-in-out infinite;
+}
+
+.animate-timer-orbit-ring {
+  animation: timerOrbitRing 12s linear infinite;
+}
+
+.animate-timer-shimmer {
+  background: linear-gradient(
+    110deg,
+    #fffdd0 0%,
+    #fef08a 25%,
+    #ffffff 50%,
+    #fef08a 75%,
+    #fffdd0 100%
+  );
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: timerDigitShimmer 5s linear infinite;
+}
+
+@keyframes tremorPulse {
+  0%, 100% {
+    transform: scale(1) translateY(0);
+    filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.3));
+  }
+  50% {
+    transform: scale(1.025) translateY(-1px);
+    filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.65));
+  }
+}
+
+@keyframes bellGentleSwing {
+  0% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(7deg);
+  }
+  45% {
+    transform: rotate(-5deg);
+  }
+  70% {
+    transform: rotate(2deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes zenStoneBreathe {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.25));
+  }
+  50% {
+    transform: scale(1.02);
+    filter: drop-shadow(0 12px 24px rgba(16, 185, 129, 0.25));
+  }
+}
+
+@keyframes zenWaterRippleSlow {
+  0% {
+    r: 25px;
+    opacity: 0.6;
+    stroke-width: 1.5;
+  }
+  100% {
+    r: 120px;
+    opacity: 0;
+    stroke-width: 0.5;
+  }
+}
+
+@keyframes zenGlowWarm {
+  0%, 100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+.animate-zen-stone {
+  transform-box: fill-box;
+  transform-origin: 50% 90%;
+  animation: zenStoneBreathe 6s ease-in-out infinite;
+}
+
+.animate-zen-ripple-1 {
+  animation: zenWaterRippleSlow 4s cubic-bezier(0.2, 0.6, 0.4, 1) infinite;
+}
+
+.animate-zen-ripple-2 {
+  animation: zenWaterRippleSlow 4s cubic-bezier(0.2, 0.6, 0.4, 1) infinite;
+  animation-delay: 2s;
+}
+
+.animate-zen-glow {
+  animation: zenGlowWarm 3.5s ease-in-out infinite;
+}
+
+/* Shimmer Progress Filling Animation */
+@keyframes shimmerProgress {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+@keyframes liquidFillFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes pulseFillShine {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.65;
+  }
+  100% {
+    transform: translateX(220%);
+    opacity: 0.2;
+  }
+}
+
+.animate-shimmer-progress {
+  animation: shimmerProgress 2.2s linear infinite;
+}
+
+.animate-fill-flow {
+  background-size: 200% 200%;
+  animation: liquidFillFlow 3s ease infinite;
+}
+
+.animate-fill-shine {
+  animation: pulseFillShine 2.4s ease-in-out infinite;
+}
+
+/* ========================================================================== */
+/* DYNAMIC DARK MODE GRADIENT BACKGROUNDS (ADAPTS TO SELECTED ACCENT)         */
+/* ========================================================================== */
+html.dark, html[data-theme="dark"] {
+  background: linear-gradient(145deg, #1c1e24 0%, #232730 50%, #14161c 100%);
+  color-scheme: dark;
+}
+
+html.dark[data-accent="gray"], html[data-theme="dark"][data-accent="gray"] {
+  background: linear-gradient(145deg, #1c1e24 0%, #232730 50%, #14161c 100%);
+}
+
+html.dark[data-accent="charcoal"], html[data-theme="dark"][data-accent="charcoal"] {
+  background: linear-gradient(145deg, #16171b 0%, #202227 50%, #0f1013 100%);
+}
+
+html.dark[data-accent="sage"], html[data-theme="dark"][data-accent="sage"] {
+  background: linear-gradient(145deg, #18221e 0%, #222e29 50%, #101614 100%);
+}
+
+html.dark[data-accent="taupe"], html[data-theme="dark"][data-accent="taupe"] {
+  background: linear-gradient(145deg, #201c19 0%, #2c2723 50%, #141210 100%);
+}
+
+html.dark[data-accent="slate-blue"], html[data-theme="dark"][data-accent="slate-blue"] {
+  background: linear-gradient(145deg, #181d29 0%, #21293a 50%, #0f121b 100%);
+}
+
+html.dark[data-accent="ash-olive"], html[data-theme="dark"][data-accent="ash-olive"] {
+  background: linear-gradient(145deg, #192018 0%, #242c23 50%, #111510 100%);
+}
+
+/* ========================================================================== */
+/* ТЕМА: ЕКО (ДУЖЕ ЧОРНА / TRUE BLACK OLED / ZERO ANIMATIONS)                 */
+/* ========================================================================== */
+html[data-app-theme="eco"],
+html[data-app-theme="eco"] body {
+  background-color: #000000 !important;
+  background-image: none !important;
+}
+
+html[data-app-theme="eco"] .dark\:bg-\[\#1c1c22\]\/95,
+html[data-app-theme="eco"] .dark\:bg-\[\#1c1c22\],
+html[data-app-theme="eco"] .dark\:bg-\[\#23232c\]\/80,
+html[data-app-theme="eco"] .dark\:bg-\[\#23232c\],
+html[data-app-theme="eco"] .dark\:bg-zinc-900,
+html[data-app-theme="eco"] .dark\:bg-zinc-900\/60,
+html[data-app-theme="eco"] .dark\:bg-zinc-900\/80,
+html[data-app-theme="eco"] .dark\:bg-zinc-900\/50,
+html[data-app-theme="eco"] .dark\:bg-zinc-950 {
+  background-color: #040405 !important;
+  border-color: #1a1a1f !important;
+}
+
+html[data-app-theme="eco"] .dark\:bg-zinc-800,
+html[data-app-theme="eco"] .dark\:bg-zinc-800\/80,
+html[data-app-theme="eco"] .dark\:bg-zinc-800\/90 {
+  background-color: #0c0c0f !important;
+  border-color: #222228 !important;
+}
+
+html[data-app-theme="eco"] .animate-pulse,
+html[data-app-theme="eco"] .animate-spin-slow,
+html[data-app-theme="eco"] .animate-breathing,
+html[data-app-theme="eco"] .animate-shimmer,
+html[data-app-theme="eco"] .animate-shimmer-progress,
+html[data-app-theme="eco"] .animate-fill-flow,
+html[data-app-theme="eco"] .animate-fill-shine,
+html[data-app-theme="eco"] .animate-breeze,
+html[data-app-theme="eco"] .animate-pine-crown,
+html[data-app-theme="eco"] .animate-pine-mid {
+  animation: none !important;
+}
+
+/* ========================================================================== */
+/* ТЕМА: СТАНДАРТНА БЕЗ АНІМАЦІЙ (MAX PERFORMANCE / ZERO ANIMATION OVERHEAD)  */
+/* ========================================================================== */
+html[data-app-theme="standard-static"],
+html[data-app-theme="standard-static"] body {
+  background: #090a0f !important;
+}
+
+html[data-app-theme="standard-static"] .animate-pulse,
+html[data-app-theme="standard-static"] .animate-spin-slow,
+html[data-app-theme="standard-static"] .animate-breathing,
+html[data-app-theme="standard-static"] .animate-shimmer,
+html[data-app-theme="standard-static"] .animate-shimmer-progress,
+html[data-app-theme="standard-static"] .animate-fill-flow,
+html[data-app-theme="standard-static"] .animate-fill-shine,
+html[data-app-theme="standard-static"] .animate-breeze,
+html[data-app-theme="standard-static"] .animate-pine-crown,
+html[data-app-theme="standard-static"] .animate-pine-mid {
+  animation: none !important;
+}
+
+body {
+  background-color: transparent;
+}
+
+/* ========================================================================== */
+/* FRAMELESS, RADIUS & LIQUID GLASS CUSTOM MODES                             */
+/* ========================================================================== */
+html[data-frameless="true"] .border,
+html[data-frameless="true"] [class*="border-[#"],
+html[data-frameless="true"] [class*="border-slate-"],
+html[data-frameless="true"] [class*="border-zinc-"],
+html[data-frameless="true"] [class*="border-emerald-"],
+html[data-frameless="true"] [class*="border-amber-"],
+html[data-frameless="true"] [class*="border-indigo-"],
+html[data-frameless="true"] [class*="border-sky-"],
+html[data-frameless="true"] [class*="border-rose-"] {
+  border-color: transparent !important;
+}
+
+html[data-frameless="true"] .shadow-xs,
+html[data-frameless="true"] .shadow-sm {
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Rounded Corner Variations */
+html[data-radius="sharp"] .rounded-2xl,
+html[data-radius="sharp"] .rounded-3xl,
+html[data-radius="sharp"] .rounded-xl {
+  border-radius: 8px !important;
+}
+
+html[data-radius="soft"] .rounded-2xl,
+html[data-radius="soft"] .rounded-3xl {
+  border-radius: 14px !important;
+}
+
+html[data-radius="standard"] .rounded-2xl {
+  border-radius: 20px !important;
+}
+
+html[data-radius="pill"] .rounded-2xl,
+html[data-radius="pill"] .rounded-3xl {
+  border-radius: 28px !important;
+}
+
+/* Liquid Glass Mode (Легке рідке скло) */
+html[data-glass="true"] .bg-white\/80,
+html[data-glass="true"] .bg-white\/90,
+html[data-glass="true"] .bg-white\/95 {
+  background-color: rgba(255, 255, 255, 0.72) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+}
+
+html.dark[data-glass="true"] [class*="dark:bg-\[#1c1c21\]"],
+html.dark[data-glass="true"] [class*="dark:bg-\[#202127\]"],
+html.dark[data-glass="true"] [class*="dark:bg-\[#18181b\]"],
+html.dark[data-glass="true"] .dark\:bg-zinc-900\/80,
+html.dark[data-glass="true"] .dark\:bg-zinc-900 {
+  background-color: rgba(30, 32, 40, 0.65) !important;
+  backdrop-filter: blur(20px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(190%) !important;
+  box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.08), 0 8px 32px 0 rgba(0, 0, 0, 0.25) !important;
+}
+
+/* ========================================================================== */
+/* THEME: ДРЕВНІЙ ПЕРГАМЕНТ (ANCIENT PARCHMENT FULL-APP THEME)                */
+/* ========================================================================== */
+@keyframes parchmentCandleGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 1px rgba(217, 119, 6, 0.15));
+  }
+  50% {
+    filter: drop-shadow(0 0 6px rgba(217, 119, 6, 0.35));
+  }
+}
+
+@keyframes parchmentWarmthPulse {
+  0%, 100% {
+    box-shadow: inset 0 0 10px rgba(139, 92, 26, 0.16), 0 4px 12px rgba(100, 65, 25, 0.12);
+  }
+  50% {
+    box-shadow: inset 0 0 18px rgba(197, 130, 37, 0.28), 0 6px 18px rgba(139, 92, 26, 0.18);
+  }
+}
+
+@keyframes scrollUnfurl {
+  from {
+    opacity: 0.94;
+    transform: translateY(2px) scale(0.998);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 1. Global Parchment Canvas & Typography */
+html[data-app-theme="parchment"],
+html[data-app-theme="parchment"] body {
+  background-color: #f4ebda !important;
+  background-image: 
+    radial-gradient(circle at 50% 12%, rgba(255, 253, 247, 0.95) 0%, rgba(246, 237, 219, 0.92) 50%, rgba(224, 207, 178, 0.97) 100%),
+    radial-gradient(rgba(139, 92, 26, 0.06) 1px, transparent 0) !important;
+  background-size: 100% 100%, 28px 28px !important;
+  background-attachment: fixed !important;
+  color: #3b2717 !important;
+  font-family: 'EB Garamond', 'Marcellus', Georgia, serif !important;
+  color-scheme: light !important;
+}
+
+/* 2. Headings & Titles in Ancient Epigraphic Serif */
+html[data-app-theme="parchment"] h1,
+html[data-app-theme="parchment"] h2,
+html[data-app-theme="parchment"] h3,
+html[data-app-theme="parchment"] h4,
+html[data-app-theme="parchment"] .font-extrabold,
+html[data-app-theme="parchment"] .font-bold {
+  font-family: 'Marcellus', 'Cinzel', 'EB Garamond', serif !important;
+  color: #2b180d !important;
+  letter-spacing: 0.015em;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+/* Handwritten calligraphic accents */
+html[data-app-theme="parchment"] .parchment-handwritten {
+  font-family: 'Caveat', cursive !important;
+}
+
+/* 3. Cards & Windows (Вікна та блоки) */
+html[data-app-theme="parchment"] .bg-white\/80,
+html[data-app-theme="parchment"] .bg-white\/90,
+html[data-app-theme="parchment"] .bg-white\/95,
+html[data-app-theme="parchment"] .bg-white,
+html[data-app-theme="parchment"] [class*="dark:bg-\[#1c1c21\]"],
+html[data-app-theme="parchment"] [class*="dark:bg-\[#202127\]"],
+html[data-app-theme="parchment"] [class*="dark:bg-\[#18181b\]"],
+html[data-app-theme="parchment"] [class*="dark:bg-\[#121212\]"],
+html[data-app-theme="parchment"] .dark\:bg-zinc-900\/80,
+html[data-app-theme="parchment"] .dark\:bg-zinc-900,
+html[data-app-theme="parchment"] .dark\:bg-zinc-800,
+html[data-app-theme="parchment"] .dark\:bg-slate-900 {
+  background-color: #fbf5e8 !important;
+  background-image: radial-gradient(rgba(255, 253, 247, 0.95) 20%, rgba(245, 234, 214, 0.9) 100%) !important;
+  box-shadow: inset 0 0 14px rgba(139, 92, 26, 0.14), 0 4px 18px rgba(100, 65, 25, 0.1) !important;
+  color: #3b2717 !important;
+  border-color: #c9af88 !important;
+  animation: scrollUnfurl 0.3s ease-out;
+}
+
+/* 4. Borders & Ornamental Edges (Рамки) */
+html[data-app-theme="parchment"]:not([data-frameless="true"]) .border,
+html[data-app-theme="parchment"]:not([data-frameless="true"]) [class*="border-[#"],
+html[data-app-theme="parchment"]:not([data-frameless="true"]) [class*="border-slate-"],
+html[data-app-theme="parchment"]:not([data-frameless="true"]) [class*="border-zinc-"] {
+  border-color: #c9af88 !important;
+}
+
+/* 5. Typography Colors & Iron Gall Ink */
+html[data-app-theme="parchment"] [class*="dark:text-[#f4f4f5]"],
+html[data-app-theme="parchment"] [class*="dark:text-white"],
+html[data-app-theme="parchment"] [class*="text-[#12302B]"],
+html[data-app-theme="parchment"] .text-slate-900,
+html[data-app-theme="parchment"] .text-slate-800 {
+  color: #2b180d !important;
+}
+
+html[data-app-theme="parchment"] [class*="dark:text-[#8FAAA3]"],
+html[data-app-theme="parchment"] [class*="dark:text-slate-400"],
+html[data-app-theme="parchment"] [class*="text-[#55726B]"],
+html[data-app-theme="parchment"] .text-slate-500,
+html[data-app-theme="parchment"] .text-slate-600 {
+  color: #5c432d !important;
+}
+
+/* 6. Buttons & Wax Seal Accents */
+html[data-app-theme="parchment"] .bg-emerald-600,
+html[data-app-theme="parchment"] .bg-emerald-500,
+html[data-app-theme="parchment"] [class*="bg-emerald-600"],
+html[data-app-theme="parchment"] button.bg-emerald-500 {
+  background-color: #9a3729 !important;
+  background-image: linear-gradient(135deg, #a73f30 0%, #882b1d 100%) !important;
+  color: #fdf8ee !important;
+  border-color: #7b2316 !important;
+  box-shadow: 0 3px 10px rgba(136, 43, 29, 0.28), inset 0 1px 1px rgba(255, 255, 255, 0.3) !important;
+}
+
+/* 7. Input fields and textareas */
+html[data-app-theme="parchment"] input,
+html[data-app-theme="parchment"] textarea,
+html[data-app-theme="parchment"] select {
+  background-color: #f7eedf !important;
+  border-color: #c9af88 !important;
+  color: #2b180d !important;
+  box-shadow: inset 0 1px 3px rgba(139, 92, 26, 0.12) !important;
+}
+
+/* 8. Bottom Navigation Bar in Parchment Theme */
+html[data-app-theme="parchment"] nav.fixed {
+  background-color: rgba(246, 238, 224, 0.97) !important;
+  background-image: radial-gradient(rgba(255, 253, 247, 0.8) 0%, rgba(243, 233, 214, 0.95) 100%) !important;
+  border-top-color: #cbb18a !important;
+  box-shadow: 0 -4px 22px rgba(100, 65, 25, 0.14) !important;
+}
+
+/* 9. Dial animation in Parchment Theme */
+html[data-app-theme="parchment"] .timer-parchment-box {
+  animation: parchmentWarmthPulse 4s infinite ease-in-out;
+}
+
+/* 10. MODERN THEME INDICATORS REDESIGN (Без рамок і поля, просто іконки і цифри) */
+html:not([data-app-theme="parchment"]) .indicators-container button,
+html:not([data-app-theme="parchment"]) .indicator-button {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 2px 6px !important;
+  border-radius: 8px !important;
+  font-weight: 700 !important;
+}
+
+html:not([data-app-theme="parchment"]) .indicators-container button:hover,
+html:not([data-app-theme="parchment"]) .indicator-button:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* 11. PARCHMENT THEME SIMPLIFIED MODE (Молочно-кремове тло всюди, читабельний текст, спрощений режим модалок/малюнків/індикаторів) */
+html[data-app-theme="parchment"],
+html[data-app-theme="parchment"] body,
+html[data-app-theme="parchment"] #root {
+  background-color: #faf6ee !important;
+  background-image: none !important;
+  color: #2b1a0e !important;
+}
+
+/* Parchment Modals Overlay & Card Simplified Mode */
+html[data-app-theme="parchment"] .fixed.inset-0 {
+  background-color: rgba(245, 238, 224, 0.88) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+html[data-app-theme="parchment"] [class*="bg-[#16161a]"],
+html[data-app-theme="parchment"] [class*="bg-[#1a1b23]"],
+html[data-app-theme="parchment"] [class*="bg-[#1c1c21]"],
+html[data-app-theme="parchment"] [class*="bg-[#202127]"],
+html[data-app-theme="parchment"] [class*="dark:bg-[#16161a]"],
+html[data-app-theme="parchment"] [class*="dark:bg-[#1c1c21]"] {
+  background-color: #fdfbf7 !important;
+  background-image: none !important;
+  border-color: #ded2be !important;
+  color: #2b1a0e !important;
+  box-shadow: 0 8px 24px rgba(70, 50, 20, 0.08) !important;
+}
+
+/* Parchment Simplified Mode for Indicators */
+html[data-app-theme="parchment"] .indicators-container button,
+html[data-app-theme="parchment"] .indicator-button {
+  background-color: #f6f0e2 !important;
+  border: 1px solid #dfd2bc !important;
+  color: #2b1a0e !important;
+  box-shadow: none !important;
+  font-weight: 700 !important;
+}
+
+/* Parchment Simplified Mode for Drawings, Canvas and Visual Elements */
+html[data-app-theme="parchment"] img,
+html[data-app-theme="parchment"] svg.illustration,
+html[data-app-theme="parchment"] .drawing-canvas {
+  filter: sepia(0.2) contrast(1.05) !important;
+  background-color: transparent !important;
+}
+
+/* Parchment High Contrast Typography */
+html[data-app-theme="parchment"] p,
+html[data-app-theme="parchment"] span,
+html[data-app-theme="parchment"] label,
+html[data-app-theme="parchment"] div {
+  color: inherit;
+}
+
+html[data-app-theme="parchment"] .text-white,
+html[data-app-theme="parchment"] .dark\:text-white,
+html[data-app-theme="parchment"] .text-zinc-200,
+html[data-app-theme="parchment"] .text-slate-100 {
+  color: #2b1a0e !important;
+}
+
+html[data-app-theme="parchment"] .text-zinc-400,
+html[data-app-theme="parchment"] .text-slate-400,
+html[data-app-theme="parchment"] .text-zinc-500 {
+  color: #786352 !important;
+}
+
+/* Popping Bubble Animation for Thought Pictogram Disappearance */
+@keyframes bubblePop {
+  0% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+    filter: brightness(1) drop-shadow(0 0 4px rgba(255, 253, 208, 0.4));
+  }
+  30% {
+    transform: scale(1.4) rotate(-8deg);
+    opacity: 1;
+    filter: brightness(1.6) drop-shadow(0 0 10px rgba(255, 253, 208, 0.85));
+  }
+  60% {
+    transform: scale(1.65) rotate(8deg);
+    opacity: 0.75;
+    filter: brightness(2) drop-shadow(0 0 14px rgba(255, 253, 208, 1));
+  }
+  100% {
+    transform: scale(0) rotate(15deg);
+    opacity: 0;
+    filter: brightness(2.5);
+  }
+}
+
+.animate-bubble-pop {
+  animation: bubblePop 0.42s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+  will-change: transform, opacity, filter;
+}
+
+/* ==========================================================================
+   20 DISTINCTIVE THEMED TIMER STYLES (DYNAMICALLY SWITCHABLE VIA LOCALSTORAGE)
+   ========================================================================== */
+
+/* 1. PIXEL ART (8-Bit Retro Arcade) */
+@keyframes pixelGlowPulse {
+  0%, 100% {
+    text-shadow: 0 0 4px #22c55e, 0 0 10px #16a34a, 2px 2px 0px #052e16;
+    transform: scale(1);
+  }
+  50% {
+    text-shadow: 0 0 8px #4ade80, 0 0 18px #22c55e, 2px 2px 0px #052e16;
+    transform: scale(1.01);
+  }
+}
+.timer-pixel-art {
+  font-family: 'Press Start 2P', 'Courier New', monospace, ui-monospace !important;
+  letter-spacing: 0.08em;
+  padding: 6px 14px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+  image-rendering: pixelated;
+}
+html.dark .timer-pixel-art {
+  background: #091a0f;
+  color: #4ade80;
+  border: 2px solid #22c55e;
+  box-shadow: inset 0 0 8px rgba(34, 197, 94, 0.4), 0 4px 14px rgba(0, 0, 0, 0.7);
+  animation: pixelGlowPulse 2.5s ease-in-out infinite;
+}
+html:not(.dark) .timer-pixel-art {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 2px solid #16a34a;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.2);
+  text-shadow: 1px 1px 0px #bbf7d0;
+}
+
+/* 2. CYBERPUNK (Glitch HUD & Chromatic Aberration) */
+@keyframes cyberpunkGlitch {
+  0%, 100% {
+    text-shadow: -2px 0 #00f0ff, 2px 0 #ff0055, 0 0 8px rgba(0, 240, 255, 0.6);
+  }
+  20% {
+    text-shadow: 2px -1px #00f0ff, -2px 1px #ff0055, 0 0 12px rgba(255, 0, 85, 0.8);
+  }
+  40% {
+    text-shadow: -1px 2px #00f0ff, 1px -2px #ff0055, 0 0 6px rgba(0, 240, 255, 0.5);
+  }
+  60% {
+    text-shadow: 2px 0 #00f0ff, -2px 0 #ff0055, 0 0 14px rgba(0, 240, 255, 0.7);
+  }
+  80% {
+    text-shadow: 0 0 8px #00f0ff, 0 0 12px #ff0055;
+  }
+}
+.timer-cyberpunk {
+  font-family: 'Orbitron', 'Rajdhani', monospace, sans-serif !important;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  padding: 6px 18px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+html.dark .timer-cyberpunk {
+  background: linear-gradient(135deg, rgba(8, 14, 28, 0.95) 0%, rgba(18, 10, 26, 0.95) 100%);
+  color: #00f0ff;
+  border: 1px solid #ff0055;
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.3), inset 0 0 10px rgba(255, 0, 85, 0.2);
+  animation: cyberpunkGlitch 4s infinite ease-in-out;
+}
+html:not(.dark) .timer-cyberpunk {
+  background: #0f172a;
+  color: #38bdf8;
+  border: 1px solid #0284c7;
+  text-shadow: 0 0 6px rgba(56, 189, 248, 0.6);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25);
+}
+
+/* 3. GOTHIC ROMANCE (Medieval Blackletter & Ruby Halo) */
+@keyframes gothicFlameGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 6px rgba(225, 29, 72, 0.5)) drop-shadow(0 0 12px rgba(136, 19, 55, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 12px rgba(244, 63, 94, 0.75)) drop-shadow(0 0 20px rgba(225, 29, 72, 0.5));
+  }
+}
+.timer-gothic {
+  font-family: 'UnifrakturMaguntia', 'Cinzel Decorative', 'EB Garamond', Georgia, serif !important;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  padding: 4px 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+}
+html.dark .timer-gothic {
+  background: radial-gradient(circle at center, #270914 0%, #120308 100%);
+  border: 1px solid rgba(225, 29, 72, 0.4);
+  color: #ffe4e6;
+  text-shadow: 0 0 10px rgba(244, 63, 94, 0.7), 0 2px 4px #000;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8), inset 0 0 12px rgba(225, 29, 72, 0.2);
+  animation: gothicFlameGlow 3.5s ease-in-out infinite;
+}
+html:not(.dark) .timer-gothic {
+  background: #fff1f2;
+  border: 1px solid #fda4af;
+  color: #881337;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+  box-shadow: 0 2px 8px rgba(136, 19, 55, 0.1);
+}
+
+/* 4. WATERCOLOR (Pastel Wash & Bleeding Pigment) */
+@keyframes watercolorShift {
+  0% { background-position: 0% 50%; filter: drop-shadow(0 0 8px rgba(236, 72, 153, 0.35)); }
+  50% { background-position: 100% 50%; filter: drop-shadow(0 0 12px rgba(147, 51, 234, 0.45)); }
+  100% { background-position: 0% 50%; filter: drop-shadow(0 0 8px rgba(236, 72, 153, 0.35)); }
+}
+.timer-watercolor {
+  font-family: 'Caveat', 'Playfair Display', cursive, serif !important;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  background-size: 250% 250%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+  display: inline-block;
+  animation: watercolorShift 7s ease-in-out infinite;
+}
+html.dark .timer-watercolor {
+  background-image: linear-gradient(120deg, #f472b6 0%, #c084fc 35%, #818cf8 70%, #38bdf8 100%);
+}
+html:not(.dark) .timer-watercolor {
+  background-image: linear-gradient(120deg, #db2777 0%, #9333ea 35%, #4f46e5 70%, #0284c7 100%);
+}
+
+/* 5. SWISS MINIMALIST (Clean Monospace High-Legibility) */
+.timer-minimalist {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+html.dark .timer-minimalist {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #f8fafc;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+html:not(.dark) .timer-minimalist {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #0f172a;
+}
+
+/* 6. ZEN BREATHE (5.5s Coherent Breathing) */
+@keyframes zenBreathPulse {
+  0%, 100% { transform: scale(1); opacity: 0.92; }
+  50% { transform: scale(1.035); opacity: 1; }
+}
+@keyframes zenBreathHaloDark {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(45, 212, 191, 0.35)) drop-shadow(0 0 16px rgba(20, 184, 166, 0.15)); }
+  50% { filter: drop-shadow(0 0 16px rgba(45, 212, 191, 0.75)) drop-shadow(0 0 32px rgba(20, 184, 166, 0.35)); }
+}
+@keyframes zenBreathHaloLight {
+  0%, 100% { filter: drop-shadow(0 1px 2px rgba(15, 23, 42, 0.08)) drop-shadow(0 0 8px rgba(13, 148, 136, 0.2)); }
+  50% { filter: drop-shadow(0 1px 3px rgba(15, 23, 42, 0.12)) drop-shadow(0 0 18px rgba(13, 148, 136, 0.45)); }
+}
+.timer-zen-breathe {
+  font-family: 'Marcellus', serif;
+  letter-spacing: 0.04em;
+}
+html.dark .timer-zen-breathe {
+  color: #ccfbf1;
+  text-shadow: 0 0 10px rgba(45, 212, 191, 0.55), 0 0 20px rgba(20, 184, 166, 0.3);
+  animation: zenBreathPulse 5.5s ease-in-out infinite, zenBreathHaloDark 5.5s ease-in-out infinite;
+}
+html:not(.dark) .timer-zen-breathe {
+  color: #042f2e;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+  animation: zenBreathPulse 5.5s ease-in-out infinite, zenBreathHaloLight 5.5s ease-in-out infinite;
+}
+
+/* 7. AURORA BOREALIS (Silk Animated Gradients) */
+@keyframes auroraGradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.timer-aurora {
+  font-family: 'Marcellus', serif;
+  letter-spacing: 0.04em;
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+  animation: auroraGradientShift 12s ease-in-out infinite;
+}
+html.dark .timer-aurora {
+  background-image: linear-gradient(135deg, #2dd4bf 0%, #38bdf8 25%, #818cf8 50%, #c084fc 75%, #2dd4bf 100%);
+  filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.4));
+}
+html:not(.dark) .timer-aurora {
+  background-image: linear-gradient(135deg, #0f766e 0%, #0369a1 25%, #4338ca 50%, #7e22ce 75%, #0f766e 100%);
+  filter: drop-shadow(0 1px 2px rgba(15, 23, 42, 0.12));
+}
+
+/* 8. NIXIE TUBE IN-14 (Gas Discharge Warm Tube) */
+@keyframes nixieFilamentFlicker {
+  0%, 100% { opacity: 0.96; filter: drop-shadow(0 0 6px #ff7b00) drop-shadow(0 0 16px #ff4800); }
+  35% { opacity: 0.99; filter: drop-shadow(0 0 8px #ff8800) drop-shadow(0 0 20px #ff3700); }
+  70% { opacity: 0.94; filter: drop-shadow(0 0 5px #ff6600) drop-shadow(0 0 14px #ff5500); }
+}
+.timer-nixie {
+  font-family: 'Courier New', monospace, ui-monospace !important;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  padding: 5px 14px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+html.dark .timer-nixie {
+  background: #150904;
+  color: #ff9d42;
+  border: 1px solid #7c2d12;
+  box-shadow: inset 0 0 12px rgba(255, 107, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.7);
+  animation: nixieFilamentFlicker 3s infinite ease-in-out;
+}
+html:not(.dark) .timer-nixie {
+  background: #fff7ed;
+  color: #c2410c;
+  border: 1px solid #fdba74;
+  box-shadow: 0 2px 8px rgba(194, 65, 12, 0.15);
+}
+
+/* 9. MATRIX TERMINAL (Green Phosphor Hacker CRT) */
+@keyframes matrixTerminalGlow {
+  0%, 100% { text-shadow: 0 0 4px #22c55e, 0 0 12px #15803d; }
+  50% { text-shadow: 0 0 8px #4ade80, 0 0 18px #16a34a; }
+}
+.timer-matrix {
+  font-family: 'Courier New', monospace, ui-monospace !important;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 4px 12px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+html.dark .timer-matrix {
+  background: #020f06;
+  color: #4ade80;
+  border: 1px solid #166534;
+  box-shadow: inset 0 0 8px rgba(34, 197, 94, 0.2), 0 4px 12px rgba(0, 0, 0, 0.6);
+  animation: matrixTerminalGlow 2s infinite ease-in-out;
+}
+html:not(.dark) .timer-matrix {
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #86efac;
+}
+
+/* 10. SYNTHWAVE 80s (Outrun Neon Sunset) */
+@keyframes synthwaveSunset {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px rgba(255, 0, 128, 0.6)) drop-shadow(0 0 18px rgba(121, 40, 202, 0.4));
+  }
+  50% {
+    filter: drop-shadow(0 0 14px rgba(255, 0, 128, 0.85)) drop-shadow(0 0 26px rgba(0, 240, 255, 0.5));
+  }
+}
+.timer-synthwave {
+  font-family: 'Orbitron', 'Rajdhani', sans-serif !important;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  background: linear-gradient(180deg, #ffe600 0%, #ff007f 55%, #7928ca 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+  display: inline-block;
+  animation: synthwaveSunset 3s ease-in-out infinite;
+}
+
+/* 11. PARCHMENT (Ancient Scribe Script) */
+@keyframes parchmentWarmthPulse {
+  0%, 100% { filter: drop-shadow(0 1px 2px rgba(92, 67, 45, 0.15)); }
+  50% { filter: drop-shadow(0 1px 4px rgba(92, 67, 45, 0.3)); }
+}
+.timer-parchment-box {
+  font-family: 'Marcellus', 'Cinzel', 'EB Garamond', serif !important;
+  letter-spacing: 0.05em;
+  padding: 4px 16px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+html.dark .timer-parchment-box {
+  background: #231911;
+  border: 1px solid #6b4d32;
+  color: #f3e5cb;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.06), 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+html:not(.dark) .timer-parchment-box {
+  background: #fbf5e8;
+  border: 1px solid #c9af88;
+  color: #3b2717;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.8), 0 2px 8px rgba(100, 65, 25, 0.1);
+  animation: parchmentWarmthPulse 4s infinite ease-in-out;
+}
+
+/* 12. NORDIC FROST (Sub-Zero Crystal Ice) */
+@keyframes frostGlint {
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(165, 243, 252, 0.4)) drop-shadow(0 0 14px rgba(125, 211, 252, 0.2)); }
+  50% { filter: drop-shadow(0 0 12px rgba(186, 230, 253, 0.75)) drop-shadow(0 0 24px rgba(56, 189, 248, 0.4)); }
+}
+.timer-nordic-frost-box {
+  font-family: 'Marcellus', serif !important;
+  letter-spacing: 0.06em;
+  padding: 4px 16px;
+  border-radius: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+html.dark .timer-nordic-frost-box {
+  background: rgba(14, 28, 44, 0.8);
+  border: 1px solid rgba(125, 211, 252, 0.35);
+  color: #e0f2fe;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 0 14px rgba(186, 230, 253, 0.15);
+  animation: frostGlint 4s infinite ease-in-out;
+}
+html:not(.dark) .timer-nordic-frost-box {
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  color: #0369a1;
+  box-shadow: 0 2px 10px rgba(3, 105, 161, 0.1);
+}
+
+/* 13. LEATHER & GOLD (Luxury 24K Foil Embossing) */
+.timer-leather-gold-box {
+  font-family: 'Marcellus', 'Cinzel', serif !important;
+  letter-spacing: 0.08em;
+  padding: 5px 18px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+html.dark .timer-leather-gold-box {
+  background: linear-gradient(145deg, #1c1511 0%, #110d0a 100%);
+  border: 1px solid #926938;
+  color: #f7d794;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9), 0 0 10px rgba(247, 215, 148, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7), inset 0 0 8px rgba(146, 105, 56, 0.25);
+}
+html:not(.dark) .timer-leather-gold-box {
+  background: #fdfaf3;
+  border: 1px solid #d4af37;
+  color: #8a6417;
+  box-shadow: 0 3px 12px rgba(138, 100, 23, 0.15);
+}
+
+/* 14. OBSIDIAN GLOW (Volcanic Violet Crystal Fire) */
+@keyframes obsidianCrystalGlow {
+  0%, 100% {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8), 0 0 12px rgba(168, 85, 247, 0.3);
+    text-shadow: 0 0 8px rgba(192, 132, 252, 0.6);
+  }
+  50% {
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.9), 0 0 22px rgba(168, 85, 247, 0.6);
+    text-shadow: 0 0 16px rgba(216, 180, 254, 0.9);
+  }
+}
+.timer-obsidian-glow-box {
+  font-family: 'Marcellus', serif !important;
+  letter-spacing: 0.07em;
+  padding: 5px 18px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+html.dark .timer-obsidian-glow-box {
+  background: #0f0c18;
+  border: 1px solid rgba(168, 85, 247, 0.45);
+  color: #f3e8ff;
+  animation: obsidianCrystalGlow 3.5s infinite ease-in-out;
+}
+html:not(.dark) .timer-obsidian-glow-box {
+  background: #faf5ff;
+  border: 1px solid #d8b4fe;
+  color: #6b21a8;
+}
+
+/* 15. EMERALD & GOLD (Imperial Crown Jeweled) */
+.timer-emerald-gold-box {
+  font-family: 'Marcellus', serif !important;
+  letter-spacing: 0.06em;
+  padding: 5px 18px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+html.dark .timer-emerald-gold-box {
+  background: radial-gradient(circle at center, #06241a 0%, #02120d 100%);
+  border: 1px solid #d4af37;
+  color: #fef08a;
+  text-shadow: 0 0 10px rgba(250, 204, 21, 0.5), 0 1px 3px #000;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7), inset 0 0 10px rgba(16, 185, 129, 0.2);
+}
+html:not(.dark) .timer-emerald-gold-box {
+  background: #f0fdf4;
+  border: 1px solid #ca8a04;
+  color: #14532d;
+  box-shadow: 0 2px 10px rgba(20, 83, 45, 0.15);
+}
+
+/* 16. MOONLIGHT (Silver Lunar Luminescence) */
+@keyframes moonlightBreathe {
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(186, 230, 253, 0.35)) drop-shadow(0 0 16px rgba(147, 197, 253, 0.15)); opacity: 0.94; }
+  50% { filter: drop-shadow(0 0 14px rgba(224, 242, 254, 0.7)) drop-shadow(0 0 28px rgba(186, 230, 253, 0.35)); opacity: 1; }
+}
+.timer-moonlight {
+  font-family: 'Marcellus', serif;
+  letter-spacing: 0.05em;
+}
+html.dark .timer-moonlight {
+  color: #f0f9ff;
+  text-shadow: 0 0 12px rgba(186, 230, 253, 0.6), 0 0 24px rgba(147, 197, 253, 0.35);
+  animation: moonlightBreathe 6s ease-in-out infinite;
+}
+html:not(.dark) .timer-moonlight {
+  color: #0c4a6e;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+}
+
+/* 17. KYOTO ROCK GARDEN (Wabi-Sabi Serenity) */
+.timer-kyoto-box {
+  font-family: 'Marcellus', serif;
+  letter-spacing: 0.08em;
+  padding: 4px 16px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+html.dark .timer-kyoto-box {
+  background: rgba(28, 25, 23, 0.7);
+  border: 1px solid rgba(168, 162, 158, 0.25);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 4px 16px rgba(0, 0, 0, 0.4);
+  color: #f5f5f4;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8), 0 0 14px rgba(214, 211, 209, 0.25);
+}
+html:not(.dark) .timer-kyoto-box {
+  background: rgba(250, 250, 249, 0.85);
+  border: 1px solid rgba(120, 113, 108, 0.25);
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.9), 0 2px 8px rgba(120, 113, 108, 0.12);
+  color: #1c1917;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.9);
+}
+
+/* 18. GOLDEN SANDGLASS (Hourglass Amber Shimmer) */
+@keyframes sandglassWarmth {
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.35)) drop-shadow(0 0 14px rgba(217, 119, 6, 0.15)); }
+  50% { filter: drop-shadow(0 0 14px rgba(252, 211, 77, 0.7)) drop-shadow(0 0 24px rgba(245, 158, 11, 0.35)); }
+}
+.timer-sandglass {
+  font-family: 'Marcellus', serif;
+  letter-spacing: 0.05em;
+}
+html.dark .timer-sandglass {
+  color: #fef3c7;
+  text-shadow: 0 0 10px rgba(245, 158, 11, 0.6), 0 0 20px rgba(217, 119, 6, 0.35);
+  animation: sandglassWarmth 5s ease-in-out infinite;
+}
+html:not(.dark) .timer-sandglass {
+  color: #78350f;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.9);
+}
+
+/* 19. COSMIC VOID (Deep Space Ultraviolet Stardust) */
+@keyframes cosmicStardustPulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.5)) drop-shadow(0 0 18px rgba(236, 72, 153, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 16px rgba(167, 139, 250, 0.8)) drop-shadow(0 0 28px rgba(244, 114, 182, 0.5));
+  }
+}
+.timer-cosmic-void {
+  font-family: 'Orbitron', 'Marcellus', sans-serif !important;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  background: linear-gradient(135deg, #c084fc 0%, #e879f9 40%, #818cf8 80%, #38bdf8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+  display: inline-block;
+  animation: cosmicStardustPulse 4s ease-in-out infinite;
+}
+
+/* 20. NEON PULSE (Electric Gas Discharge Tube) */
+@keyframes neonPulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(6, 182, 212, 0.4), inset 0 0 8px rgba(6, 182, 212, 0.2);
+    text-shadow: 0 0 6px #06b6d4, 0 0 14px #0891b2;
+  }
+  50% {
+    box-shadow: 0 0 22px rgba(6, 182, 212, 0.75), inset 0 0 14px rgba(6, 182, 212, 0.45);
+    text-shadow: 0 0 10px #22d3ee, 0 0 22px #06b6d4;
+  }
+}
+.timer-neon-pulse-box {
+  font-family: 'Orbitron', sans-serif !important;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 4px 16px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+html.dark .timer-neon-pulse-box {
+  background: #041217;
+  border: 1px solid #06b6d4;
+  color: #cffafe;
+  animation: neonPulseGlow 2.5s infinite ease-in-out;
+}
+html:not(.dark) .timer-neon-pulse-box {
+  background: #ecfeff;
+  border: 1px solid #06b6d4;
+  color: #0e7490;
+}
+
+/* 21. МІСТИЧНИЙ ТУМАН (Mystic Fog Digit Through Mist Animation) */
+@keyframes mysticFogDrift {
+  0%, 100% {
+    filter: drop-shadow(0 0 6px rgba(148, 163, 184, 0.45)) blur(0.4px);
+    opacity: 0.88;
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 16px rgba(203, 213, 225, 0.75)) blur(1.2px);
+    opacity: 1;
+    transform: translateY(-1px) scale(1.01);
+  }
+}
+.timer-mystic-fog {
+  font-family: 'Marcellus', serif !important;
+  letter-spacing: 0.08em;
+  padding: 4px 16px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+html.dark .timer-mystic-fog {
+  background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  color: #e2e8f0;
+  text-shadow: 0 0 12px rgba(203, 213, 225, 0.65), 0 0 24px rgba(100, 116, 139, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7), inset 0 0 16px rgba(148, 163, 184, 0.15);
+  animation: mysticFogDrift 4.5s ease-in-out infinite;
+}
+html:not(.dark) .timer-mystic-fog {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.1);
+  animation: mysticFogDrift 4.5s ease-in-out infinite;
+}
+
+/* 22. ЗОЛОТИЙ БЛИСК (Golden Shimmer) */
+@keyframes goldenShimmerAnim {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px rgba(234, 179, 8, 0.6));
+    transform: scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 18px rgba(250, 204, 21, 0.9));
+    transform: scale(1.02);
+  }
+}
+.timer-golden-shimmer {
+  font-family: 'Cinzel', 'Marcellus', serif !important;
+  letter-spacing: 0.08em;
+  padding: 4px 16px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1e1b4b 0%, #09090b 100%);
+  border: 1px solid rgba(234, 179, 8, 0.5);
+  color: #fde047;
+  text-shadow: 0 0 10px rgba(234, 179, 8, 0.6);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), inset 0 0 12px rgba(234, 179, 8, 0.2);
+  animation: goldenShimmerAnim 3s ease-in-out infinite;
+}
+
+/* 23. ЕЛЕКТРИЧНИЙ ШТОРМ (Electric Storm) */
+@keyframes electricStormAnim {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5), inset 0 0 8px rgba(147, 197, 253, 0.3);
+    border-color: rgba(59, 130, 246, 0.6);
+  }
+  25% {
+    box-shadow: 0 0 25px rgba(239, 68, 68, 0.8), inset 0 0 16px rgba(248, 113, 113, 0.5);
+    border-color: rgba(239, 68, 68, 0.8);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(56, 189, 248, 0.9), inset 0 0 18px rgba(186, 230, 253, 0.6);
+    border-color: rgba(56, 189, 248, 0.9);
+  }
+  75% {
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.7), inset 0 0 12px rgba(216, 180, 254, 0.4);
+    border-color: rgba(168, 85, 247, 0.7);
+  }
+}
+.timer-electric-storm {
+  font-family: 'Orbitron', monospace !important;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  padding: 4px 16px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #030712;
+  border: 1px solid #3b82f6;
+  color: #93c5fd;
+  text-shadow: 0 0 12px #3b82f6, 0 0 20px #60a5fa;
+  animation: electricStormAnim 2s infinite linear;
+}
+
+/* 24. ЛАВОВА ЛАМПА (Lava Lamp) */
+@keyframes lavaLampAnim {
+  0%, 100% {
+    border-radius: 16px 24px 16px 24px;
+    background: linear-gradient(135deg, #4c0519 0%, #701a75 50%, #312e81 100%);
+  }
+  50% {
+    border-radius: 24px 16px 24px 16px;
+    background: linear-gradient(135deg, #701a75 0%, #312e81 50%, #831843 100%);
+  }
+}
+.timer-lava-lamp {
+  font-family: 'Quicksand', sans-serif !important;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 6px 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fbcfe8;
+  text-shadow: 0 0 10px rgba(244, 114, 182, 0.8);
+  box-shadow: 0 6px 24px rgba(112, 26, 117, 0.5), inset 0 0 16px rgba(244, 114, 182, 0.3);
+  animation: lavaLampAnim 6s ease-in-out infinite;
+}
+
+/* 25. ГОЛОГРАФІЧНИЙ СКАНЕР (Hologram Glitch) */
+@keyframes hologramScan {
+  0%, 100% {
+    background-position: 0 0;
+    filter: drop-shadow(0 0 8px rgba(6, 182, 212, 0.6));
+  }
+  50% {
+    background-position: 0 100px;
+    filter: drop-shadow(0 0 16px rgba(52, 211, 153, 0.9));
+  }
+}
+.timer-hologram-glitch {
+  font-family: 'Share Tech Mono', monospace !important;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  padding: 4px 16px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(rgba(6, 182, 212, 0.15) 50%, rgba(0, 0, 0, 0.3) 50%), #022329;
+  background-size: 100% 4px;
+  border: 1px dashed #22d3ee;
+  color: #67e8f9;
+  text-shadow: 2px 0 #ef4444, -2px 0 #3b82f6, 0 0 10px #22d3ee;
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.4), inset 0 0 10px rgba(34, 211, 238, 0.3);
+  animation: hologramScan 3s linear infinite;
+}
+
+/* 26. КВАНТОВИЙ ПОРТАЛ (Quantum Portal) */
+@keyframes quantumVortex {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.5), 0 0 30px rgba(236, 72, 153, 0.3), inset 0 0 15px rgba(167, 139, 250, 0.4);
+    transform: rotate(0deg);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(236, 72, 153, 0.7), 0 0 45px rgba(139, 92, 246, 0.5), inset 0 0 25px rgba(244, 114, 182, 0.6);
+  }
+}
+.timer-quantum-portal {
+  font-family: 'Orbitron', sans-serif !important;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 4px 18px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, #2e1065 0%, #030712 100%);
+  border: 1px solid #a855f7;
+  color: #e9d5ff;
+  text-shadow: 0 0 10px #d8b4fe, 0 0 20px #c084fc;
+  animation: quantumVortex 4s ease-in-out infinite;
+}
+
+/* 27. ПАЛАЮЧА САКУРА (Cherry Blossom) */
+@keyframes cherryDrift {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    filter: drop-shadow(0 0 8px rgba(244, 114, 182, 0.5));
+  }
+  50% {
+    transform: translateY(-2px) scale(1.02);
+    filter: drop-shadow(0 0 16px rgba(251, 207, 232, 0.8));
+  }
+}
+.timer-cherry-blossom {
+  font-family: 'Caveat', cursive, serif !important;
+  font-size: 1.15em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 4px 16px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
+  border: 1px solid #fda4af;
+  color: #9f1239;
+  box-shadow: 0 4px 16px rgba(244, 114, 182, 0.25), inset 0 0 12px rgba(255, 255, 255, 0.8);
+  animation: cherryDrift 3.5s ease-in-out infinite;
+}
+html.dark .timer-cherry-blossom {
+  background: linear-gradient(135deg, #4c0519 0%, #1f1017 100%);
+  border: 1px solid rgba(244, 114, 182, 0.4);
+  color: #fbcfe8;
+  text-shadow: 0 0 10px rgba(244, 114, 182, 0.7);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), inset 0 0 14px rgba(244, 114, 182, 0.2);
+}
+
+/* 28. СОНЯЧНА КОРОНА (Solaris Flare) */
+@keyframes solarisPulse {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.6), inset 0 0 10px rgba(252, 211, 77, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 28px rgba(249, 115, 22, 0.9), inset 0 0 18px rgba(254, 240, 138, 0.7);
+  }
+}
+.timer-solaris-flare {
+  font-family: 'Marcellus', serif !important;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 4px 16px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #451a03 0%, #170f0c 100%);
+  border: 1px solid #f59e0b;
+  color: #fef08a;
+  text-shadow: 0 0 12px #f59e0b, 0 0 24px #d97706;
+  animation: solarisPulse 3s ease-in-out infinite;
+}
+
+/* 29. ПЕРЛИНА БЕЗОДНІ (Abyssal Pearl) */
+@keyframes abyssalShimmer {
+  0%, 100% {
+    background-position: 0% 50%;
+    filter: drop-shadow(0 0 10px rgba(45, 212, 191, 0.5));
+  }
+  50% {
+    background-position: 100% 50%;
+    filter: drop-shadow(0 0 20px rgba(129, 140, 248, 0.8));
+  }
+}
+.timer-abyssal-pearl {
+  font-family: 'Quicksand', sans-serif !important;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 4px 16px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(270deg, #042f2e, #1e1b4b, #082f49);
+  background-size: 200% 200%;
+  border: 1px solid rgba(45, 212, 191, 0.5);
+  color: #5eead4;
+  text-shadow: 0 0 10px rgba(94, 234, 212, 0.7);
+  box-shadow: 0 4px 20px rgba(2, 6, 23, 0.7), inset 0 0 14px rgba(45, 212, 191, 0.25);
+  animation: abyssalShimmer 5s ease infinite;
+}
+
+/* 30. ВОГОНЬ ФЕНІКСА (Phoenix Fire) */
+@keyframes phoenixFlame {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.7), inset 0 0 10px rgba(245, 158, 11, 0.5);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 26px rgba(249, 115, 22, 0.9), inset 0 0 18px rgba(239, 68, 68, 0.7);
+    transform: scale(1.015);
+  }
+}
+.timer-phoenix-fire {
+  font-family: 'Orbitron', sans-serif !important;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 4px 16px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #450a0a 0%, #180505 100%);
+  border: 1px solid #ef4444;
+  color: #fca5a5;
+  text-shadow: 0 0 10px #ef4444, 0 0 20px #f97316;
+  animation: phoenixFlame 2.2s ease-in-out infinite;
+}
+
+/* 31. КІБЕРНЕТИЧНА СІТКА (Neon Cybergrid) */
+@keyframes cybergridMove {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 30px 30px;
+  }
+}
+.timer-neon-cybergrid {
+  font-family: 'Orbitron', monospace !important;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  padding: 4px 16px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-image: linear-gradient(rgba(236, 72, 153, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(236, 72, 153, 0.15) 1px, transparent 1px), radial-gradient(circle, #0f051d 0%, #030712 100%);
+  background-size: 15px 15px, 15px 15px, 100% 100%;
+  border: 1px solid #ec4899;
+  color: #f472b6;
+  text-shadow: 0 0 10px #ec4899, 0 0 20px #8b5cf6;
+  box-shadow: 0 0 20px rgba(236, 72, 153, 0.4), inset 0 0 12px rgba(139, 92, 246, 0.3);
+  animation: cybergridMove 4s linear infinite;
+}
+
+/* 32. НЕОНОВА МАТРИЦЯ (Neon Matrix Pulse) */
+@keyframes matrixPulse {
+  0%, 100% { text-shadow: 0 0 8px #22c55e, 0 0 16px #15803d; }
+  50% { text-shadow: 0 0 16px #4ade80, 0 0 28px #22c55e; }
+}
+.timer-neon-matrix-pulse {
+  font-family: 'Share Tech Mono', monospace !important;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 4px 16px;
+  border-radius: 12px;
+  background: #022c14;
+  border: 1px solid #22c55e;
+  color: #4ade80;
+  box-shadow: 0 0 15px rgba(34, 197, 94, 0.4), inset 0 0 10px rgba(34, 197, 94, 0.2);
+  animation: matrixPulse 2.5s ease-in-out infinite;
+}
+
+/* 33. ГОЛОГРАФІЧНА АВРОРА (Holographic Aurora) */
+@keyframes holoAurora {
+  0%, 100% { filter: hue-rotate(0deg) drop-shadow(0 0 10px rgba(94, 234, 212, 0.6)); }
+  50% { filter: hue-rotate(60deg) drop-shadow(0 0 20px rgba(236, 72, 153, 0.7)); }
+}
+.timer-holographic-aurora {
+  font-family: 'Orbitron', sans-serif !important;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 4px 16px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #134e4a 0%, #3b0764 100%);
+  border: 1px solid #2dd4bf;
+  color: #99f6e4;
+  text-shadow: 0 0 12px #2dd4bf;
+  animation: holoAurora 4s ease-in-out infinite;
+}
+
+/* 34. БУРШТИНОВИЙ ІМПУЛЬС (Cyber Pulse Amber) */
+@keyframes amberPulse {
+  0%, 100% { box-shadow: 0 0 12px rgba(245, 158, 11, 0.5), inset 0 0 8px rgba(245, 158, 11, 0.3); }
+  50% { box-shadow: 0 0 24px rgba(251, 191, 36, 0.8), inset 0 0 16px rgba(251, 191, 36, 0.5); }
+}
+.timer-cyber-pulse-amber {
+  font-family: 'Marcellus', serif !important;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 4px 16px;
+  border-radius: 16px;
+  background: #1c1404;
+  border: 1px solid #f59e0b;
+  color: #fde68a;
+  text-shadow: 0 0 10px #f59e0b;
+  animation: amberPulse 3s ease-in-out infinite;
+}
+
+/* 35. КРИЖАНИЙ КРИСТАЛ (Crystal Frost) */
+@keyframes crystalShimmer {
+  0%, 100% { filter: drop-shadow(0 0 10px rgba(186, 230, 253, 0.6)); }
+  50% { filter: drop-shadow(0 0 20px rgba(224, 242, 254, 0.9)); }
+}
+.timer-crystal-frost {
+  font-family: 'Quicksand', sans-serif !important;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 4px 16px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #0c4a6e 0%, #082f49 100%);
+  border: 1px solid #38bdf8;
+  color: #e0f2fe;
+  text-shadow: 0 0 12px #38bdf8;
+  animation: crystalShimmer 3.5s ease-in-out infinite;
+}
+
+/* 36. ЗОРЯНА БУРЯ (Nebula Storm) */
+@keyframes nebulaDrift {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 12px rgba(168, 85, 247, 0.6)); }
+  50% { transform: scale(1.02); filter: drop-shadow(0 0 22px rgba(236, 72, 153, 0.8)); }
+}
+.timer-nebula-storm {
+  font-family: 'Orbitron', sans-serif !important;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 4px 16px;
+  border-radius: 16px;
+  background: radial-gradient(circle, #3b0764 0%, #030712 100%);
+  border: 1px solid #c084fc;
+  color: #f3e8ff;
+  text-shadow: 0 0 12px #c084fc;
+  animation: nebulaDrift 4s ease-in-out infinite;
+}
+
+/* 37. ОКСАМИТ ТА ЗОЛОТО (Velvet Gold) */
+.timer-velvet-gold {
+  font-family: 'Cinzel', serif !important;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 4px 16px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #180814 0%, #050204 100%);
+  border: 1px solid #d4af37;
+  color: #fef08a;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7), inset 0 0 12px rgba(212, 175, 55, 0.25);
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.6);
+}
+
+/* 38. ЗАХІДНИЙ ГОРИЗОНТ (Sunset Horizon) */
+.timer-sunset-horizon {
+  font-family: 'Marcellus', serif !important;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 4px 16px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #431407 0%, #581c87 100%);
+  border: 1px solid #fb923c;
+  color: #ffedd5;
+  text-shadow: 0 0 12px #fb923c;
+  box-shadow: 0 4px 20px rgba(67, 20, 7, 0.5);
+}
+
+/* 39. ЕЛЕКТРИЧНИЙ ФІОЛЕТ (Electric Violet) */
+@keyframes violetFlash {
+  0%, 100% { box-shadow: 0 0 12px rgba(168, 85, 247, 0.6); }
+  50% { box-shadow: 0 0 25px rgba(217, 70, 239, 0.9); }
+}
+.timer-electric-violet {
+  font-family: 'Orbitron', monospace !important;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  padding: 4px 16px;
+  border-radius: 16px;
+  background: #0f071f;
+  border: 1px solid #a855f7;
+  color: #e9d5ff;
+  text-shadow: 0 0 12px #a855f7, 0 0 24px #d946ef;
+  animation: violetFlash 2s ease-in-out infinite;
+}
+
+/* 40. СМАРАГДОВИЙ МАТРИКС (Emerald Matrix) */
+.timer-emerald-matrix {
+  font-family: 'Share Tech Mono', monospace !important;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 4px 16px;
+  border-radius: 14px;
+  background: #022c22;
+  border: 1px solid #10b981;
+  color: #6ee7b7;
+  text-shadow: 0 0 12px #10b981;
+  box-shadow: 0 0 18px rgba(16, 185, 129, 0.35);
+}
+
+/* 41. СОНЯЧНИЙ СПАЛАХ (Solar Flare Gold) */
+@keyframes solarFlash {
+  0%, 100% { filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.7)); }
+  50% { filter: drop-shadow(0 0 22px rgba(251, 191, 36, 1)); }
+}
+.timer-solar-flare-gold {
+  font-family: 'Cinzel', serif !important;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 4px 16px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #451a03 0%, #78350f 100%);
+  border: 1px solid #facc15;
+  color: #fef08a;
+  text-shadow: 0 0 14px #facc15, 0 0 28px #eab308;
+  animation: solarFlash 3s ease-in-out infinite;
+}
+
+/* Unconstrained floating text timer */
+.timer-unconstrained {
+  background: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* Custom Text Shadows and Glows for Unconstrained Floating Timers */
+.timer-unconstrained.timer-pixel-art {
+  color: #38bdf8 !important;
+  text-shadow: 0 0 8px #0284c7, 0 0 16px #0369a1 !important;
+}
+.timer-unconstrained.timer-cyberpunk {
+  color: #22d3ee !important;
+  text-shadow: 2px 2px #ec4899, -2px -2px #06b6d4, 0 0 12px rgba(34, 211, 238, 0.8) !important;
+}
+.timer-unconstrained.timer-gothic {
+  color: #fca5a5 !important;
+  text-shadow: 0 0 6px #ef4444, 0 0 15px #7f1d1d !important;
+}
+.timer-unconstrained.timer-watercolor {
+  color: #f472b6 !important;
+  text-shadow: 0 0 8px #c084fc, 0 0 16px rgba(236, 72, 153, 0.4) !important;
+}
+.timer-unconstrained.timer-minimalist {
+  color: inherit !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+}
+.timer-unconstrained.timer-zen-breathe {
+  color: #34d399 !important;
+  text-shadow: 0 0 10px #10b981, 0 0 20px #047857 !important;
+}
+.timer-unconstrained.timer-aurora {
+  color: #2dd4bf !important;
+  text-shadow: 0 0 12px #0d9488, 0 0 24px #6366f1, 0 0 36px #4f46e5 !important;
+}
+.timer-unconstrained.timer-nixie {
+  color: #ffedd5 !important;
+  text-shadow: 0 0 4px #f97316, 0 0 10px #ea580c, 0 0 20px #c2410c, 0 0 35px #7c2d12 !important;
+}
+.timer-unconstrained.timer-matrix {
+  color: #4ade80 !important;
+  text-shadow: 0 0 6px #22c55e, 0 0 14px #15803d, 0 0 24px #14532d !important;
+}
+.timer-unconstrained.timer-synthwave {
+  color: #f472b6 !important;
+  text-shadow: 0 0 8px #ec4899, 0 0 18px #a855f7, 0 0 28px #8b5cf6 !important;
+}
+.timer-unconstrained.timer-parchment-box {
+  color: #7c2d12 !important;
+  text-shadow: 0 1px 2px rgba(124, 45, 18, 0.2) !important;
+}
+.timer-unconstrained.timer-nordic-frost-box {
+  color: #e0f2fe !important;
+  text-shadow: 0 0 8px #38bdf8, 0 0 16px #0284c7 !important;
+}
+.timer-unconstrained.timer-leather-gold-box {
+  color: #fef08a !important;
+  text-shadow: 0 0 6px #eab308, 0 0 12px #ca8a04 !important;
+}
+.timer-unconstrained.timer-obsidian-glow-box {
+  color: #e9d5ff !important;
+  text-shadow: 0 0 10px #a855f7, 0 0 20px #6b21a8 !important;
+}
+.timer-unconstrained.timer-emerald-gold-box {
+  color: #a7f3d0 !important;
+  text-shadow: 0 0 8px #10b981, 0 0 16px #fbbf24 !important;
+}
+.timer-unconstrained.timer-moonlight {
+  color: #e0f2fe !important;
+  text-shadow: 0 0 8px #38bdf8, 0 0 20px #1d4ed8 !important;
+}
+.timer-unconstrained.timer-kyoto-box {
+  color: #d1fae5 !important;
+  text-shadow: 0 0 4px #10b981, 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+.timer-unconstrained.timer-sandglass {
+  color: #fef08a !important;
+  text-shadow: 0 0 8px #f59e0b, 0 0 18px #ca8a04 !important;
+}
+.timer-unconstrained.timer-cosmic-void {
+  color: #fdf4ff !important;
+  text-shadow: 0 0 10px #d946ef, 0 0 20px #8b5cf6, 0 0 30px #6366f1 !important;
+}
+.timer-unconstrained.timer-neon-pulse-box {
+  color: #cffafe !important;
+  text-shadow: 0 0 8px #06b6d4, 0 0 18px #0891b2, 0 0 28px #0e7490 !important;
+}
+.timer-unconstrained.timer-mystic-fog {
+  color: #f1f5f9 !important;
+  text-shadow: 0 0 8px #cbd5e1, 0 0 18px #94a3b8 !important;
+}
+.timer-unconstrained.timer-golden-shimmer {
+  color: #fef08a !important;
+  text-shadow: 0 0 8px #eab308, 0 0 18px #ca8a04, 0 0 28px #854d0e !important;
+}
+.timer-unconstrained.timer-electric-storm {
+  color: #e0f2fe !important;
+  text-shadow: 0 0 8px #3b82f6, 0 0 18px #06b6d4, 0 0 28px #6366f1 !important;
+}
+.timer-unconstrained.timer-lava-lamp {
+  color: #fbcfe8 !important;
+  text-shadow: 0 0 10px #ec4899, 0 0 20px #d946ef, 0 0 30px #818cf8 !important;
+}
+.timer-unconstrained.timer-hologram-glitch {
+  color: #67e8f9 !important;
+  text-shadow: 2px 0 #ef4444, -2px 0 #3b82f6, 0 0 12px #22d3ee !important;
+}
+.timer-unconstrained.timer-quantum-portal {
+  color: #f3e8ff !important;
+  text-shadow: 0 0 10px #a855f7, 0 0 20px #db2777, 0 0 30px #6366f1 !important;
+}
+.timer-unconstrained.timer-cherry-blossom {
+  color: #ffe4e6 !important;
+  text-shadow: 0 0 8px #f43f5e, 0 0 18px #fda4af !important;
+}
+.timer-unconstrained.timer-solaris-flare {
+  color: #fef08a !important;
+  text-shadow: 0 0 10px #f59e0b, 0 0 20px #ea580c, 0 0 30px #b45309 !important;
+}
+.timer-unconstrained.timer-abyssal-pearl {
+  color: #e0f2fe !important;
+  text-shadow: 0 0 8px #2dd4bf, 0 0 18px #6366f1, 0 0 28px #3b82f6 !important;
+}
+.timer-unconstrained.timer-phoenix-fire {
+  color: #fecaca !important;
+  text-shadow: 0 0 10px #ef4444, 0 0 20px #f97316, 0 0 30px #b91c1c !important;
+}
+.timer-unconstrained.timer-neon-cybergrid {
+  color: #fbcfe8 !important;
+  text-shadow: 0 0 8px #ec4899, 0 0 18px #8b5cf6, 0 0 28px #db2777 !important;
+}
+.timer-unconstrained.timer-neon-matrix-pulse {
+  color: #86efac !important;
+  text-shadow: 0 0 8px #22c55e, 0 0 18px #15803d, 0 0 28px #14532d !important;
+}
+.timer-unconstrained.timer-holographic-aurora {
+  color: #ccfbf1 !important;
+  text-shadow: 0 0 10px #2dd4bf, 0 0 20px #ec4899, 0 0 30px #a855f7 !important;
+}
+.timer-unconstrained.timer-cyber-pulse-amber {
+  color: #fef3c7 !important;
+  text-shadow: 0 0 8px #f59e0b, 0 0 18px #ca8a04, 0 0 28px #78350f !important;
+}
+.timer-unconstrained.timer-crystal-frost {
+  color: #f0f9ff !important;
+  text-shadow: 0 0 8px #38bdf8, 0 0 18px #0284c7 !important;
+}
+.timer-unconstrained.timer-nebula-storm {
+  color: #f5f3ff !important;
+  text-shadow: 0 0 10px #c084fc, 0 0 20px #ec4899, 0 0 30px #4f46e5 !important;
+}
+.timer-unconstrained.timer-velvet-gold {
+  color: #fef08a !important;
+  text-shadow: 0 0 8px #ca8a04, 0 0 18px #ca8a04 !important;
+}
+.timer-unconstrained.timer-sunset-horizon {
+  color: #ffedd5 !important;
+  text-shadow: 0 0 8px #f97316, 0 0 18px #8b5cf6 !important;
+}
+.timer-unconstrained.timer-electric-violet {
+  color: #f5f3ff !important;
+  text-shadow: 0 0 10px #a855f7, 0 0 20px #d946ef, 0 0 30px #6b21a8 !important;
+}
+.timer-unconstrained.timer-emerald-matrix {
+  color: #a7f3d0 !important;
+  text-shadow: 0 0 8px #10b981, 0 0 18px #047857 !important;
+}
+.timer-unconstrained.timer-solar-flare-gold {
+  color: #fef08a !important;
+  text-shadow: 0 0 12px #facc15, 0 0 22px #eab308, 0 0 32px #854d0e !important;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes smoothModalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-smoothModalSlideUp {
+  animation: smoothModalSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ==================== PULSING HALO & RIPPLE ANIMATIONS ==================== */
+@keyframes pulseHalo {
+  0%, 100% {
+    transform: scale(0.96);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.95;
+  }
+}
+
+@keyframes rippleHalo {
+  0% {
+    transform: scale(0.75);
+    opacity: 0.95;
+  }
+  100% {
+    transform: scale(1.42);
+    opacity: 0;
+  }
+}
+
+.animate-pulse-halo {
+  animation: pulseHalo 2.2s ease-in-out infinite;
+}
+
+.animate-ripple-halo {
+  animation: rippleHalo 1.9s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+
+
+
+/* 38. ГЛИБИНА ОКЕАНУ (Ocean Depth) */
+@keyframes oceanDepthGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 6px rgba(45, 212, 191, 0.4)) drop-shadow(0 0 16px rgba(14, 165, 233, 0.2));
+  }
+  50% {
+    filter: drop-shadow(0 0 12px rgba(94, 234, 212, 0.7)) drop-shadow(0 0 24px rgba(2, 132, 199, 0.4));
+  }
+}
+.timer-ocean-depth {
+  font-family: 'Marcellus', serif !important;
+  letter-spacing: 0.08em;
+  padding: 4px 16px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #082f49 0%, #0f172a 100%);
+  border: 1px solid rgba(45, 212, 191, 0.3);
+  color: #cffafe;
+  text-shadow: 0 0 10px rgba(45, 212, 191, 0.5), 0 0 20px rgba(14, 165, 233, 0.3);
+  animation: oceanDepthGlow 4s ease-in-out infinite;
+}
+
+/* Cascading Step-by-Step Defocus Animation for Pictograms (Подарунок, Блискавка, Крапля, Щит) */
+@keyframes pictogramDefocusCascade {
+  0%, 18% {
+    filter: blur(0px) brightness(1) drop-shadow(0 0 0 rgba(255, 253, 208, 0));
+    transform: scale(1);
+    opacity: 1;
+  }
+  25% {
+    filter: blur(1.5px) brightness(1.28) drop-shadow(0 0 7px rgba(255, 253, 208, 0.85));
+    transform: scale(1.12);
+    opacity: 0.95;
+  }
+  32% {
+    filter: blur(0.5px) brightness(1.1) drop-shadow(0 0 3px rgba(255, 253, 208, 0.6));
+    transform: scale(1.04);
+    opacity: 1;
+  }
+  38%, 100% {
+    filter: blur(0px) brightness(1) drop-shadow(0 0 0 rgba(255, 253, 208, 0));
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-pictogram-step-1 {
+  animation: pictogramDefocusCascade 8s ease-in-out infinite 0s;
+  transform-origin: center center;
+}
+
+.animate-pictogram-step-2 {
+  animation: pictogramDefocusCascade 8s ease-in-out infinite 2s;
+  transform-origin: center center;
+}
+
+.animate-pictogram-step-3 {
+  animation: pictogramDefocusCascade 8s ease-in-out infinite 4s;
+  transform-origin: center center;
+}
+
+.animate-pictogram-step-4 {
+  animation: pictogramDefocusCascade 8s ease-in-out infinite 6s;
+  transform-origin: center center;
+}
+
+@keyframes timerSubtlePulse {
+  0%, 100% {
+    opacity: 0.85;
+    filter: drop-shadow(0 0 6px rgba(255, 253, 208, 0.6));
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 12px rgba(255, 253, 208, 0.95));
+  }
+}
+
+.animate-timer-subtle-pulse {
+  animation: timerSubtlePulse 5s ease-in-out infinite;
+}
+
+@keyframes celestialGiftHarmonicFloatGlobal {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg) scale(0.96);
+    filter: drop-shadow(0 0 2px rgba(254, 240, 138, 0.8)) drop-shadow(0 0 5px rgba(245, 158, 11, 0.45));
+  }
+  25% {
+    transform: translateY(-2px) rotate(-4deg) scale(1.06);
+    filter: drop-shadow(0 0 5px #ffffff) drop-shadow(0 0 10px rgba(253, 224, 71, 0.95)) drop-shadow(0 0 14px rgba(56, 189, 248, 0.65));
+  }
+  50% {
+    transform: translateY(0px) rotate(0deg) scale(0.96);
+    filter: drop-shadow(0 0 2px rgba(254, 240, 138, 0.8)) drop-shadow(0 0 6px rgba(245, 158, 11, 0.5));
+  }
+  75% {
+    transform: translateY(-2px) rotate(4deg) scale(1.06);
+    filter: drop-shadow(0 0 5px #ffffff) drop-shadow(0 0 12px rgba(250, 204, 21, 0.95)) drop-shadow(0 0 15px rgba(245, 158, 11, 0.75));
+  }
+}
+
+.animate-celestial-gift {
+  animation: none !important;
+  transform: none !important;
+}
+
+.animate-celestial-lightning {
+  animation: none !important;
+  transform: none !important;
+}
+
+/* ==================== INTRO: ANALYZER SHELL GENESIS ANIMATION ==================== */
+@keyframes analyzerGenesisAura {
+  0% {
+    transform: scale(0.18) translateY(28px);
+    opacity: 0;
+    filter: blur(28px) brightness(2.2);
+  }
+  35% {
+    opacity: 0.85;
+    filter: blur(12px) brightness(1.6);
+  }
+  65% {
+    transform: scale(1.12) translateY(-4px);
+    opacity: 1;
+    filter: blur(3px) brightness(1.25);
+  }
+  85% {
+    transform: scale(0.97) translateY(1px);
+    filter: blur(0px) brightness(1.05);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+    filter: blur(0px) brightness(1);
+  }
+}
+
+@keyframes analyzerQuantumRipple {
+  0% {
+    transform: scale(0.25);
+    opacity: 0.95;
+    border-color: rgba(52, 211, 153, 0.9);
+    box-shadow: 0 0 45px rgba(52, 211, 153, 0.85), inset 0 0 30px rgba(56, 189, 248, 0.6);
+  }
+  50% {
+    opacity: 0.65;
+    border-color: rgba(56, 189, 248, 0.6);
+    box-shadow: 0 0 65px rgba(56, 189, 248, 0.6), inset 0 0 40px rgba(168, 85, 247, 0.4);
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+    border-color: rgba(168, 85, 247, 0);
+    box-shadow: 0 0 85px rgba(168, 85, 247, 0);
+  }
+}
+
+.animate-analyzer-genesis {
+  animation: analyzerGenesisAura 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity, filter;
+}
+
+.animate-analyzer-ripple {
+  animation: analyzerQuantumRipple 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  pointer-events: none;
+}
+
+/* Playful Sentient Chatter / Intro Speech Animation for Analyzer Shell */
+@keyframes shellIntroChatter {
+  0% {
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+  20% {
+    transform: translateY(-5px) scale(1.045) rotate(1.2deg);
+  }
+  40% {
+    transform: translateY(-1px) scale(0.985) rotate(-1deg);
+  }
+  60% {
+    transform: translateY(-6px) scale(1.035) rotate(0.9deg);
+  }
+  80% {
+    transform: translateY(-2px) scale(1.01) rotate(-0.5deg);
+  }
+  100% {
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+}
+
+.animate-shell-intro-chatter {
+  animation: shellIntroChatter 2.2s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+  will-change: transform;
+}
+
+/* ==================== AUTO-ECO / PERFORMANCE BOOST OVERRIDES ==================== */
+/* When Auto-Eco or Performance Boost is active, completely disable all blurs, backdrop-blurs, and animations */
+html[data-perf-boost="true"],
+html[data-economy="true"],
+html[data-auto-eco="true"],
+body[data-perf-boost="true"],
+body[data-economy="true"] {
+  --tw-backdrop-blur: none !important;
+  --tw-blur: none !important;
+}
+
+html[data-perf-boost="true"] *,
+html[data-economy="true"] *,
+html[data-auto-eco="true"] *,
+body[data-perf-boost="true"] *,
+body[data-economy="true"] * {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html[data-perf-boost="true"] [class*="blur-"],
+html[data-economy="true"] [class*="blur-"],
+html[data-auto-eco="true"] [class*="blur-"] {
+  filter: none !important;
+}
+
+/* 2. Disable all icon, pictogram, and halo animations */
+html[data-perf-boost="true"] .animate-pictogram-step-1,
+html[data-perf-boost="true"] .animate-pictogram-step-2,
+html[data-perf-boost="true"] .animate-pictogram-step-3,
+html[data-perf-boost="true"] .animate-pictogram-step-4,
+html[data-perf-boost="true"] .animate-pulse-halo,
+html[data-perf-boost="true"] .animate-ripple-halo,
+html[data-perf-boost="true"] .animate-timer-subtle-pulse,
+html[data-perf-boost="true"] .animate-pulse,
+html[data-perf-boost="true"] .animate-ping,
+html[data-perf-boost="true"] .animate-spin,
+html[data-perf-boost="true"] .animate-bounce,
+html[data-perf-boost="true"] .animate-dragon-float,
+html[data-perf-boost="true"] .animate-wing-left,
+html[data-perf-boost="true"] .animate-wing-right,
+html[data-perf-boost="true"] .animate-star-twinkle,
+html[data-perf-boost="true"] .animate-celestial-gift,
+html[data-perf-boost="true"] .animate-celestial-lightning,
+html[data-perf-boost="true"] .animate-celestial-star,
+html[data-perf-boost="true"] .animate-yinyang-spin,
+html[data-economy="true"] .animate-pictogram-step-1,
+html[data-economy="true"] .animate-pictogram-step-2,
+html[data-economy="true"] .animate-pictogram-step-3,
+html[data-economy="true"] .animate-pictogram-step-4,
+html[data-economy="true"] .animate-pulse-halo,
+html[data-economy="true"] .animate-ripple-halo,
+html[data-economy="true"] .animate-timer-subtle-pulse,
+html[data-economy="true"] .animate-pulse,
+html[data-economy="true"] .animate-ping,
+html[data-economy="true"] .animate-spin,
+html[data-economy="true"] .animate-bounce,
+html[data-economy="true"] .animate-dragon-float,
+html[data-economy="true"] .animate-wing-left,
+html[data-economy="true"] .animate-wing-right,
+html[data-economy="true"] .animate-star-twinkle,
+html[data-economy="true"] .animate-celestial-gift,
+html[data-economy="true"] .animate-celestial-lightning,
+html[data-economy="true"] .animate-celestial-star,
+html[data-economy="true"] .animate-yinyang-spin,
+html[data-auto-eco="true"] .animate-pictogram-step-1,
+html[data-auto-eco="true"] .animate-pictogram-step-2,
+html[data-auto-eco="true"] .animate-pictogram-step-3,
+html[data-auto-eco="true"] .animate-pictogram-step-4,
+html[data-auto-eco="true"] .animate-pulse-halo,
+html[data-auto-eco="true"] .animate-ripple-halo,
+html[data-auto-eco="true"] .animate-timer-subtle-pulse,
+html[data-auto-eco="true"] .animate-pulse,
+html[data-auto-eco="true"] .animate-ping,
+html[data-auto-eco="true"] .animate-spin,
+html[data-auto-eco="true"] .animate-bounce,
+html[data-auto-eco="true"] .animate-dragon-float,
+html[data-auto-eco="true"] .animate-wing-left,
+html[data-auto-eco="true"] .animate-wing-right,
+html[data-auto-eco="true"] .animate-star-twinkle,
+html[data-auto-eco="true"] .animate-celestial-gift,
+html[data-auto-eco="true"] .animate-celestial-lightning,
+html[data-auto-eco="true"] .animate-celestial-star,
+html[data-auto-eco="true"] .animate-yinyang-spin {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Minimalist Indicators override mode: removes shadows, glow, shimmer & heavy filters across main screen cards */
+html[data-minimal-indicators="true"] *,
+[data-minimal-indicators="true"] * {
+  box-shadow: none !important;
+  text-shadow: none !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+}
+
+html[data-minimal-indicators="true"] .animate-pulse,
+html[data-minimal-indicators="true"] .animate-shimmer,
+html[data-minimal-indicators="true"] .animate-glow,
+html[data-minimal-indicators="true"] .animate-blur-sweep,
+html[data-minimal-indicators="true"] .animate-section-chevron,
+html[data-minimal-indicators="true"] .animate-section-header-text,
+html[data-minimal-indicators="true"] .animate-spin,
+html[data-minimal-indicators="true"] .animate-bounce {
+  animation: none !important;
+}
+
+/* ==========================================================================
+   DYNAMIC STATS ILLUMINATION SYSTEM (ДИНАМІЧНЕ ОСВІТЛЕННЯ ПОКАЗНИКІВ)
+   ========================================================================== */
+
+@keyframes statDigitIgnite {
+  0% {
+    color: #ffffff;
+    filter: brightness(1.35);
+    text-shadow: 0 0 3px currentColor, 0 0 8px currentColor;
+    transform: translateY(-1px) scale(1.05);
+  }
+  25% {
+    color: #ffffff;
+    filter: brightness(1.2);
+    text-shadow: 0 0 4px currentColor, 0 0 10px currentColor;
+    transform: translateY(0) scale(1.02);
+  }
+  60% {
+    filter: brightness(1.1);
+    text-shadow: 0 0 4px currentColor;
+    transform: scale(1);
+  }
+  100% {
+    filter: brightness(1);
+    text-shadow: none;
+    transform: scale(1);
+  }
+}
+
+@keyframes statIconFlare {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  20% {
+    transform: scale(1.12);
+    filter: brightness(1.35) drop-shadow(0 0 6px currentColor);
+  }
+  55% {
+    transform: scale(1.04);
+    filter: brightness(1.15) drop-shadow(0 0 3px currentColor);
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1) drop-shadow(0 0 0 transparent);
+  }
+}
+
+@keyframes statLightSheen {
+  0% {
+    transform: translateX(-120%) skewX(-25deg);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.55;
+  }
+  100% {
+    transform: translateX(250%) skewX(-25deg);
+    opacity: 0;
+  }
+}
+
+@keyframes statFloatDelta {
+  0% {
+    opacity: 0;
+    transform: translateY(2px) scale(0.85);
+  }
+  20% {
+    opacity: 0.95;
+    transform: translateY(-3px) scale(1);
+  }
+  70% {
+    opacity: 0.85;
+    transform: translateY(-9px) scale(0.95);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-14px) scale(0.85);
+  }
+}
+
+@keyframes statAuraPulse {
+  0% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  25% {
+    opacity: 0.65;
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+.animate-stat-digit-ignite {
+  animation: statDigitIgnite 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  display: inline-block;
+  will-change: transform, filter, color, text-shadow;
+}
+
+.animate-stat-icon-flare {
+  animation: statIconFlare 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, filter;
+}
+
+.animate-stat-sheen {
+  animation: statLightSheen 0.85s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  pointer-events: none;
+}
+
+.animate-stat-delta {
+  animation: statFloatDelta 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  pointer-events: none;
+}
+
+.animate-stat-aura {
+  animation: statAuraPulse 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  pointer-events: none;
+}
+
+
+

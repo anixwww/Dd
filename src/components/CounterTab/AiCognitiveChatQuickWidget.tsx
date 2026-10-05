@@ -267,9 +267,8 @@ export const AiCognitiveChatQuickWidget: React.FC<AiCognitiveChatQuickWidgetProp
           <div className="min-w-0">
             <div className="text-xs font-bold text-zinc-200 group-hover:text-white flex items-center gap-1.5 transition-colors">
               <span>ШІ-Чат</span>
-              <span className="text-[8.5px] font-extrabold px-1.5 py-0.5 rounded-md border border-indigo-500/40 bg-indigo-500/20 text-indigo-200 font-mono tracking-wider uppercase flex items-center gap-1 shadow-[0_0_8px_rgba(99,102,241,0.25)]">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0 shadow-[0_0_5px_#34d399]" />
-                <span>LIVE AI</span>
+              <span className="text-[8px] font-bold px-1.5 py-0.2 rounded-md border border-zinc-800 bg-zinc-900/60 text-zinc-400 font-mono tracking-wider uppercase scale-90">
+                Чат
               </span>
             </div>
             <p className="text-[10px] text-zinc-400 truncate mt-0.5">

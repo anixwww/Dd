@@ -1601,10 +1601,15 @@ const CounterTabComponent: React.FC<CounterTabProps> = ({
 
   const [isSavedStatsExpanded, setIsSavedStatsExpanded] = React.useState<boolean>(false);
 
-  // Clear any legacy stale expanded state on mount so it never automatically pops open
+  // Clear any legacy stale expanded state on mount so it never automatically pops open, and restore main statistics view
   React.useEffect(() => {
     try {
       localStorage.removeItem('quit-smoking:saved-stats-expanded');
+      localStorage.setItem('quit-smoking:show-stats-widget-on-main', 'true');
+      localStorage.setItem('quit-smoking:everything-hidden', 'false');
+      setShowStatsWidgetOnMain(true);
+      setIsStatsMinimized(false);
+      setIsEverythingHidden(false);
     } catch {}
   }, []);
 
@@ -4100,10 +4105,7 @@ const CounterTabComponent: React.FC<CounterTabProps> = ({
             minutesPerCig={money?.minutesPerCig ?? 7}
             currency={money?.cur ?? '₴'}
             onOpenStatistics={() => {
-              if (onOpenOverlaySection) {
-                onOpenOverlaySection('statistics');
-              }
-              window.dispatchEvent(new CustomEvent('open-section-overlay', { detail: 'statistics' }));
+              setIsSavedStatsExpanded(true);
             }}
             onOpenTreeTip={() => setIsTreeTipOpen(true)}
           />
@@ -4557,6 +4559,75 @@ const CounterTabComponent: React.FC<CounterTabProps> = ({
             <div className="absolute w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full zen-star-pinpoint" />
           </div>
         </div>
+      )}
+
+      {/* Expanded Statistics & Calculator Parameters Modal */}
+      {isSavedStatsExpanded && typeof document !== 'undefined' && createPortal(
+        <div 
+          className="fixed inset-0 z-[500] flex items-center justify-center p-3.5 sm:p-4 bg-black/85 backdrop-blur-xl animate-in fade-in duration-200"
+          onClick={() => setIsSavedStatsExpanded(false)}
+        >
+          <div 
+            className="bg-[#0e0e14]/95 border border-zinc-800 rounded-3xl p-5 sm:p-6 w-full max-w-lg max-h-[86vh] sm:max-h-[88vh] flex flex-col shadow-2xl transition-all duration-200 animate-in fade-in zoom-in-95 origin-center overflow-hidden text-zinc-100 my-auto text-left"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between pb-3.5 border-b border-zinc-800/80 mb-3.5 shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                  <TrendingUp className="w-4 h-4" />
+                </div>
+                <div>
+                  <h2 className="text-base font-bold text-zinc-100 tracking-wide">
+                    Розширена статистика
+                  </h2>
+                  <p className="text-xs text-zinc-400">
+                    Калькулятор заощаджень та аналіз біо-маркерів
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setIsSavedStatsExpanded(false)}
+                  className="p-1.5 text-zinc-400 hover:text-white rounded-xl hover:bg-white/10 cursor-pointer transition-colors"
+                  title="Закрити"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+            {/* Body */}
+            <div className="overflow-y-auto flex-1 pr-1 custom-scrollbar pb-2">
+              <ExpandedSavedResourcesStats
+                totalSaved={totalSaved}
+                cigsAvoided={cigsAvoided}
+                diffMs={diffMs}
+                startDate={startDate}
+                streaks={streaks}
+                longestStreakMs={longestStreakMs}
+                money={money}
+                goals={goals}
+                onOpenGoalsModal={() => {
+                  setIsSavedStatsExpanded(false);
+                  setIsGoalModalOpen(true);
+                }}
+                onOpenTreeTip={() => setIsTreeTipOpen(true)}
+                onOpenSetup={() => {
+                  setIsSavedStatsExpanded(false);
+                  onOpenSetup?.();
+                }}
+                onOpenRelapse={() => {
+                  setIsSavedStatsExpanded(false);
+                  onOpenRelapse?.();
+                }}
+                onUndoLastRelapse={onUndoLastRelapse}
+                onUpdateMoney={onUpdateMoney}
+              />
+            </div>
+          </div>
+        </div>,
+        document.body
       )}
 
       {/* Saved Trees Ecological Tip Modal */}

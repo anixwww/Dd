@@ -97,15 +97,8 @@ export const MoreTab: React.FC<MoreTabProps> = ({
             <Settings className="w-4 h-4 text-zinc-400" />
           </div>
           <div className="text-xs text-zinc-400 space-y-1">
-            {(() => {
-              const m: any = activeMoney;
-              return (
-                <>
-                  <div>Сигарет на день: <span className="text-zinc-200 font-bold">{m?.cigsPerDay ?? m?.perDay ?? 20}</span></div>
-                  <div>Ціна пачки: <span className="text-zinc-200 font-bold">{m?.pricePerPack ?? m?.packPrice ?? 100} {m?.currency ?? m?.cur ?? '₴'}</span></div>
-                </>
-              );
-            })()}
+            <div>Сигарет на день: <span className="text-zinc-200 font-bold">{activeMoney.perDay || activeMoney.cigsPerDay || 20}</span></div>
+            <div>Ціна пачки: <span className="text-zinc-200 font-bold">{activeMoney.packPrice || activeMoney.pricePerPack || 100} {activeMoney.cur || activeMoney.currency || '₴'}</span></div>
           </div>
           <div className="flex gap-2 pt-1">
             <button

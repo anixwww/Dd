@@ -512,10 +512,10 @@ export const ExpandedSavedResourcesStats: React.FC<ExpandedSavedResourcesStatsPr
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              if ((window as any).__openSetupModal) {
-                (window as any).__openSetupModal();
-              } else if (onOpenSetup) {
+              if (onOpenSetup) {
                 onOpenSetup();
+              } else if ((window as any).__openSetupModal) {
+                (window as any).__openSetupModal();
               }
               window.dispatchEvent(new CustomEvent('open-setup-modal'));
             }}
@@ -524,15 +524,15 @@ export const ExpandedSavedResourcesStats: React.FC<ExpandedSavedResourcesStatsPr
             <MonoRefractedCalendarIcon className="w-3.5 h-3.5 text-indigo-300" />
             <span>Змінити дату</span>
           </button>
-
+ 
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              if ((window as any).__openRelapseModal) {
-                (window as any).__openRelapseModal();
-              } else if (onOpenRelapse) {
+              if (onOpenRelapse) {
                 onOpenRelapse();
+              } else if ((window as any).__openRelapseModal) {
+                (window as any).__openRelapseModal();
               }
               window.dispatchEvent(new CustomEvent('open-relapse-modal'));
             }}
@@ -542,16 +542,16 @@ export const ExpandedSavedResourcesStats: React.FC<ExpandedSavedResourcesStatsPr
             <span>Фіксація зриву</span>
           </button>
         </div>
-
+ 
         {streaks && streaks.length > 0 && (
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              if ((window as any).__undoLastRelapse) {
-                (window as any).__undoLastRelapse();
-              } else if (onUndoLastRelapse) {
+              if (onUndoLastRelapse) {
                 onUndoLastRelapse();
+              } else if ((window as any).__undoLastRelapse) {
+                (window as any).__undoLastRelapse();
               }
               window.dispatchEvent(new CustomEvent('undo-last-relapse'));
             }}

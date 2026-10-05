@@ -1,7 +1,7 @@
 import React from 'react';
 import { Moon, Clock, Sparkles } from 'lucide-react';
 
-export const SleepScheduleAnalytics: React.FC<any> = () => {
+export const SleepScheduleAnalytics: React.FC = () => {
   return (
     <div className="p-4 rounded-2xl bg-zinc-900/80 border border-zinc-800 space-y-2 text-white">
       <div className="flex items-center gap-2">

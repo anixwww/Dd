@@ -16,6 +16,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { MonoRefractedDropletsIcon } from './MonoRefractedSosIcons';
+import { useAiStatus, reportAiSuccess, reportAiQuotaLimit } from '../utils/aiStatusManager';
 
 export interface AiHealthAnalyzerProps {
   diffMs?: number;
@@ -48,6 +49,7 @@ export const AiHealthAnalyzer: React.FC<AiHealthAnalyzerProps> = ({
   onNavigateToHydration,
   embedded = false,
 }) => {
+  const { badgeText, badgeClasses, dotClasses, tooltipText } = useAiStatus();
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [focusMode, setFocusMode] = useState<'general' | 'urgent_craving' | 'hydration_detox' | 'sleep_recovery' | 'lungs_breathing'>('general');
@@ -347,13 +349,22 @@ export const AiHealthAnalyzer: React.FC<AiHealthAnalyzerProps> = ({
         })
       });
 
-      if (!res.ok) throw new Error('API response not ok');
+      if (!res.ok) {
+        reportAiQuotaLimit();
+        throw new Error('API response not ok');
+      }
       const data: AdviceResponse = await res.json();
       setAdviceData(data);
+      if (data.isLiveAi !== false) {
+        reportAiSuccess();
+      } else {
+        reportAiQuotaLimit();
+      }
       try {
         localStorage.setItem('quit-smoking:cached-ai-advice', JSON.stringify(data));
       } catch {}
     } catch (err) {
+      reportAiQuotaLimit();
       console.warn('Fallback analysis applied:', err);
       const isUrgent = telemetry.craving >= 4 || telemetry.anxiety >= 4;
       const isLowWater = telemetry.hydrationPct < 50;
@@ -540,8 +551,12 @@ export const AiHealthAnalyzer: React.FC<AiHealthAnalyzerProps> = ({
                   {analyzerName}
                 </h3>
                 <Edit3 className="w-3 h-3 text-zinc-500 group-hover:text-purple-400 shrink-0" />
-                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                  Gemini 3.8
+                <span 
+                  className={`text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded border flex items-center gap-1 shrink-0 ${badgeClasses}`}
+                  title={tooltipText}
+                >
+                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${dotClasses}`} />
+                  <span>{badgeText}</span>
                 </span>
               </div>
             )}

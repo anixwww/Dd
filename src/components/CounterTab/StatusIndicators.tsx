@@ -331,51 +331,6 @@ export const StatusIndicators: React.FC<StatusIndicatorsProps> = React.memo(({
         );
       })()}
 
-      {/* 2. БЛИСКАВКА: ШВИДКА ЦІЛЬ (стриманість до 24 год - показує % виконання) */}
-      {currentQuickGoalDocked && (() => {
-        let liveQuickData = quickGoalData;
-        try {
-          const savedQG = localStorage.getItem('quit-smoking:quick-goal');
-          if (savedQG) liveQuickData = JSON.parse(savedQG);
-        } catch {}
-
-        const hasQuickGoal = Boolean(liveQuickData && liveQuickData.targetTime && liveQuickData.targetTime > (liveQuickData.createdAt || 0));
-        let qgPct = 0;
-        if (hasQuickGoal) {
-          const isFailed = Boolean(startDate && startDate > liveQuickData.createdAt && !liveQuickData.isCompleted);
-          const isReached = quickGoalNow >= liveQuickData.targetTime;
-          if (!isFailed && !isReached) {
-            const totalDuration = liveQuickData.targetTime - liveQuickData.createdAt;
-            const elapsed = quickGoalNow - liveQuickData.createdAt;
-            qgPct = totalDuration > 0 ? Math.min(100, Math.max(0, Math.floor((elapsed / totalDuration) * 100))) : 0;
-          } else if (isReached || liveQuickData.isCompleted) { 
-            qgPct = 100; 
-          }
-        }
-
-        return (
-          <div 
-            onClick={(e) => {
-              e.stopPropagation();
-              window.dispatchEvent(new CustomEvent('open-quick-goal-modal'));
-            }}
-            className={itemClassName}
-            title={hasQuickGoal ? `Швидка ціль «${liveQuickData.title || ''}»: ${qgPct}%. Натисніть для деталей.` : 'Швидка ціль (1-24 год). Натисніть, щоб обрати стриманість та винагороду.'}
-          >
-            <div className={iconWrapperClassName}>
-              {iconStyle === 'sparkles' ? (
-                <Sparkle className="w-4 h-4 text-zinc-200 shrink-0 origin-center transition-transform duration-200 group-hover:scale-110" />
-              ) : (
-                <RefractedPrismLightningIcon className="w-4 h-4 shrink-0 origin-center transition-transform duration-200 group-hover:scale-110" />
-              )}
-            </div>
-            <span className={textClassName}>
-              {qgPct}%
-            </span>
-          </div>
-        );
-      })()}
-
       {/* 3. КРАПЛЯ: РЕГЕНЕРАЦІЯ СИСТЕМ (Крапля) */}
       {isBioPinned && (
         <div

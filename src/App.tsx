@@ -1709,7 +1709,7 @@ function AppContent() {
               disableBottomNavBlur ? 'backdrop-blur-none' : 'backdrop-blur-md'
             } transition-all duration-300 py-2 px-2.5 sm:px-3.5 rounded-2xl`}
           >
-            <div className="mx-auto grid grid-cols-4 text-center items-center gap-0.5 sm:gap-1.5 max-w-md w-full">
+            <div className="mx-auto grid grid-cols-2 text-center items-center gap-0.5 sm:gap-1.5 max-w-md w-full">
               {/* 1. Counter / Home */}
               <button
                 type="button"
@@ -1750,51 +1750,6 @@ function AppContent() {
                 </div>
                 <span className="leading-tight tracking-tight text-[10px] sm:text-[11px]">
                   Стан
-                </span>
-              </button>
-
-              {/* 3. SOS */}
-              <button
-                type="button"
-                id="nav-btn-sos"
-                onClick={() => {
-                  setActiveTab('sos');
-                  setIsSosTimerModalOpen(false);
-                  setIsNavVisibleOnTouch(true);
-                }}
-                className={`flex flex-col items-center justify-center rounded-xl cursor-pointer transition-all duration-300 py-1.5 px-1 sm:px-2 gap-0.5 ${
-                  activeTab === 'sos'
-                    ? `${getAccentTextClass(accent)} font-bold bg-white/5 dark:bg-white/[0.04]`
-                    : 'text-slate-500 dark:text-slate-400 font-medium hover:text-slate-700 dark:hover:text-slate-200'
-                }`}
-                aria-label="SOS"
-              >
-                <div className="flex items-center justify-center w-6 h-6">
-                  <NavSosIcon active={activeTab === 'sos'} className="w-5 h-5" />
-                </div>
-                <span className="leading-tight tracking-tight font-bold text-[10px] sm:text-[11px]">
-                  SOS
-                </span>
-              </button>
-
-              {/* 4. More */}
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveTab('more');
-                  setIsNavVisibleOnTouch(true);
-                }}
-                className={`flex flex-col items-center justify-center rounded-xl cursor-pointer transition-all duration-300 py-1.5 px-1 sm:px-2 gap-0.5 ${
-                  activeTab === 'more'
-                    ? `${getAccentTextClass(accent)} font-bold bg-white/5 dark:bg-white/[0.04]`
-                    : 'text-slate-500 dark:text-slate-400 font-medium hover:text-slate-700 dark:hover:text-slate-200'
-                }`}
-              >
-                <div className="flex items-center justify-center w-6 h-6">
-                  <NavMoreIcon active={activeTab === 'more'} className="w-5 h-5" />
-                </div>
-                <span className="leading-tight tracking-tight text-[10px] sm:text-[11px]">
-                  Ще
                 </span>
               </button>
             </div>

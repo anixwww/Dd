@@ -31,25 +31,10 @@ export const ToughestTimeWidgetTimer: React.FC<ToughestTimeWidgetTimerProps> = (
   const [isUrgeRunning, setIsUrgeRunning] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  // Update clock (pause when tab is hidden to save energy)
+  // Update clock
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (!document.hidden) {
-        setNow(Date.now());
-      }
-    }, 1000);
-
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        setNow(Date.now());
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => {
-      clearInterval(interval);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
+    const interval = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(interval);
   }, []);
 
   // Listen for open urge timer event

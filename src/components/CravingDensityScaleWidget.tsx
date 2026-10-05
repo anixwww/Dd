@@ -12,23 +12,8 @@ export const CravingDensityScaleWidget: React.FC<CravingDensityScaleWidgetProps>
 
   // Update time every 10 seconds for ultra-low battery consumption and smooth movement
   useEffect(() => {
-    const timer = setInterval(() => {
-      if (!document.hidden) {
-        setNow(Date.now());
-      }
-    }, 10000);
-
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        setNow(Date.now());
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => {
-      clearInterval(timer);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
+    const timer = setInterval(() => setNow(Date.now()), 10000);
+    return () => clearInterval(timer);
   }, []);
 
   // Helper to load all craving sources
@@ -393,27 +378,27 @@ export const CravingDensityScaleWidget: React.FC<CravingDensityScaleWidgetProps>
 
   /**
    * Top Header State Text (без символа кола):
-   * Відсутня тяга   — 0
-   * Низька тяга     — 0-3 (0 < x <= 3)
-   * Помірна тяга    — 3-5 (3 < x <= 5)
-   * Висока тяга     — 5-7 (5 < x <= 7)
-   * Небезпечна тяга — 7-10 (7 < x <= 10)
+   * Відсутня — 0
+   * Слабка   — 0-3 (0 < x <= 3)
+   * Помірна  — 3-5 (3 < x <= 5)
+   * Висока   — 5-7 (5 < x <= 7)
+   * Небезпечна — 7-10 (7 < x <= 10)
    */
   const intensityInfo = useMemo(() => {
     const d = currentDensity;
     if (d <= 0.1) {
-      return { label: 'Відсутня тяга', color: 'text-zinc-400' };
+      return { label: 'Відсутня', color: 'text-zinc-400' };
     }
     if (d <= 3.0) {
-      return { label: 'Низька тяга', color: 'text-emerald-400' };
+      return { label: 'Слабка', color: 'text-emerald-400' };
     }
     if (d <= 5.0) {
-      return { label: 'Помірна тяга', color: 'text-amber-300' };
+      return { label: 'Помірна', color: 'text-amber-300' };
     }
     if (d <= 7.0) {
-      return { label: 'Висока тяга', color: 'text-orange-400 font-bold' };
+      return { label: 'Висока', color: 'text-orange-400 font-bold' };
     }
-    return { label: 'Небезпечна тяга', color: 'text-rose-400 font-extrabold animate-pulse' };
+    return { label: 'Небезпечна', color: 'text-rose-400 font-extrabold animate-pulse' };
   }, [currentDensity]);
 
   /**
@@ -455,7 +440,7 @@ export const CravingDensityScaleWidget: React.FC<CravingDensityScaleWidgetProps>
       title={widgetTooltip}
     >
       <div 
-        className="flex flex-col justify-between bg-transparent border-0 shadow-none p-0 w-[78px] xs:w-[86px] sm:w-[96px] transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
+        className="flex flex-col justify-between bg-transparent border-0 shadow-none p-0 w-[68px] xs:w-[74px] sm:w-[80px] transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
       >
         {/* Top Header Row - Інтенсивність поточного стану (без символа кола) */}
         <div className="flex items-center justify-center mb-0.5 min-h-[16px]">

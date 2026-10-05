@@ -87,7 +87,7 @@ const StateDynamicsChartComponent: React.FC<StateDynamicsChartProps> = ({
         displayLabel = `${monthOnly}`;
       }
 
-      const surveys = (dayRating as any)?.surveys || (dayRating as any)?.entries || [];
+      const surveys = dayRating?.surveys || dayRating?.entries || [];
       const hasSurveys = surveys.length > 0;
 
       let daySlices: any[] = [];
@@ -155,23 +155,22 @@ const StateDynamicsChartComponent: React.FC<StateDynamicsChartProps> = ({
         return count > 0 ? Number((sum / count).toFixed(1)) : null;
       };
 
-      const dRating: any = dayRating;
-      const cravingVal = calcAvg('craving') ?? dRating?.craving ?? dRating?.cravingLevel ?? null;
+      const cravingVal = calcAvg('craving') ?? dayRating?.craving ?? null;
       const energyVal = calcAvg('energy') ?? null;
-      const calmnessVal = calcAvg('balance') ?? calcAvg('mood') ?? dRating?.mood ?? dRating?.moodLevel ?? null;
+      const calmnessVal = calcAvg('balance') ?? calcAvg('mood') ?? dayRating?.mood ?? null;
       const focusVal = calcAvg('focus') ?? null;
 
-      const sleepHours = dRating?.sleep?.hours ?? null;
-      const mealsCount = dRating?.meals?.length ?? 0;
-      const drinksCount = dRating?.drinks?.length ?? 0;
+      const sleepHours = dayRating?.sleep?.hours ?? null;
+      const mealsCount = dayRating?.meals?.length ?? 0;
+      const drinksCount = dayRating?.drinks?.length ?? 0;
 
       const sexEntries = surveys.filter(
-        (s: any) => s.id?.startsWith('sex_') || s.note?.includes('Секс') || s.note?.includes('Близькість')
+        (s) => s.id?.startsWith('sex_') || s.note?.includes('Секс') || s.note?.includes('Близькість')
       );
       const sexCount = sexEntries.length > 0 ? sexEntries.length : null;
 
       const totalCheckinsCount = Math.max(surveys.length, daySlices.length, checkinEntries.length);
-      const hasAnyData = hasSurveys || daySlices.length > 0 || checkinEntries.length > 0 || dRating?.sleep || mealsCount > 0 || drinksCount > 0 || cravingVal !== null;
+      const hasAnyData = hasSurveys || daySlices.length > 0 || checkinEntries.length > 0 || dayRating?.sleep || mealsCount > 0 || drinksCount > 0 || cravingVal !== null;
 
       points.push({
         dateKey,

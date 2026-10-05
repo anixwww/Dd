@@ -168,9 +168,8 @@ export const AiQuickAdviceWidget: React.FC<AiQuickAdviceWidgetProps> = ({
             <div className="min-w-0">
               <div className="text-xs font-bold text-zinc-200 group-hover:text-white flex items-center gap-1.5 transition-colors">
                 <span>ШІ-Аналіз</span>
-                <span className="text-[8.5px] font-extrabold px-1.5 py-0.5 rounded-md border border-purple-500/40 bg-purple-500/20 text-purple-200 font-mono tracking-wider uppercase flex items-center gap-1 shadow-[0_0_8px_rgba(168,85,247,0.25)]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0 shadow-[0_0_5px_#34d399]" />
-                  <span>GEMINI AI</span>
+                <span className="text-[8px] font-bold px-1.5 py-0.2 rounded-md border border-zinc-800 bg-zinc-900/60 text-zinc-400 font-mono tracking-wider uppercase scale-90">
+                  Gemini
                 </span>
               </div>
               <p className="text-[10px] text-zinc-400 truncate mt-0.5">
@@ -261,16 +260,32 @@ export const AiQuickAdviceWidget: React.FC<AiQuickAdviceWidgetProps> = ({
           </div>
 
           {/* Quick Actions Footer */}
-          {!isLoading && onOpenFullAnalyzer && (
-            <div className="flex items-center justify-end gap-2 pt-1 border-t border-white/5 text-[11px]">
+          {!isLoading && (
+            <div className="flex items-center justify-between gap-2 pt-1 border-t border-white/5 text-[11px]">
               <button
                 type="button"
-                onClick={onOpenFullAnalyzer}
-                className="text-purple-300 hover:text-purple-200 font-bold flex items-center gap-1 hover:underline cursor-pointer transition-colors"
+                onClick={handleAddWater}
+                disabled={quickActionDone}
+                className={`px-2.5 py-1 rounded-lg text-[10.5px] font-semibold flex items-center gap-1 transition-all cursor-pointer border ${
+                  quickActionDone
+                    ? 'bg-cyan-500/20 border-cyan-500/40 text-cyan-200'
+                    : 'bg-white/5 border-white/10 text-cyan-300 hover:bg-cyan-500/15 hover:border-cyan-500/30'
+                }`}
               >
-                <span>Детальніше</span>
-                <ChevronRight className="w-3 h-3" />
+                {quickActionDone ? <Check className="w-3 h-3 text-cyan-300" /> : <Droplets className="w-3 h-3 text-cyan-400" />}
+                <span>{quickActionDone ? '+250 мл додано' : '+250 мл води'}</span>
               </button>
+
+              {onOpenFullAnalyzer && (
+                <button
+                  type="button"
+                  onClick={onOpenFullAnalyzer}
+                  className="text-purple-300 hover:text-purple-200 font-bold flex items-center gap-1 hover:underline cursor-pointer transition-colors ml-auto"
+                >
+                  <span>Детальніше</span>
+                  <ChevronRight className="w-3 h-3" />
+                </button>
+              )}
             </div>
           )}
         </div>
